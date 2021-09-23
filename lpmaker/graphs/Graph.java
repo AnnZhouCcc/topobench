@@ -49,7 +49,7 @@ public class Graph
 	//default number of hosts associated to each node in the graph
 	public static final int DEFAULT_NO_HOSTS = 1;
 
-	int[][] switchLevelMatrix;
+	double[][] switchLevelMatrix;
 	int nCommodities;
 
 	protected boolean[] isSwitch;
@@ -72,7 +72,7 @@ public class Graph
 		allocateAdjacencyList();
 		setUpFixWeight(DEFAULT_NO_HOSTS);
 		setUpAllSwitches();
-		switchLevelMatrix = new int[noNodes][noNodes];
+		switchLevelMatrix = new double[noNodes][noNodes];
 	}
 
 	public Graph(int size, int noHosts)
@@ -84,7 +84,7 @@ public class Graph
 		allocateAdjacencyList();
 		setUpFixWeight(noHosts);
 		setUpAllSwitches();
-		switchLevelMatrix = new int[noNodes][noNodes];
+		switchLevelMatrix = new double[noNodes][noNodes];
 	}
 
 	public void randomConstructorPerms(Vector<Integer> in_set, Vector<Integer> in_degrees, int cap)
@@ -933,11 +933,25 @@ public class Graph
 
 			// traffic-mode: 0 = randPerm; 1 = all-all; 2 = all-to-one; Any higher n means stride(n)
 			ArrayList<TrafficPair> rndmap;
-			if (trafficmode == 0) rndmap = RandomPermutationPairs(svrs);
-			else if (trafficmode == 1) rndmap = TrafficGenAllAll();
-			else if (trafficmode == 2) rndmap = TrafficGenAllToOne();
-			else if (trafficmode == 4) { rndmap = MaxWeightPairs("maxWeightMatch.txt");System.out.println("*******MAX-WEIGHT-MATCHING************");}
-			else rndmap = TrafficGenStride(trafficmode);
+			if (trafficmode == 0) {
+				rndmap = RandomPermutationPairs(svrs);
+			}
+			else if (trafficmode == 1) {
+				rndmap = TrafficGenAllAll();
+			}
+			else if (trafficmode == 2) {
+				rndmap = TrafficGenAllToOne();
+			}
+			else if (trafficmode == 3) {
+				rndmap = TrafficGenStride(trafficmode);
+			}
+			else if (trafficmode == 4) {
+				rndmap = MaxWeightPairs("maxWeightMatch.txt");System.out.println("*******MAX-WEIGHT-MATCHING************");
+			}
+			else {
+				System.out.println("Trafficmode is not recognized.");
+				rndmap = RandomPermutationPairs(svrs);
+			}
 			
 			FileWriter fstream = new FileWriter(filename);
 			BufferedWriter out = new BufferedWriter(fstream);
@@ -961,6 +975,7 @@ public class Graph
 				}
 			}
 
+			double trafficPerFlow = 0.05; // 1/20
 			for (int i = 0; i < rndmap.size(); i++) {
 				int from = rndmap.get(i).from;
 				int to=rndmap.get(i).to;
@@ -971,7 +986,7 @@ public class Graph
 				// I'm counting only number of connections
 				if (fromsw == tosw) continue;
 				if (switchLevelMatrix[fromsw][tosw] == 0) nCommodities ++;
-				switchLevelMatrix[fromsw][tosw] ++;
+				switchLevelMatrix[fromsw][tosw] += trafficPerFlow;
 			}
 
 
@@ -1361,7 +1376,7 @@ public class Graph
 			out.write("\n\\Type 2: Flow conservation at node\n");
 			System.out.println(new Date() + ": Starting part 2");
 
-                        for(int i=0; i<noNodes; i++){
+			for(int i=0; i<noNodes; i++){
 				for(int k=0; k<noNodes; k++){
 					if (i!=k){
 						constraint = "c3_" + i + "_" + k + ": ";
@@ -1370,13 +1385,13 @@ public class Graph
 					
 						}
 
-	                                	for(int j=0; j<adjacencyList[i].size(); j++){
+						for(int j=0; j<adjacencyList[i].size(); j++){
 							constraint += " + l_" + adjacencyList[i].elementAt(j).intValue() +"_" + i +"_" + k + " ";		
 						}
 	
-	                                        for(int j=0; j<adjacencyList[i].size(); j++){
-        	                                        constraint += " - l_" + i +"_" + adjacencyList[i].elementAt(j).intValue() +"_" + k + " ";              
-                	                        }
+						for(int j=0; j<adjacencyList[i].size(); j++){
+								constraint += " - l_" + i +"_" + adjacencyList[i].elementAt(j).intValue() +"_" + k + " ";
+						}
 
 						constraint+= " = 0\n";
 						out.write(constraint);
@@ -1389,11 +1404,11 @@ public class Graph
 							}
 						}
 	
-	                                        for(int j=0; j<adjacencyList[i].size(); j++){
-        	                                        constraint += " + l_" + adjacencyList[i].elementAt(j).intValue() +"_" + i +"_" + i + " ";      
-                	                        }
-                                                constraint+= " = 0\n";
-                                                out.write(constraint);
+						for(int j=0; j<adjacencyList[i].size(); j++){
+								constraint += " + l_" + adjacencyList[i].elementAt(j).intValue() +"_" + i +"_" + i + " ";
+						}
+						constraint+= " = 0\n";
+						out.write(constraint);
 						
 					}
 				}

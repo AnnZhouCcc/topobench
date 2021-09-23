@@ -44,7 +44,7 @@ public class ProduceLP {
 		switches = Integer.parseInt(args[4]);
 		switchports = Integer.parseInt(args[5]);
 		serverports = switchports - Integer.parseInt(args[6]);	// Pay attention to the arguments here!
-		extended_switches = Integer.parseInt(args[7]);		
+		extended_switches = Integer.parseInt(args[7]);
 		nsvrs = Integer.parseInt(args[8]);
 		double fail_rate = Double.parseDouble(args[9]);
 
@@ -421,6 +421,38 @@ public class ProduceLP {
                                 mynet.PrintGraphforMCFFairCondensed("my." + runs + ".lp", trafficMode, 100);
                         }
 			mynet.printPathLengths("pl." + runs);
+		}
+		else if (graphtype == 23){ // Read graph from file, print linear program for both that graph, and equivalent random graph for comparison; graph file has lines of type "<source switch>-><destination switch>"
+			String graph_file = args[2];
+
+			Graph mynet = new GraphFromFileSrcDstPair(switches, graph_file, switchports);
+			if (createLP == 1) {
+				if (trafficMode == 0) {
+					mynet.PrintGraphforMCFFairCondensed("my." + runs + ".lp", trafficMode, 100);
+				} else if (trafficMode == 1) {
+					mynet.PrintSimpleGraph("my." + runs + ".lp", trafficMode);
+				}
+			} else {
+				System.out.println("createLP != 1. Not implemented yet.");
+			}
+
+//			int[] degreeDist = new int[mynet.noNodes];
+//			for (int sw = 0; sw < mynet.noNodes; sw++) {
+//				degreeDist[sw] = mynet.adjacencyList[sw].size();
+//			}
+//			Graph randCompare = new RandDegreeDist(switches, degreeDist);
+//			if (createLP == 1) {
+//				if (trafficMode == 0) {
+//					randCompare.PrintGraphforMCFFairCondensed("randCompare." + runs + ".lp", trafficMode, 100);
+//				} else if (trafficMode == 1) {
+//					mynet.PrintSimpleGraph("randCompare." + runs + ".lp", trafficMode);
+//				}
+//			} else {
+//				System.out.println("createLP != 1. Not implemented yet.");
+//			}
+
+			mynet.printPathLengths("pl." + runs);
+//			randCompare.printPathLengths("pl_randCompare." + runs);
 		}
 		System.out.println("Done Constructing Graph");
 	}

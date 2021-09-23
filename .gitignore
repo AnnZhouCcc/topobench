@@ -1,0 +1,13 @@
+lpmaker/graphs/*.class
+lpmaker/*.class
+out/
+.idea/
+flowIDmap
+linkCaps
+resultfiles/
+scripts/flowtmp_*
+scripts/gurobi.log
+scripts/templog
+topobench.iml
+topology/my.lp
+topology/pathlengths/pl.0
