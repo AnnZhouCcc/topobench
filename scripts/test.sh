@@ -9,7 +9,7 @@ cd -
 switches=80
 port=64
 numsvr=3072 # may not be needed
-trafficmode=0
+trafficmode=7
 
 name=test
 topology=rrg
@@ -23,7 +23,7 @@ for (( i=0 ; i < $NRUNS ; i++ ))
 do
   # We checked -- the fat-tree does give throughput = 1 each time, as expected. So need to run the LP for it!
   cd $MYJAVAPATH
-  java lpmaker/ProduceLP 1 23 "graphfiles/rrg_instance1_80_64.edgelist" $trafficmode $switches $port 0 0 $numsvr 0.0 0 0 0 0 0 0 0 0 0 1 0
+  java lpmaker/ProduceLP 1 23 "graphfiles/rrg_instance1_80_64.edgelist" $trafficmode $switches $port 0 0 $numsvr 0.0 0 0 0 0 0 0 0 0 0 1 0 "trafficfiles/fb_skewed.data"
 
   # Run LP for mynet
   mv my.0.lp topology/my.lp

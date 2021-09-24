@@ -8,18 +8,10 @@ package lpmaker.graphs;
 import java.util.*;
 import java.io.*;
 import java.math.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import lpmaker.ProduceLP;
-
-class TrafficPair {
-	public int from;
-	public int to;
-
-	TrafficPair(int a, int b) {
-		from = a;
-		to = b;
-	}
-}
 
 public class Graph
 {
@@ -49,11 +41,9 @@ public class Graph
 	//default number of hosts associated to each node in the graph
 	public static final int DEFAULT_NO_HOSTS = 1;
 
-	double[][] switchLevelMatrix;
-	int nCommodities;
+//	int nCommodities; <- not really used
 
 	protected boolean[] isSwitch;
-
 
 	public static Random rand;
 	public String name = "graph";
@@ -72,7 +62,6 @@ public class Graph
 		allocateAdjacencyList();
 		setUpFixWeight(DEFAULT_NO_HOSTS);
 		setUpAllSwitches();
-		switchLevelMatrix = new double[noNodes][noNodes];
 	}
 
 	public Graph(int size, int noHosts)
@@ -84,7 +73,6 @@ public class Graph
 		allocateAdjacencyList();
 		setUpFixWeight(noHosts);
 		setUpAllSwitches();
-		switchLevelMatrix = new double[noNodes][noNodes];
 	}
 
 	public void randomConstructorPerms(Vector<Integer> in_set, Vector<Integer> in_degrees, int cap)
@@ -813,86 +801,6 @@ public class Graph
 		}
 	}
 
-	// Send from all servers to some random server
-	public ArrayList TrafficGenAllToOne()
-	{
-		int target = rand.nextInt(totalWeight);
-
-		ArrayList<TrafficPair> ls = new ArrayList<TrafficPair>();
-		for (int svr = 0; svr < totalWeight; svr++)
-			ls.add(new TrafficPair(svr, target));
-		System.out.println("ALL-ONE FLOWS = " + ls.size());
-		return ls;
-	}
-
-	public ArrayList TrafficGenAllAll()
-	{
-		ArrayList<TrafficPair> ls = new ArrayList<TrafficPair>();
-		for (int svr = 0; svr < totalWeight; svr++)
-			for (int svrto = 0; svrto < totalWeight; svrto++)
-				ls.add(new TrafficPair(svr, svrto));
-
-		System.out.println("ALL-ALL FLOWS = " + ls.size());
-
-		return ls;
-	}
-
-	public ArrayList TrafficGenStride(int n) {
-		ArrayList<TrafficPair> ls = new ArrayList<TrafficPair>();
-		for (int svr = 0; svr < totalWeight; svr++)
-			ls.add(new TrafficPair(svr, (svr+n)%totalWeight));
-		System.out.println("STRIDE FLOWS = " + ls.size());
-		return ls;
-		
-	}
-
-	public ArrayList RandomPermutationPairs(int size)
-	{
-		int screw;
-		ArrayList<TrafficPair> ls;
-		do
-		{
-			screw=0;
-			ls=new ArrayList<TrafficPair>();
-			for(int i=0; i<size; i++)
-			{
-				ls.add(new TrafficPair(i, i));
-			}
-			for(int i=0; i<size; i++)
-			{
-				int ok=0;
-				int k=0;
-				int cnt=0;
-				do
-				{
-					//choose a shift in [0,size-1-i]
-					k = rand.nextInt(size-i);
-					//check if we should swap i and i+k
-					int r;
-					if(svrToSwitch(i) != svrToSwitch(ls.get(i+k).to))
-					{
-						ok = 1;
-					}
-					//System.out.println(i + " " + ls.get(i+k) + " " + i/serverport + " " + ls.get(i+k)/serverport);
-					cnt++;
-					if(cnt>500)
-					{
-						screw=1;
-						ok=1;
-					}
-				}
-				while(ok==0);
-				//swap i's value and i+k's value
-				int buf=ls.get(i).to;
-				ls.set(i, new TrafficPair(i, ls.get(i+k).to));
-				ls.set(i+k, new TrafficPair(i+k, buf));
-			}
-		}
-		while(screw==1);
-		System.out.println("PERM FLOWS = " + ls.size());
-		return ls;
-	}
-
 	private class FlowID
 	{
 		public int flowID;
@@ -920,7 +828,7 @@ public class Graph
 	}
 
 	// Uses a path-length based heuristic to determine that a certain flow on a certain link will be 0, so no need to factor in LP etc.
-	public void PrintGraphforMCFFairCondensed(String filename, int trafficmode, int probability)
+	public void PrintGraphforMCFFairCondensed(String filename, int probability, double[][] switchLevelMatrix)
 	{
 
 		modifiedFloydWarshall();
@@ -930,29 +838,6 @@ public class Graph
 		int nflowlet = 1;
 		try
 		{
-
-			// traffic-mode: 0 = randPerm; 1 = all-all; 2 = all-to-one; Any higher n means stride(n)
-			ArrayList<TrafficPair> rndmap;
-			if (trafficmode == 0) {
-				rndmap = RandomPermutationPairs(svrs);
-			}
-			else if (trafficmode == 1) {
-				rndmap = TrafficGenAllAll();
-			}
-			else if (trafficmode == 2) {
-				rndmap = TrafficGenAllToOne();
-			}
-			else if (trafficmode == 3) {
-				rndmap = TrafficGenStride(trafficmode);
-			}
-			else if (trafficmode == 4) {
-				rndmap = MaxWeightPairs("maxWeightMatch.txt");System.out.println("*******MAX-WEIGHT-MATCHING************");
-			}
-			else {
-				System.out.println("Trafficmode is not recognized.");
-				rndmap = RandomPermutationPairs(svrs);
-			}
-			
 			FileWriter fstream = new FileWriter(filename);
 			BufferedWriter out = new BufferedWriter(fstream);
 
@@ -974,21 +859,6 @@ public class Graph
 					edgeID++;
 				}
 			}
-
-			double trafficPerFlow = 0.05; // 1/20
-			for (int i = 0; i < rndmap.size(); i++) {
-				int from = rndmap.get(i).from;
-				int to=rndmap.get(i).to;
-
-				int fromsw=svrToSwitch(from);
-				int tosw=svrToSwitch(to);
-
-				// I'm counting only number of connections
-				if (fromsw == tosw) continue;
-				if (switchLevelMatrix[fromsw][tosw] == 0) nCommodities ++;
-				switchLevelMatrix[fromsw][tosw] += trafficPerFlow;
-			}
-
 
 			// Commodities
 			int commodityIndex = 0;
@@ -1261,7 +1131,7 @@ public class Graph
 		}
 	}
 
-	public void PrintSimpleGraph(String filename, int trafficmode)
+	public void PrintSimpleGraph(String filename, double[][] switchLevelMatrix)
 	{
 		modifiedFloydWarshall();
 		int r=noNodes; //# of ToR switches
@@ -1269,14 +1139,6 @@ public class Graph
 
 		try
 		{
-			// traffic-mode: 0 = randPerm; 1 = all-all; 2 = all-to-one; Any higher n means stride(n)
-			ArrayList<TrafficPair> rndmap;
-			if (trafficmode == 0) {rndmap = RandomPermutationPairs(svrs); System.out.println("RAND-PERM TRAFFIC ************");}
-			else if (trafficmode == 1) {rndmap = TrafficGenAllAll(); System.out.println("All-all *********************");}
-			else if (trafficmode == 2) rndmap = TrafficGenAllToOne();
-			else rndmap = TrafficGenStride(trafficmode);
-
-			
 			FileWriter fstream = new FileWriter(filename);
 			BufferedWriter out = new BufferedWriter(fstream);
 			
@@ -1284,8 +1146,7 @@ public class Graph
 			for(int i=0; i<noNodes; i++)
 			{
 				numEdges += adjacencyList[i].size();
-			}	
-
+			}
 
 
 			int edgeID = 0;
@@ -1300,25 +1161,6 @@ public class Graph
 			}
 
 			System.out.println("Number of edges " + edgeID);
-			System.out.println("Map size " + rndmap.size());
-
-			for (int i = 0; i < rndmap.size(); i++) {
-				int from = rndmap.get(i).from;
-				int to=rndmap.get(i).to;
-
-				int fromsw=svrToSwitch(from);
-				int tosw=svrToSwitch(to);
-
-				// I'm counting only number of connections
-				//if (switchLevelMatrix[fromsw][tosw] != 0) nCommodities ++;
-
-				if (fromsw == tosw) continue;
-
-				if (switchLevelMatrix[fromsw][tosw] == 0) nCommodities ++;
-
-				switchLevelMatrix[fromsw][tosw] ++;
-
-			}
 
 
 			int numFlows = 0;
@@ -1423,6 +1265,491 @@ public class Graph
 		}
 	}
 
+	/*
+	// Uses a path-length based heuristic to determine that a certain flow on a certain link will be 0, so no need to factor in LP etc.
+	public void PrintGraphforMCFFairCondensed(String filename, int trafficmode, int probability)
+	{
+
+		modifiedFloydWarshall();
+		int r=noNodes; //# of ToR switches
+		int svrs=totalWeight;
+
+		int nflowlet = 1;
+		try
+		{
+			// traffic-mode: 0 = randPerm; 1 = all-all; 2 = all-to-one; Any higher n means stride(n)
+			ArrayList<TrafficPair> rndmap;
+			if (trafficmode == 0) {rndmap = RandomPermutationPairs(svrs); System.out.println("RAND-PERM TRAFFIC ************");}
+			else if (trafficmode == 1) {rndmap = TrafficGenAllAll(); System.out.println("All-all *********************");}
+			else if (trafficmode == 2) rndmap = TrafficGenAllToOne();
+			else rndmap = TrafficGenStride(trafficmode);
+
+			FileWriter fstream = new FileWriter(filename);
+			BufferedWriter out = new BufferedWriter(fstream);
+
+			// Nodes
+			int numEdges = 0;
+			for(int i=0; i<noNodes; i++)
+			{
+				numEdges += adjacencyList[i].size();
+			}
+
+			// Edges
+			int edgeID = 0;
+			int edgeCapacity = 1;
+			for(int i=0; i<noNodes; i++)
+			{
+				for(int j=0; j<adjacencyList[i].size(); j++)
+				{
+					int to = adjacencyList[i].elementAt(j).intValue();
+					edgeID++;
+				}
+			}
+
+			for (int i = 0; i < rndmap.size(); i++) {
+				int from = rndmap.get(i).from;
+				int to=rndmap.get(i).to;
+
+				int fromsw=svrToSwitch(from);
+				int tosw=svrToSwitch(to);
+
+				// I'm counting only number of connections
+				if (fromsw == tosw) continue;
+				if (switchLevelMatrix[fromsw][tosw] == 0) nCommodities ++;
+				switchLevelMatrix[fromsw][tosw] ++;
+			}
+
+
+			// Commodities
+			int commodityIndex = 0;
+			for (int f = 0; f < noNodes; f ++)
+				for (int t = 0; t < noNodes; t++)
+					if (switchLevelMatrix[f][t] != 0) commodityIndex ++;
+
+
+			int numFlows = 0;
+			for (int f = 0; f < noNodes; f++)
+				for (int t = 0; t < noNodes; t++)
+					if(switchLevelMatrix[f][t]>0)
+						numFlows++;
+
+			String file_index = filename.substring(3);
+			file_index = file_index.substring(0, file_index.length() - 4);
+
+			System.out.println(file_index + " ***************************** ");
+
+			FlowID[] allFlowIDs = new FlowID[numFlows];
+			int curfID=0;
+			Writer output1 = new BufferedWriter(new FileWriter("flowIDmap" + file_index));
+
+			for (int f = 0; f < noNodes; f++)
+				for (int t = 0; t < noNodes; t++)
+					if(switchLevelMatrix[f][t]>0)
+					{
+						allFlowIDs[curfID] = new FlowID(curfID, f, t);
+						output1.write(curfID + " " + f + " " + t + "\n");
+						curfID++;
+					}
+			output1.close();
+
+			Writer output2 = new BufferedWriter(new FileWriter("linkCaps" + file_index));
+
+			for (int f = 0; f < noNodes; f++)
+				for (int j=0; j<adjacencyList[f].size(); j++) {  //for each out link of f = (f,j)
+					String lType = "";
+
+					if (adjacencyList[f].elementAt(j).linkcapacity > 1) lType = "H-H";
+					else lType += adjacencyList[f].size() + "-" + adjacencyList[adjacencyList[f].elementAt(j).intValue()].size();
+
+					output2.write(f + "_" + adjacencyList[f].elementAt(j).intValue() + " " + adjacencyList[f].elementAt(j).linkcapacity + " " + adjacencyList[f].size() + " " + lType + "\n");
+				}
+			output2.close();
+
+			//boolean fair = false;
+			boolean fair = true;
+			int fid=0;
+			String constraint = "";
+			if (fair) {
+				// we need to set probability% of flows to large flows.
+				// Rand(100) < probability does not give desired distribution for small network sizes
+				// Hence, we shuffle the flows and choose the first round(prob% * totalFlows) number of flows
+				ArrayList<Integer> list = new ArrayList<Integer>();
+				for (int i = 0; i < curfID; i++) {
+					list.add(new Integer(i));
+				}
+				Collections.shuffle(list);
+				float prob = (float) probability / 100;
+				int chooseCount = Math.round(prob * curfID);
+
+				//< Objective
+				out.write("Maximize \n");
+				out.write("obj: ");
+				String objective = "K";
+
+				// To make CPLEX not fill pipes as freely as it does while keeping the optimal value same
+				// Simple idea: For each utilization of capacity, subtract a tiny amount from the objective.
+				// This forces CPLEX to keep the main 'K' part as large as possible, while avoiding wastage of capacity
+//				for (int f = 0; f < noNodes; f++)
+//				  for (int j=0; j<adjacencyList[f].size(); j++) {  //for each out link of f = (f,j)
+//				  for (int fid = 0; fid < numFlows; fid ++) {
+//				  if (!isFlowZero(allFlowIDs[fid], f, adjacencyList[f].elementAt(j).intValue())) {
+//				  double normalized_factor = 0.00000001 / adjacencyList[f].elementAt(j).linkcapacity;
+//				  objective += " -" + (new BigDecimal(Double.toString(normalized_factor))).toPlainString() + "f_" + fid + "_" + f + "_" + adjacencyList[f].elementAt(j).intValue();
+//				  }
+//				  }
+//				  }
+
+				out.write(objective);
+
+
+				//<Constraints of Type 0: fairness i.e. flow >= K
+				out.write("\n\nSUBJECT TO \n\\Type 0: Flow >= K\n");
+				System.out.println(new Date() + ": Starting part 0");
+				for (int f = 0; f < noNodes; f++)
+				{
+					for (int t = 0; t < noNodes; t++)
+					{
+						if(switchLevelMatrix[f][t]>0)	  //for each flow fid with source f
+						{
+							constraint = "c0_" + fid + ": ";
+							//System.out.println("CHECK FLOW =========== " + fid + " " + f + " " + t);
+
+							int writeCons = 0;
+							for(int j=0; j<adjacencyList[f].size(); j++)   //for each out link of f = (f,j)
+							{
+								if (!isFlowZero(allFlowIDs[fid], f, adjacencyList[f].elementAt(j).intValue()))
+								{
+									constraint += "-f_" + fid + "_" + f + "_" + adjacencyList[f].elementAt(j).intValue() + " ";
+									writeCons = 1;
+								}
+								//if(j!=adjacencyList[f].size()-1) constraint += "- ";
+							}
+							if (writeCons == 1)
+							{
+								Random rand = new Random();
+								if (list.indexOf(fid) < chooseCount && probability < 100) {
+									constraint += " + " + 10*switchLevelMatrix[f][t] + " K <= 0\n";
+								} else {
+									constraint += " + " + switchLevelMatrix[f][t] + " K <= 0\n";
+								}
+								out.write(constraint);
+							}
+							fid++;
+						}
+					}
+				}
+			}
+			else { // no fairness constraints -- max total throughput
+				//< Objective
+				out.write("Maximize \n");
+				out.write("obj: ");
+				fid = 0;
+				String objective = "";
+				for (int f = 0; f < noNodes; f++) {
+					for (int t = 0; t < noNodes; t++) {
+						if(switchLevelMatrix[f][t]>0)   { //for each flow fid with source f
+							for(int j=0; j<adjacencyList[f].size(); j++) { //for each out link of f = (f,j)
+								objective += "f_" + fid + "_" + f + "_" + adjacencyList[f].elementAt(j).intValue() + " ";
+								if(j!=adjacencyList[f].size()-1)
+									objective += "+ ";
+							}
+							if(fid != commodityIndex-1)
+								objective += "+ ";
+							else
+								objective += "\n";
+							fid++;
+						}
+					}
+				}
+				out.write(objective);
+				out.write("\n\nSUBJECT TO \n\\Type 0: Flow >= K\n");
+				//>
+			}
+
+			//<Constraints of Type 1: Load on link <= max_load
+			out.write("\n\\Type 1: Load on link <= max_load\n");
+			System.out.println(new Date() + ": Starting part 1");
+			constraint = "";
+			int strCapacity = 25*commodityIndex;
+			for(int i=0; i<noNodes; i++)
+			{
+				for(int j=0; j<adjacencyList[i].size(); j++)
+				{
+					StringBuilder curConstraint = new StringBuilder(strCapacity);
+					int writeCons = 0;
+					for(int fd_=0; fd_<commodityIndex; fd_++)
+					{
+						//for each flow fd_
+						if (!isFlowZero(allFlowIDs[fd_], i, adjacencyList[i].elementAt(j).intValue()))
+						{
+							//constraint += "f_" + fd_ + "_" + i + "_" + adjacencyList[i].elementAt(j).intValue() + " + ";
+							curConstraint.append("f_" + fd_ + "_" + i + "_" + adjacencyList[i].elementAt(j).intValue() + " + ");
+							writeCons = 1;
+						}
+					}
+					constraint = curConstraint.toString();
+					if(constraint.endsWith("+ "))
+						constraint = constraint.substring(0, constraint.lastIndexOf("+")-1);
+					//System.out.println("string size: "+constraint.length());
+					if(writeCons == 1)
+					{
+						out.write("c1_" + i + "_" + adjacencyList[i].elementAt(j).intValue() + ": " + constraint + " <= " +  adjacencyList[i].elementAt(j).linkcapacity + "\n");
+						//constraint = "";
+					}
+				}
+				if(i > 0 && i % 20 == 0)
+					System.out.println(new Date() + ": "+i+" of "+noNodes+" done");
+			}
+			//>
+
+			//<Constraints of Type 2: Flow conservation at non-source, non-destination
+			int LARGE_VALUE = 10;		// TOPO_COMPARISON
+			System.out.println(new Date() + ": Starting part 2");
+			out.write("\n\\Type 2: Flow conservation at non-source, non-destination\n");
+			fid=0;
+			for (int f = 0; f < noNodes; f++)
+			{
+				for (int t = 0; t < noNodes; t++)
+				{
+					if(switchLevelMatrix[f][t]>0)	   //for each flow fid
+					{
+						for(int u=0; u<noNodes; u++)   //for each node u
+						{
+							constraint = "";
+							int writeCons = 0;
+							if(u==f)    //src
+							{
+								constraint = "c2_" + fid + "_" + u + "_1: ";
+
+								for(int j=0; j<adjacencyList[u].size(); j++)   //for each out link of u = (u,j)
+								{
+									if (!isFlowZero(allFlowIDs[fid], u, adjacencyList[u].elementAt(j).intValue()))
+									{
+										constraint += "f_" + fid + "_" + u + "_" + adjacencyList[u].elementAt(j).intValue() + " + ";
+										writeCons = 1;
+									}
+								}
+								if (constraint.endsWith("+ ")) constraint = constraint.substring(0, constraint.lastIndexOf("+")-1 );
+								if (writeCons == 1) out.write(constraint + " <= " + switchLevelMatrix[f][t]*LARGE_VALUE + "\n");
+								writeCons = 0;
+								constraint = "c2_" + fid + "_" + u + "_2: ";
+								for(int j=0; j<adjacencyList[u].size(); j++)   //for each in link of u = (j,u)
+								{
+									if (!isFlowZero(allFlowIDs[fid], adjacencyList[u].elementAt(j).intValue(), u))
+									{
+										constraint += "f_" + fid + "_" + adjacencyList[u].elementAt(j).intValue() + "_" + u + " + ";
+										writeCons = 1;
+									}
+								}
+								if (constraint.endsWith("+ ")) constraint = constraint.substring(0, constraint.lastIndexOf("+")-1 );
+								if (writeCons == 1) out.write(constraint + " = 0\n");
+							}
+							else if (u==t) {}
+							else  // non-src and non-dest
+							{
+								constraint = "c2_" + fid + "_" + u + "_3: ";
+								for(int j=0; j<adjacencyList[u].size(); j++)   //for each out link of u = (u,j)
+								{
+									if (!isFlowZero(allFlowIDs[fid], u, adjacencyList[u].elementAt(j).intValue()))
+									{
+										constraint += "f_" + fid + "_" + u + "_" + adjacencyList[u].elementAt(j).intValue() + " + ";
+										writeCons = 1;
+									}
+								}
+								if (constraint.endsWith("+ ")) constraint = constraint.substring(0, constraint.lastIndexOf("+")-1 );
+								constraint += " - ";
+
+								for(int j=0; j<adjacencyList[u].size(); j++)   //for each in link of u = (j,u)
+								{
+									if (!isFlowZero(allFlowIDs[fid], adjacencyList[u].elementAt(j).intValue(), u))
+									{
+										constraint += "f_" + fid + "_" + adjacencyList[u].elementAt(j).intValue() + "_" + u + " - ";
+										writeCons = 1;
+									}
+								}
+								if (constraint.endsWith("- ")) constraint = constraint.substring(0, constraint.lastIndexOf("-")-1 );
+								if (writeCons == 1) out.write(constraint + " = 0\n");
+							}
+						}
+						fid++;
+					}
+				}
+				if(f > 0 && f % 20 == 0)
+					System.out.println(new Date() + ": "+f+" of "+noNodes+" done");
+			}
+
+			out.write("End\n");
+			out.close();
+		}
+		catch (Exception e)
+		{
+			System.err.println("PrintGraphforMCFFairCondensed Error: " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
+
+	public void PrintSimpleGraph(String filename, int trafficmode)
+	{
+		modifiedFloydWarshall();
+		int r=noNodes; //# of ToR switches
+		int svrs=totalWeight;
+
+		try
+		{
+			// traffic-mode: 0 = randPerm; 1 = all-all; 2 = all-to-one; Any higher n means stride(n)
+			ArrayList<TrafficPair> rndmap;
+			if (trafficmode == 0) {rndmap = RandomPermutationPairs(svrs); System.out.println("RAND-PERM TRAFFIC ************");}
+			else if (trafficmode == 1) {rndmap = TrafficGenAllAll(); System.out.println("All-all *********************");}
+			else if (trafficmode == 2) rndmap = TrafficGenAllToOne();
+			else rndmap = TrafficGenStride(trafficmode);
+
+			FileWriter fstream = new FileWriter(filename);
+			BufferedWriter out = new BufferedWriter(fstream);
+
+			int numEdges = 0;
+			for(int i=0; i<noNodes; i++)
+			{
+				numEdges += adjacencyList[i].size();
+			}
+
+
+
+			int edgeID = 0;
+			int edgeCapacity = 1;
+			for(int i=0; i<noNodes; i++)
+			{
+				for(int j=0; j<adjacencyList[i].size(); j++)
+				{
+					edgeID++;
+				}
+
+			}
+
+			System.out.println("Number of edges " + edgeID);
+			System.out.println("Map size " + rndmap.size());
+
+			for (int i = 0; i < rndmap.size(); i++) {
+				int from = rndmap.get(i).from;
+				int to=rndmap.get(i).to;
+
+				int fromsw=svrToSwitch(from);
+				int tosw=svrToSwitch(to);
+
+				// I'm counting only number of connections
+				//if (switchLevelMatrix[fromsw][tosw] != 0) nCommodities ++;
+
+				if (fromsw == tosw) continue;
+
+				if (switchLevelMatrix[fromsw][tosw] == 0) nCommodities ++;
+
+				switchLevelMatrix[fromsw][tosw] ++;
+
+			}
+
+
+			int numFlows = 0;
+			for (int f = 0; f < noNodes; f++){
+				for (int t = 0; t < noNodes; t++){
+					if(switchLevelMatrix[f][t]>0){
+						numFlows++;
+					}
+				}
+			}
+
+
+			int fid=0;
+			String constraint = "";
+
+			out.write("Maximize \n");
+			out.write("obj: ");
+			String objective = "K";
+			out.write(objective);
+
+			//Type 0 - Flows >= K
+			out.write("\n\nSUBJECT TO \n\\Type 0: Flow >= K\n");
+			System.out.println(new Date() + ": Starting part 0");
+
+			for (int f = 0; f < noNodes; f++){
+				for (int t = 0; t < noNodes; t++){
+					if(switchLevelMatrix[f][t]>0){
+						constraint = "c0_" + fid + ": ";
+						constraint += "- f_" + f + "_" + t +  " ";
+						constraint += " + " + switchLevelMatrix[f][t] + " K <= 0\n";
+						out.write(constraint);
+						fid++;
+						//			System.out.println("fid " + fid + " f " + f + " t " + t + " flows " + switchLevelMatrix[f][t]);
+					}
+				}
+			}
+
+
+			//Type 1 - sum (l_i_j_d) over d on link i_j less than link capacity
+			out.write("\n\\Type 1: Link capacity constraint\n");
+			System.out.println(new Date() + ": Starting part 1");
+
+			for(int i=0; i<noNodes; i++){
+				for(int j=0; j<adjacencyList[i].size(); j++){
+					constraint = "c2_" + i + "_" + adjacencyList[i].elementAt(j).intValue() + ": ";
+					for(int k=0; k<noNodes; k++){
+						constraint += " + l_"+ i + "_" + adjacencyList[i].elementAt(j).intValue() +"_" + k ;
+					}
+					constraint += " <= " +  adjacencyList[i].elementAt(j).linkcapacity + "\n";
+					out.write(constraint);
+				}
+			}
+
+			//Type 2 - flow conservation at nodes
+			out.write("\n\\Type 2: Flow conservation at node\n");
+			System.out.println(new Date() + ": Starting part 2");
+
+			for(int i=0; i<noNodes; i++){
+				for(int k=0; k<noNodes; k++){
+					if (i!=k){
+						constraint = "c3_" + i + "_" + k + ": ";
+						if (switchLevelMatrix[i][k] > 0){
+							constraint += " f_" + i + "_" + k  ;
+
+						}
+
+						for(int j=0; j<adjacencyList[i].size(); j++){
+							constraint += " + l_" + adjacencyList[i].elementAt(j).intValue() +"_" + i +"_" + k + " ";
+						}
+
+						for(int j=0; j<adjacencyList[i].size(); j++){
+							constraint += " - l_" + i +"_" + adjacencyList[i].elementAt(j).intValue() +"_" + k + " ";
+						}
+
+						constraint+= " = 0\n";
+						out.write(constraint);
+					}
+					else if (i == k) {
+						constraint = "c3_" + i + "_" + k + ": ";
+						for(int j=0; j<noNodes; j++){
+							if(switchLevelMatrix[j][i] > 0){
+								constraint += " - f_" + j + "_" + i;
+							}
+						}
+
+						for(int j=0; j<adjacencyList[i].size(); j++){
+							constraint += " + l_" + adjacencyList[i].elementAt(j).intValue() +"_" + i +"_" + i + " ";
+						}
+						constraint+= " = 0\n";
+						out.write(constraint);
+
+					}
+				}
+			}
+
+			out.close();
+		}
+		catch (Exception e)
+		{
+			System.err.println("PrintSimpleGraph Error: " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
+	*/
+
     //Get distances between servers
     public void printServerDistance(String serverDistFile)
     {
@@ -1458,37 +1785,4 @@ public class Graph
             e.printStackTrace();
         }
     }
-
-    public ArrayList MaxWeightPairs(String filename){
-        ArrayList<TrafficPair> ls = new ArrayList<TrafficPair>();
-        System.out.println (filename);
-        try
-        {
-            FileInputStream fstream = new FileInputStream(filename);
-            BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
-
-            String strLine;
-
-            while ((strLine = br.readLine()) != null)   {
-                String[] matchedNodes = strLine.split(" ");
-                int svr1 = Integer.parseInt(matchedNodes[0]);
-                int svr2 = Integer.parseInt(matchedNodes[1]);
-                ls.add(new TrafficPair(svr1,svr2));
-                //    ls.add(new Pair(svr2,svr1));
-                System.out.println (svr1 + " " + svr2);
-            }
-
-            br.close();
-        }
-
-        catch (Exception e)
-        {
-            System.err.println("Max Weight Error: " + e.getMessage());
-            e.printStackTrace();
-        }
-
-        return ls;
-    }
-
-
 }

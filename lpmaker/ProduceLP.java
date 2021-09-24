@@ -64,17 +64,19 @@ public class ProduceLP {
 			System.out.println("svr port:" + serverports);
 			System.out.println("nsvrs" + nsvrs);
 			Graph mynet = new RandomRegularGraph(switches,switchports, switchports - serverports, 1, extended_switches, nsvrs, fail_rate);
+			TrafficMatrix tm = new TrafficMatrix(switches, trafficMode, "", mynet);
 
-			if (createLP == 1 && trafficMode == 0) mynet.PrintGraphforMCFFairCondensed("my." + runs + ".lp", trafficMode, 100);
-			if (createLP == 1 && trafficMode == 1) mynet.PrintSimpleGraph("my." + runs + ".lp", trafficMode);
+			if (createLP == 1 && trafficMode == 0) mynet.PrintGraphforMCFFairCondensed("my." + runs + ".lp",100, tm.switchLevelMatrix);
+			if (createLP == 1 && trafficMode == 1) mynet.PrintSimpleGraph("my." + runs + ".lp", tm.switchLevelMatrix);
                         if (createLP == 1 && trafficMode == 4) {
                                 mynet.printServerDistance("lpmaker/serverDist1.txt");
                                 String cmd = "python lpmaker/maxWeight.py lpmaker/serverDist1.txt maxWeightMatch.txt";
                                 runCommand(cmd);
-                                mynet.PrintGraphforMCFFairCondensed("my." + runs + ".lp", trafficMode, 100);
+                                mynet.PrintGraphforMCFFairCondensed("my." + runs + ".lp", 100, tm.switchLevelMatrix);
                         }
 			mynet.printPathLengths("pl." + runs);
 		}
+		/*
 		else if(graphtype==1)	// Fat tree
 		{
 			System.out.println("FAT-SIZE = " + switchports);
@@ -106,7 +108,7 @@ public class ProduceLP {
 
 			// if z=1, a=2, p=2, h=2
 
-			Graph mynet = new Dragonfly(a, p, h, z); 
+			Graph mynet = new Dragonfly(a, p, h, z);
 			if (createLP == 1 && trafficMode == 0) mynet.PrintGraphforMCFFairCondensed("my." + runs + ".lp", trafficMode, 100);
 			if (createLP == 1 && trafficMode == 1) mynet.PrintSimpleGraph("my." + runs + ".lp", trafficMode);
                         if (createLP == 1 && trafficMode == 4) {
@@ -118,7 +120,7 @@ public class ProduceLP {
 			mynet.printPathLengths("pl." + runs);
 		}
 		else if(graphtype==5) // SWDC_hex
-		{	
+		{
 			System.out.println("Start SWDC_hex Construction");
 			Graph mynet = new SWDC_hex(switches,switchports-serverports);
 			if (createLP == 1 && trafficMode == 0) mynet.PrintGraphforMCFFairCondensed("my." + runs + ".lp", trafficMode, 100);
@@ -132,7 +134,7 @@ public class ProduceLP {
 			mynet.printPathLengths("pl." + runs);
 		}
 		else if(graphtype==6) // SWDC_2torus
-		{	
+		{
 			int gridSize = Integer.parseInt(args[7]);
 			System.out.println("Start SWDC_2torus Construction");
 			Graph mynet = new SWDC_2torus(switches,switchports, serverports, gridSize);
@@ -147,7 +149,7 @@ public class ProduceLP {
 			mynet.printPathLengths("pl." + runs);
 		}
 		else if(graphtype==7) // SWDC_ring
-		{	
+		{
 			System.out.println("Start SWDC_ring Construction");
 			Graph mynet = new SWDC_ring(switches,switchports);
 			if (createLP == 1 && trafficMode == 0) mynet.PrintGraphforMCFFairCondensed("my." + runs + ".lp", trafficMode, 100);
@@ -161,12 +163,12 @@ public class ProduceLP {
 			mynet.printPathLengths("pl." + runs);
 		}
 		else if(graphtype==9) // Jellyfish Heterogeneous
-		{	
+		{
 			int nh = Integer.parseInt(args[10]);
 			int nl = Integer.parseInt(args[11]);
 			int h  = Integer.parseInt(args[12]);
 			int l  = Integer.parseInt(args[13]);
-			int dh = Integer.parseInt(args[14]);          	// high network degree     
+			int dh = Integer.parseInt(args[14]);          	// high network degree
 			int dl = Integer.parseInt(args[15]);		// low network degree
 
 			System.out.println("HETER: " + nh + " " + h + "-port; " + nl + " " + l + "-port; ");
@@ -203,12 +205,12 @@ public class ProduceLP {
 			}
 		}
 		else if(graphtype==10) // Jellyfish Heterogeneous Server distribution
-		{	
+		{
 			int nh = Integer.parseInt(args[10]);
 			int nl = Integer.parseInt(args[11]);
 			int h  = Integer.parseInt(args[12]);
 			int l  = Integer.parseInt(args[13]);
-			int dh = Integer.parseInt(args[14]); 
+			int dh = Integer.parseInt(args[14]);
 			int dl = Integer.parseInt(args[15]);
 
 			Graph mynet = new HeterServerGraph(nh, nl, h, l, dh, dl);
@@ -227,7 +229,7 @@ public class ProduceLP {
 			int aggports = Integer.parseInt(args[10]);
 			int aggsw = Integer.parseInt(args[11]);
 
-			Graph mynet = new VL2(aggsw, aggports); 
+			Graph mynet = new VL2(aggsw, aggports);
 			if (createLP == 1 && trafficMode == 0) mynet.PrintGraphforMCFFairCondensed("my." + runs + ".lp", trafficMode, 100);
 			if (createLP == 1 && trafficMode == 1) mynet.PrintSimpleGraph("my." + runs + ".lp", trafficMode);
                         if (createLP == 1 && trafficMode == 4) {
@@ -256,7 +258,7 @@ public class ProduceLP {
 		}
 		else if(graphtype==15) // Hypercube
 		{
-			Graph mynet = new Hypercube((int)(Math.log(switches)/Math.log(2)), serverports); 
+			Graph mynet = new Hypercube((int)(Math.log(switches)/Math.log(2)), serverports);
 			if (createLP == 1 && trafficMode == 0) mynet.PrintGraphforMCFFairCondensed("my." + runs + ".lp", trafficMode, 100);
 			if (createLP == 1 && trafficMode == 1) mynet.PrintSimpleGraph("my." + runs + ".lp", trafficMode);
                         if (createLP == 1 && trafficMode == 4) {
@@ -267,7 +269,7 @@ public class ProduceLP {
                         }
 			mynet.printPathLengths("pl." + runs);
 		}
-		else if (graphtype == 16) // Butterfly 
+		else if (graphtype == 16) // Butterfly
 		{
 			Graph mynet = new FlattenedButterfly(1+serverports,1+((switchports-serverports)/serverports),switches);
 			if (createLP == 1 && trafficMode == 0) mynet.PrintGraphforMCFFairCondensed("my." + runs + ".lp", trafficMode, 100);
@@ -283,7 +285,7 @@ public class ProduceLP {
 		else if(graphtype==17) // LSPIIRamanujam
 		{
 			serverports = Integer.parseInt(args[6]);
-			Graph mynet = new LSPRamanujanII(switchports, switches, serverports); 
+			Graph mynet = new LSPRamanujanII(switchports, switches, serverports);
 			if (createLP == 1 && trafficMode == 0) mynet.PrintGraphforMCFFairCondensed("my." + runs + ".lp", trafficMode, 100);
 			if (createLP == 1 && trafficMode == 1) mynet.PrintSimpleGraph("my." + runs + ".lp", trafficMode);
                         if (createLP == 1 && trafficMode == 4) {
@@ -295,18 +297,18 @@ public class ProduceLP {
 			mynet.printPathLengths("pl." + runs);
 		}
 		else if(graphtype==18) // Jellyfish Heterogeneous Linespeeds
-		{	
+		{
 			int nh = Integer.parseInt(args[10]);
 			int nl = Integer.parseInt(args[11]);
 			int h1 = Integer.parseInt(args[12]);
 			int h2 = Integer.parseInt(args[13]);
 			int l  = Integer.parseInt(args[14]);
-			int dh = Integer.parseInt(args[15]);          	// high network degree i.e. out of h2, how many are network ports     
+			int dh = Integer.parseInt(args[15]);          	// high network degree i.e. out of h2, how many are network ports
 			int dl = Integer.parseInt(args[16]);		// low network degree i.e. out of 'l' how many are network ports
 			int capH = Integer.parseInt(args[17]);		// Higher line-rate i.e. either 10G or 40G
 			int capL = Integer.parseInt(args[18]);		// Lower line-rate i.e. either 1G or 10G
 
-			int netH1 = h1;	
+			int netH1 = h1;
 			int netH2 = dh;
 			int netL = dl;
 
@@ -422,15 +424,22 @@ public class ProduceLP {
                         }
 			mynet.printPathLengths("pl." + runs);
 		}
+		*/
 		else if (graphtype == 23){ // Read graph from file, print linear program for both that graph, and equivalent random graph for comparison; graph file has lines of type "<source switch>-><destination switch>"
-			String graph_file = args[2];
+			String graphFile = args[2];
+			String trafficFile = args[21];
+			System.out.println("graph file: " + graphFile);
+			System.out.println("traffic file: " + trafficFile);
 
-			Graph mynet = new GraphFromFileSrcDstPair(switches, graph_file, switchports);
+			Graph mynet = new GraphFromFileSrcDstPair(switches, graphFile, switchports);
+			TrafficMatrix tm = new TrafficMatrix(switches, trafficMode, trafficFile, mynet);
 			if (createLP == 1) {
-				if (trafficMode == 0) {
-					mynet.PrintGraphforMCFFairCondensed("my." + runs + ".lp", trafficMode, 100);
-				} else if (trafficMode == 1) {
-					mynet.PrintSimpleGraph("my." + runs + ".lp", trafficMode);
+				if (trafficMode == 1 || trafficMode == 5) {
+					System.out.println("PrintSimpleGraph");
+					mynet.PrintSimpleGraph("my." + runs + ".lp", tm.switchLevelMatrix);
+				} else {
+					System.out.println("PrintGraphforMCFFairCondensed");
+					mynet.PrintGraphforMCFFairCondensed("my." + runs + ".lp",100, tm.switchLevelMatrix);
 				}
 			} else {
 				System.out.println("createLP != 1. Not implemented yet.");
