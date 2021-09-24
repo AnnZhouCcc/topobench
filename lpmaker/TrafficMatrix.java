@@ -21,7 +21,7 @@ class TrafficPair {
 
 public class TrafficMatrix {
     double[][] switchLevelMatrix;
-    double trafficPerFlow = 0.01;
+    double trafficPerFlow = 1.0/1000000000;
     int numSwitches;
     int numServers;
     int trafficmode;
@@ -106,7 +106,7 @@ public class TrafficMatrix {
 
     public void TrafficGenFromFile(String filename) {
         System.out.println("Flows from file " + filename);
-        int numFlows = 0;
+        double numFlows = 0;
 
         int[][] accumulativeTrafficMatrix = new int[numSwitches][numSwitches];
         int minTraffic = Integer.MAX_VALUE;
@@ -136,9 +136,10 @@ public class TrafficMatrix {
             }
         }
 
+        int downscale = 1500*100;
         for (int src = 0; src < numSwitches; src++) {
             for (int dst = 0; dst < numSwitches; dst++) {
-                int mult = (accumulativeTrafficMatrix[src][dst] / (1500*minTraffic)) +1;
+                double mult = (double)accumulativeTrafficMatrix[src][dst] / (downscale*minTraffic);
                 switchLevelMatrix[src][dst] += trafficPerFlow * mult;
                 numFlows += mult;
             }
