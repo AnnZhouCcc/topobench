@@ -21,7 +21,8 @@ class TrafficPair {
 
 public class TrafficMatrix {
     double[][] switchLevelMatrix;
-    double trafficPerFlow = 1.0/1000000000;
+    double trafficPerFlow = 0.1;
+    int packetSize = 1500;
     int numSwitches;
     int numServers;
     int trafficmode;
@@ -106,7 +107,7 @@ public class TrafficMatrix {
 
     public void TrafficGenFromFile(String filename) {
         System.out.println("Flows from file " + filename);
-        double numFlows = 0;
+        int numFlows = 0;
 
         int[][] accumulativeTrafficMatrix = new int[numSwitches][numSwitches];
         int minTraffic = Integer.MAX_VALUE;
@@ -118,7 +119,7 @@ public class TrafficMatrix {
                 StringTokenizer strTok = new StringTokenizer(strLine);
                 int src = Integer.parseInt(strTok.nextToken());
                 int dst = Integer.parseInt(strTok.nextToken());
-                int traffic = Integer.parseInt(strTok.nextToken());
+                int traffic = (Integer.parseInt(strTok.nextToken()))/packetSize;
 
                 int src_sw = topology.svrToSwitch(src);
                 int dst_sw = topology.svrToSwitch(dst);
@@ -135,11 +136,12 @@ public class TrafficMatrix {
                 if (traffic > 0) minTraffic = Math.min(minTraffic, traffic);
             }
         }
+        System.out.println("minTraffic = " + minTraffic);
 
-        int downscale = 1500*100;
+        int downscale = 1000;
         for (int src = 0; src < numSwitches; src++) {
             for (int dst = 0; dst < numSwitches; dst++) {
-                double mult = (double)accumulativeTrafficMatrix[src][dst] / (downscale*minTraffic);
+                int mult = accumulativeTrafficMatrix[src][dst] / (downscale*minTraffic);
                 switchLevelMatrix[src][dst] += trafficPerFlow * mult;
                 numFlows += mult;
             }
