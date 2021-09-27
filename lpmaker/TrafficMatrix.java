@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.StringTokenizer;
 
 class TrafficPair {
@@ -21,7 +22,7 @@ class TrafficPair {
 
 public class TrafficMatrix {
     double[][] switchLevelMatrix;
-    double trafficPerFlow = 0.1;
+    double trafficPerFlow = 1;
     int packetSize = 1500;
     int numSwitches;
     int numServers;
@@ -55,6 +56,7 @@ public class TrafficMatrix {
         }
 
         System.out.println("Number of flows = " + numFlows);
+        System.out.println("Target = " + target);
     }
 
     public void TrafficGenAllAll()
@@ -136,7 +138,6 @@ public class TrafficMatrix {
                 if (traffic > 0) minTraffic = Math.min(minTraffic, traffic);
             }
         }
-        System.out.println("minTraffic = " + minTraffic);
 
         int downscale = 1000;
         for (int src = 0; src < numSwitches; src++) {
@@ -148,6 +149,42 @@ public class TrafficMatrix {
         }
 
         System.out.println("Number of flows = " + numFlows);
+    }
+
+    public void TrafficGenARackToBRack(int a, int b)
+    {
+        System.out.println(a + " racks to " + b + " racks flows");
+
+        HashSet<Integer> srcRacks = new HashSet<>();
+        HashSet<Integer> dstRacks = new HashSet<>();
+        while (srcRacks.size() < a) {
+            srcRacks.add(topology.rand.nextInt(numSwitches));
+        }
+        while (dstRacks.size() < b) {
+            int rack = topology.rand.nextInt(numSwitches);
+            if (!srcRacks.contains(rack)) dstRacks.add(rack);
+        }
+
+        int numFlows = 0;
+        for (int srcSw : srcRacks) {
+            for (int dstSw : dstRacks) {
+                assert(srcSw != dstSw);
+                switchLevelMatrix[srcSw][dstSw] += trafficPerFlow;
+                numFlows++;
+            }
+        }
+
+        System.out.println("Number of flows = " + numFlows);
+        System.out.print("Source racks: ");
+        for (int r : srcRacks) {
+            System.out.print(r + " ");
+        }
+        System.out.println();
+        System.out.print("Destination racks: ");
+        for (int r : dstRacks) {
+            System.out.print(r + " ");
+        }
+        System.out.println();
     }
 
     public void RandomPermutationPairs(int size)
@@ -264,6 +301,11 @@ public class TrafficMatrix {
         }
         else if (trafficmode == 7) {
             TrafficGenFromFile(trafficfile);
+        }
+        else if (trafficmode == 8) {
+            int a = 1;
+            int b = 1;
+            TrafficGenARackToBRack(a, b);
         }
         else {
             System.out.println("Trafficmode is not recognized.");

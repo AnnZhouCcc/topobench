@@ -7,11 +7,31 @@ package lpmaker.graphs;
 
 import java.util.*;
 import java.io.*;
-import java.math.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import lpmaker.ProduceLP;
+import lpmaker.*;
+
+class FlowSrcDst {
+	int src;
+	int dst;
+
+	FlowSrcDst (int _src, int _dst) {
+		src = _src;
+		dst = _dst;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		FlowSrcDst that = (FlowSrcDst) o;
+		return src == that.src && dst == that.dst;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(src, dst);
+	}
+}
 
 public class Graph
 {
@@ -122,8 +142,8 @@ public class Graph
 				int remDeg = in_degrees.elementAt(i) - linksAdded[in_set.elementAt(i)];
 				if (remDeg > 1)
 				{
-					degrees.add(new Integer(remDeg));
-					still_to_link.add(new Integer(in_set.elementAt(i)));
+					degrees.add(Integer.valueOf(remDeg));
+					still_to_link.add(Integer.valueOf(in_set.elementAt(i)));
 				}
 			}
 			if (still_to_link.size() < 2) break;
@@ -139,8 +159,8 @@ public class Graph
 			int remDeg = in_degrees.elementAt(i) - linksAdded[in_set.elementAt(i)];
 			if (remDeg > 0)
 			{
-				degrees.add(new Integer(remDeg));
-				still_to_link.add(new Integer(in_set.elementAt(i)));
+				degrees.add(Integer.valueOf(remDeg));
+				still_to_link.add(Integer.valueOf(in_set.elementAt(i)));
 			}
 		}
 
@@ -172,7 +192,7 @@ public class Graph
 					mycap = adjacencyList[randNode1].elementAt(rndnbr).linkcapacity;
 
 				}
-				while (!in_set.contains(new Integer(randNode2)) || mycap != cap);
+				while (!in_set.contains(Integer.valueOf(randNode2)) || mycap != cap);
 			}
 
 			// Swap
@@ -232,8 +252,8 @@ public class Graph
 			boolean found = false;
 
 			int p1 = -1, p2 = -1;
-			Integer n1 = new Integer(0);
-			Integer n2 = new Integer(0);
+			Integer n1 = Integer.valueOf(0);
+			Integer n2 = Integer.valueOf(0);
 
 			int iteration = 0;
 			int MAX_ITERATION = 1000;
@@ -275,8 +295,8 @@ public class Graph
 					System.out.println("WARNING: Unable to find new pair for link between:"+still_to_link);
 					stop_sign=1;
 				}
-				degrees.set(p1, new Integer(((Integer)(degrees.elementAt(p1))).intValue()-1));
-				degrees.set(p2, new Integer(((Integer)(degrees.elementAt(p2))).intValue()-1));
+				degrees.set(p1, Integer.valueOf(((Integer)(degrees.elementAt(p1))).intValue()-1));
+				degrees.set(p2, Integer.valueOf(((Integer)(degrees.elementAt(p2))).intValue()-1));
 				boolean deleted_p1 = false;
 
 				if(((Integer)degrees.elementAt(p1)).intValue() == 0)
@@ -312,8 +332,8 @@ public class Graph
 			int remDeg = in_degrees.elementAt(i) - linksAdded[in_set.elementAt(i)];
 			if (remDeg > 0)
 			{
-				degrees.add(new Integer(remDeg));
-				still_to_link.add(new Integer(in_set.elementAt(i)));
+				degrees.add(Integer.valueOf(remDeg));
+				still_to_link.add(Integer.valueOf(in_set.elementAt(i)));
 			}
 		}
 
@@ -345,7 +365,7 @@ public class Graph
 					mycap = adjacencyList[randNode1].elementAt(rndnbr).linkcapacity;
 
 				}
-				while (!in_set.contains(new Integer(randNode2)) || mycap != cap);
+				while (!in_set.contains(Integer.valueOf(randNode2)) || mycap != cap);
 			}
 
 			// Swap
@@ -447,7 +467,7 @@ public class Graph
 
 	protected boolean addBidirNeighbor(int n1, int n2)
 	{
-		return addBidirNeighbor(new Integer(n1), new Integer(n2));
+		return addBidirNeighbor(Integer.valueOf(n1), Integer.valueOf(n2));
 	}
 
 	protected boolean removeBidirNeighbor(int n1, int n2, int cap)
@@ -499,7 +519,7 @@ public class Graph
 
 	protected boolean addBidirNeighbor(int n1, int n2, int cap)
 	{
-		return addBidirNeighbor(new Integer(n1), new Integer(n2), cap);
+		return addBidirNeighbor(Integer.valueOf(n1), Integer.valueOf(n2), cap);
 	}
 
 	protected boolean addBidirNeighbor(Integer n1, Integer n2, int cap)
@@ -513,12 +533,12 @@ public class Graph
 
 	protected boolean addNeighbor(int n1, int n2)
 	{
-		return addNeighbor(n1, new Integer(n2));
+		return addNeighbor(n1, Integer.valueOf(n2));
 	}
 
 	protected boolean addNeighbor(int n1, int n2, int cap)
 	{
-		return addNeighbor(n1, new Integer(n2), cap);
+		return addNeighbor(n1, Integer.valueOf(n2), cap);
 	}
 
 	protected boolean addNeighbor(int n1, Integer n2_i)
@@ -571,7 +591,7 @@ public class Graph
 	}
 	public void assertNeighbor(int n1, int n2)
 	{
-		if(!adjacencyList[n1].contains(new Integer(n2)))
+		if(!adjacencyList[n1].contains(Integer.valueOf(n2)))
 		{
 			throw new RuntimeException("ERROR: neighbor assertion failed: "+n2+" is not a neighbor of current "+n1);
 		}
@@ -598,7 +618,7 @@ public class Graph
 	{
 		for(int i = 0; i < noNodes; i++)
 		{
-			Integer i_obj = new Integer(i);
+			Integer i_obj = Integer.valueOf(i);
 			for(int j = 0; j < adjacencyList[i].size(); j++)
 			{
 				if(findNeighbor(adjacencyList[i].get(j).intValue(), i) == null)
@@ -817,7 +837,7 @@ public class Graph
 	// If slack is set to 3, flows can not deviate more than 2 hops from their shortest path distance
 	private boolean isFlowZero(FlowID flowID, int linkFrom, int linkTo)
 	{
-		int SLACK = 4;
+		int SLACK = 6;
 		int srcSw = flowID.srcSwitch;
 		int destSw = flowID.dstSwitch;
 
@@ -828,12 +848,17 @@ public class Graph
 	}
 
 	// Uses a path-length based heuristic to determine that a certain flow on a certain link will be 0, so no need to factor in LP etc.
-	public void PrintGraphforMCFFairCondensed(String filename, int probability, double[][] switchLevelMatrix)
+	public void PrintGraphforMCFFairCondensed(String filename, int probability, double[][] switchLevelMatrix, ArrayList<Rack> rackPool, ArrayList<Path>[][] pathPool)
 	{
 
 		modifiedFloydWarshall();
 		int r=noNodes; //# of ToR switches
 		int svrs=totalWeight;
+		boolean useOptimalRouting = true;
+		if (rackPool != null) {
+			assert(pathPool != null);
+			useOptimalRouting = false;
+		}
 
 		int nflowlet = 1;
 		try
@@ -881,7 +906,7 @@ public class Graph
 			FlowID[] allFlowIDs = new FlowID[numFlows];
 			int curfID=0;
 			Writer output1 = new BufferedWriter(new FileWriter("flowIDmap" + file_index));
-			
+
 			for (int f = 0; f < noNodes; f++)
 				for (int t = 0; t < noNodes; t++)
 					if(switchLevelMatrix[f][t]>0)
@@ -891,19 +916,19 @@ public class Graph
 						curfID++;
 					}
 			output1.close();
-
-			Writer output2 = new BufferedWriter(new FileWriter("linkCaps" + file_index));
-			
-			for (int f = 0; f < noNodes; f++)
-				for (int j=0; j<adjacencyList[f].size(); j++) {  //for each out link of f = (f,j)
-					String lType = "";
-
-					if (adjacencyList[f].elementAt(j).linkcapacity > 1) lType = "H-H";
-					else lType += adjacencyList[f].size() + "-" + adjacencyList[adjacencyList[f].elementAt(j).intValue()].size();
-				
-					output2.write(f + "_" + adjacencyList[f].elementAt(j).intValue() + " " + adjacencyList[f].elementAt(j).linkcapacity + " " + adjacencyList[f].size() + " " + lType + "\n");
-				}
-			output2.close();
+//
+//			Writer output2 = new BufferedWriter(new FileWriter("linkCaps" + file_index));
+//
+//			for (int f = 0; f < noNodes; f++)
+//				for (int j=0; j<adjacencyList[f].size(); j++) {  //for each out link of f = (f,j)
+//					String lType = "";
+//
+//					if (adjacencyList[f].elementAt(j).linkcapacity > 1) lType = "H-H";
+//					else lType += adjacencyList[f].size() + "-" + adjacencyList[adjacencyList[f].elementAt(j).intValue()].size();
+//
+//					output2.write(f + "_" + adjacencyList[f].elementAt(j).intValue() + " " + adjacencyList[f].elementAt(j).linkcapacity + " " + adjacencyList[f].size() + " " + lType + "\n");
+//				}
+//			output2.close();
 
 			//boolean fair = false;
 			boolean fair = true;
@@ -915,7 +940,7 @@ public class Graph
                 // Hence, we shuffle the flows and choose the first round(prob% * totalFlows) number of flows
                 ArrayList<Integer> list = new ArrayList<Integer>();
                 for (int i = 0; i < curfID; i++) {
-                    list.add(new Integer(i));
+                    list.add(Integer.valueOf(i));
                 }
                 Collections.shuffle(list);
                 float prob = (float) probability / 100;
@@ -1046,81 +1071,855 @@ public class Graph
 			//>
 
 			//<Constraints of Type 2: Flow conservation at non-source, non-destination
-			int LARGE_VALUE = 10;		// TOPO_COMPARISON
+			int LARGE_VALUE = 1;		// TOPO_COMPARISON
 			System.out.println(new Date() + ": Starting part 2");
 			out.write("\n\\Type 2: Flow conservation at non-source, non-destination\n");
-			fid=0;
-			for (int f = 0; f < noNodes; f++)
-			{
-				for (int t = 0; t < noNodes; t++)
-				{
-					if(switchLevelMatrix[f][t]>0)	   //for each flow fid
-					{
-						for(int u=0; u<noNodes; u++)   //for each node u
-						{
-							constraint = "";
-							int writeCons = 0;
-							if(u==f)    //src
-							{
-								constraint = "c2_" + fid + "_" + u + "_1: ";
 
-								for(int j=0; j<adjacencyList[u].size(); j++)   //for each out link of u = (u,j)
+			if (useOptimalRouting) {
+
+				fid = 0;
+				for (int f = 0; f < noNodes; f++) {
+					for (int t = 0; t < noNodes; t++) {
+						if (switchLevelMatrix[f][t] > 0)       //for each flow fid
+						{
+							for (int u = 0; u < noNodes; u++)   //for each node u
+							{
+								constraint = "";
+								int writeCons = 0;
+								if (u == f)    //src
 								{
-									if (!isFlowZero(allFlowIDs[fid], u, adjacencyList[u].elementAt(j).intValue()))
+									constraint = "c2_" + fid + "_" + u + "_1: ";
+
+									for (int j = 0; j < adjacencyList[u].size(); j++)   //for each out link of u = (u,j)
 									{
+										if (!isFlowZero(allFlowIDs[fid], u, adjacencyList[u].elementAt(j).intValue())) {
+											constraint += "f_" + fid + "_" + u + "_" + adjacencyList[u].elementAt(j).intValue() + " + ";
+											writeCons = 1;
+										}
+									}
+									if (constraint.endsWith("+ "))
+										constraint = constraint.substring(0, constraint.lastIndexOf("+") - 1);
+									if (writeCons == 1)
+										out.write(constraint + " <= " + switchLevelMatrix[f][t] * LARGE_VALUE + "\n");
+									writeCons = 0;
+									constraint = "c2_" + fid + "_" + u + "_2: ";
+									for (int j = 0; j < adjacencyList[u].size(); j++)   //for each in link of u = (j,u)
+									{
+										if (!isFlowZero(allFlowIDs[fid], adjacencyList[u].elementAt(j).intValue(), u)) {
+											constraint += "f_" + fid + "_" + adjacencyList[u].elementAt(j).intValue() + "_" + u + " + ";
+											writeCons = 1;
+										}
+									}
+									if (constraint.endsWith("+ "))
+										constraint = constraint.substring(0, constraint.lastIndexOf("+") - 1);
+									if (writeCons == 1) out.write(constraint + " = 0\n");
+								} else if (u == t) {
+								} else  // non-src and non-dest
+								{
+									constraint = "c2_" + fid + "_" + u + "_3: ";
+									for (int j = 0; j < adjacencyList[u].size(); j++)   //for each out link of u = (u,j)
+									{
+										if (!isFlowZero(allFlowIDs[fid], u, adjacencyList[u].elementAt(j).intValue())) {
+											constraint += "f_" + fid + "_" + u + "_" + adjacencyList[u].elementAt(j).intValue() + " + ";
+											writeCons = 1;
+										}
+									}
+									if (constraint.endsWith("+ "))
+										constraint = constraint.substring(0, constraint.lastIndexOf("+") - 1);
+									constraint += " - ";
+
+									for (int j = 0; j < adjacencyList[u].size(); j++)   //for each in link of u = (j,u)
+									{
+										if (!isFlowZero(allFlowIDs[fid], adjacencyList[u].elementAt(j).intValue(), u)) {
+											constraint += "f_" + fid + "_" + adjacencyList[u].elementAt(j).intValue() + "_" + u + " - ";
+											writeCons = 1;
+										}
+									}
+									if (constraint.endsWith("- "))
+										constraint = constraint.substring(0, constraint.lastIndexOf("-") - 1);
+									if (writeCons == 1) out.write(constraint + " = 0\n");
+								}
+							}
+							fid++;
+						}
+					}
+					if (f > 0 && f % 20 == 0)
+						System.out.println(new Date() + ": " + f + " of " + noNodes + " done");
+				}
+			} else {
+
+				fid = 0;
+				for (int f = 0; f < noNodes; f++) {
+					for (int t = 0; t < noNodes; t++) {
+						if (switchLevelMatrix[f][t] > 0)       //for each flow fid from f to t
+						{
+							for (int u = 0; u < noNodes; u++)   //for each node u
+							{
+								constraint = "";
+								int writeCons = 0;
+								if (u == f)    //src
+								{
+
+									writeCons = 0;
+									constraint = "c2_" + fid + "_" + u + "_1: ";
+									HashSet<Integer> feasibleOutgoingLinkDst = rackPool.get(u).outgoingLinkDst[f][t];
+									for (Integer linkDst : feasibleOutgoingLinkDst) { // for feasible out link of u = (u,j)
+										constraint += "f_" + fid + "_" + u + "_" + linkDst.intValue() + " + ";
+										writeCons = 1;
+									}
+									if (constraint.endsWith("+ "))
+										constraint = constraint.substring(0, constraint.lastIndexOf("+") - 1);
+									if (writeCons == 1)
+										out.write(constraint + " <= " + switchLevelMatrix[f][t] * LARGE_VALUE + "\n");
+
+									writeCons = 0;
+									constraint = "c2_" + fid + "_" + u + "_2: ";
+									for (int j = 0; j < adjacencyList[u].size(); j++) // for every other out link of u = (u,j)
+									{
+										if (feasibleOutgoingLinkDst.contains(adjacencyList[u].elementAt(j).intValue())) continue;
 										constraint += "f_" + fid + "_" + u + "_" + adjacencyList[u].elementAt(j).intValue() + " + ";
 										writeCons = 1;
 									}
-								}
-								if (constraint.endsWith("+ ")) constraint = constraint.substring(0, constraint.lastIndexOf("+")-1 );
-								if (writeCons == 1) out.write(constraint + " <= " + switchLevelMatrix[f][t]*LARGE_VALUE + "\n");
-								writeCons = 0;
-								constraint = "c2_" + fid + "_" + u + "_2: ";
-								for(int j=0; j<adjacencyList[u].size(); j++)   //for each in link of u = (j,u)
-								{
-									if (!isFlowZero(allFlowIDs[fid], adjacencyList[u].elementAt(j).intValue(), u))
+									if (constraint.endsWith("+ "))
+										constraint = constraint.substring(0, constraint.lastIndexOf("+") - 1);
+									if (writeCons == 1)
+										out.write(constraint + " = 0\n");
+
+									// A flow starting from u should not come back to u for any reason.
+									writeCons = 0;
+									constraint = "c2_" + fid + "_" + u + "_2: ";
+									for (int j = 0; j < adjacencyList[u].size(); j++)   //for each in link of u = (j,u)
 									{
 										constraint += "f_" + fid + "_" + adjacencyList[u].elementAt(j).intValue() + "_" + u + " + ";
 										writeCons = 1;
 									}
-								}
-								if (constraint.endsWith("+ ")) constraint = constraint.substring(0, constraint.lastIndexOf("+")-1 );
-								if (writeCons == 1) out.write(constraint + " = 0\n");
-							}
-							else if (u==t) {}
-							else  // non-src and non-dest
-							{
-								constraint = "c2_" + fid + "_" + u + "_3: ";
-								for(int j=0; j<adjacencyList[u].size(); j++)   //for each out link of u = (u,j)
-								{
-									if (!isFlowZero(allFlowIDs[fid], u, adjacencyList[u].elementAt(j).intValue()))
+									if (constraint.endsWith("+ "))
+										constraint = constraint.substring(0, constraint.lastIndexOf("+") - 1);
+									if (writeCons == 1) out.write(constraint + " = 0\n");
+
+								} else if (u == t) { // dst
+
+									// A flow ending at u should not go out from u again for any reason.
+									writeCons = 0;
+									constraint = "c2_" + fid + "_" + u + "_3: ";
+									for (int j = 0; j < adjacencyList[u].size(); j++) // for each out link of u = (u,j)
 									{
 										constraint += "f_" + fid + "_" + u + "_" + adjacencyList[u].elementAt(j).intValue() + " + ";
 										writeCons = 1;
 									}
-								}
-								if (constraint.endsWith("+ ")) constraint = constraint.substring(0, constraint.lastIndexOf("+")-1 );
-								constraint += " - ";
+									if (constraint.endsWith("+ "))
+										constraint = constraint.substring(0, constraint.lastIndexOf("+") - 1);
+									if (writeCons == 1)
+										out.write(constraint + " = 0\n");
 
-								for(int j=0; j<adjacencyList[u].size(); j++)   //for each in link of u = (j,u)
-								{
-									if (!isFlowZero(allFlowIDs[fid], adjacencyList[u].elementAt(j).intValue(), u))
-									{
-										constraint += "f_" + fid + "_" + adjacencyList[u].elementAt(j).intValue() + "_" + u + " - ";
+									writeCons = 0;
+									constraint = "c2_" + fid + "_" + u + "_4: ";
+									HashSet<Integer> feasibleIncomingLinkSrc = rackPool.get(u).incomingLinkSrc[f][t];
+									for (Integer linkSrc : feasibleIncomingLinkSrc) { // for feasible in link of u = (j,u)
+										constraint += "f_" + fid + "_" + linkSrc.intValue() + "_" + u + " + ";
 										writeCons = 1;
 									}
+									if (constraint.endsWith("+ "))
+										constraint = constraint.substring(0, constraint.lastIndexOf("+") - 1);
+									if (writeCons == 1)
+										out.write(constraint + " <= " + switchLevelMatrix[f][t] * LARGE_VALUE + "\n");
+
+									writeCons = 0;
+									constraint = "c2_" + fid + "_" + u + "_5: ";
+									for (int j = 0; j < adjacencyList[u].size(); j++) // for every other in link of u = (j,u)
+									{
+										if (feasibleIncomingLinkSrc.contains(adjacencyList[u].elementAt(j).intValue())) continue;
+										constraint += "f_" + fid + "_" + adjacencyList[u].elementAt(j).intValue() + "_" + u + " + ";
+										writeCons = 1;
+									}
+									if (constraint.endsWith("+ "))
+										constraint = constraint.substring(0, constraint.lastIndexOf("+") - 1);
+									if (writeCons == 1) out.write(constraint + " = 0\n");
+
+								} else  // non-src and non-dest
+								{
+
+									writeCons = 0;
+									constraint = "c2_" + fid + "_" + u + "_6: ";
+									HashSet<Integer> feasibleOutgoingLinkDst = rackPool.get(u).outgoingLinkDst[f][t];
+									for (Integer linkDst :  feasibleOutgoingLinkDst) { // for feasible out link of u = (u,j)
+										constraint += "f_" + fid + "_" + u + "_" + linkDst.intValue() + " + ";
+										writeCons = 1;
+									}
+									if (constraint.endsWith("+ "))
+										constraint = constraint.substring(0, constraint.lastIndexOf("+") - 1);
+									constraint += " - ";
+
+									HashSet<Integer> feasibleIncomingLinkSrc = rackPool.get(u).incomingLinkSrc[f][t];
+									for (Integer linkSrc : feasibleIncomingLinkSrc) { // for feasible in link of u = (j,u)
+										constraint += "f_" + fid + "_" + linkSrc.intValue() + "_" + u + " - ";
+										writeCons = 1;
+									}
+									if (constraint.endsWith("- "))
+										constraint = constraint.substring(0, constraint.lastIndexOf("-") - 1);
+									if (writeCons == 1) out.write(constraint + " = 0\n");
+
+									writeCons = 0;
+									constraint = "c2_" + fid + "_" + u + "_7: ";
+									for (int j = 0; j < adjacencyList[u].size(); j++) // for every other out link of u = (u,j)
+									{
+										if (feasibleOutgoingLinkDst.contains(adjacencyList[u].elementAt(j).intValue())) continue;
+										constraint += "f_" + fid + "_" + u + "_" + adjacencyList[u].elementAt(j).intValue() + " + ";
+										writeCons = 1;
+									}
+									if (constraint.endsWith("+ "))
+										constraint = constraint.substring(0, constraint.lastIndexOf("+") - 1);
+									if (writeCons == 1)
+										out.write(constraint + " = 0\n");
+
+									writeCons = 0;
+									constraint = "c2_" + fid + "_" + u + "_8: ";
+									for (int j = 0; j < adjacencyList[u].size(); j++) // for every other in link of u = (j,u)
+									{
+										if (feasibleIncomingLinkSrc.contains(adjacencyList[u].elementAt(j).intValue())) continue;
+										constraint += "f_" + fid + "_" + adjacencyList[u].elementAt(j).intValue() + "_" + u + " + ";
+										writeCons = 1;
+									}
+									if (constraint.endsWith("+ "))
+										constraint = constraint.substring(0, constraint.lastIndexOf("+") - 1);
+									if (writeCons == 1) out.write(constraint + " = 0\n");
 								}
-								if (constraint.endsWith("- ")) constraint = constraint.substring(0, constraint.lastIndexOf("-")-1 );
-								if (writeCons == 1) out.write(constraint + " = 0\n");
+							}
+							fid++;
+						}
+					}
+					if (f > 0 && f % 20 == 0)
+						System.out.println(new Date() + ": " + f + " of " + noNodes + " done");
+				}
+			}
+
+			// <Constraints of Type 3: Flow >= 0 for any flow on any link
+			out.write("\n\\Type 3: Flow >= 0 for any flow on any link\n");
+			System.out.println(new Date() + ": Starting part 3");
+			constraint = "";
+
+			fid = 0;
+			for (int f = 0; f < noNodes; f++) {
+				for (int t = 0; t < noNodes; t++) {
+					if (switchLevelMatrix[f][t] > 0) // for each flow fid from f to t
+					{
+						for (int u = 0; u < noNodes; u++) // for each node u
+						{
+							for (int j = 0; j < adjacencyList[u].size(); j++) // for each out link of u = (u,j)
+							{
+								if (!isFlowZero(allFlowIDs[fid], u, adjacencyList[u].elementAt(j).intValue())) {
+									constraint = "c3_" + fid + "_" + u + "_" + adjacencyList[u].elementAt(j).intValue() + ": ";
+									constraint += "f_" + fid + "_" + u + "_" + adjacencyList[u].elementAt(j).intValue() + " >= 0\n";
+									out.write(constraint);
+								}
+							}
+
+							for (int j = 0; j < adjacencyList[u].size(); j++) // for each in link of u = (j,u)
+							{
+								if (!isFlowZero(allFlowIDs[fid], adjacencyList[u].elementAt(j).intValue(), u)) {
+									constraint = "c3_" + fid + "_" + adjacencyList[u].elementAt(j).intValue() + "_" + u + ": ";
+									constraint += "f_" + fid + "_" + adjacencyList[u].elementAt(j).intValue() + "_" + u;
+									out.write(constraint + " >= 0\n");
+								}
 							}
 						}
 						fid++;
 					}
 				}
-				if(f > 0 && f % 20 == 0)
-					System.out.println(new Date() + ": "+f+" of "+noNodes+" done");
+			}
+
+
+			if (!useOptimalRouting && false)
+			{
+				//<Constraints of Type 4: Flow conservation per path
+				System.out.println(new Date() + ": Starting part 4");
+				out.write("\n\\Type 4: Flow conservation per path\n");
+
+				fid = 0;
+				for (int f = 0; f < noNodes; f++)
+				{
+					for (int t = 0; t < noNodes; t++)
+					{
+						if (switchLevelMatrix[f][t] > 0) // for each flow fid from f to t
+						{
+							ArrayList<Path> feasiblePaths = pathPool[f][t];
+							for (int i=0; i<feasiblePaths.size(); i++) // for each feasible path from f to t for carrying flow fid
+							{
+								Path thisPath = feasiblePaths.get(i);
+								// for each link of this path starting at the second link: the flow on it cannot be smaller than the flow on the previous link
+								for (int j=1; j<thisPath.path.size(); j++)
+								{
+									NPLink currLink = thisPath.path.get(j);
+									NPLink prevLink = thisPath.path.get(j-1);
+									constraint = "c4_" + fid + "_" + f + "_" + t + "_" + i + "_" + j + ": ";
+									constraint += "f_" + fid + "_" + currLink.from + "_" + currLink.to + " - " + "f_" + fid + "_" + prevLink.from + "_" + prevLink.to;
+									out.write(constraint + " = 0\n");
+								}
+							}
+							fid++;
+						}
+					}
+					if (f > 0 && f % 20 == 0)
+						System.out.println(new Date() + ": " + f + " of " + noNodes + " done");
+				}
 			}
 			
+			out.write("End\n");
+			out.close();
+		}
+		catch (Exception e)
+		{
+			System.err.println("PrintGraphforMCFFairCondensed Error: " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
+
+	// Uses a path-length based heuristic to determine that a certain flow on a certain link will be 0, so no need to factor in LP etc.
+	public void PrintGraphforMCFFairCondensedForKnownRoutingEqualShare(String filename, int probability, double[][] switchLevelMatrix, ArrayList<Rack> rackPool, ArrayList<Path>[][] pathPool, ArrayList<LinkUsageTupleWithDuplicate>[][] linksUsageWithDuplicate, NPLink[][] linkPool)
+	{
+		modifiedFloydWarshall();
+		try
+		{
+			FileWriter fstream = new FileWriter(filename);
+			BufferedWriter out = new BufferedWriter(fstream);
+
+			int numFlows = 0;
+			for (int f = 0; f < noNodes; f++)
+				for (int t = 0; t < noNodes; t++)
+					if(switchLevelMatrix[f][t]>0)
+						numFlows++;
+
+			String file_index = filename.substring(3);
+			file_index = file_index.substring(0, file_index.length() - 4);
+
+			System.out.println(file_index + " ***************************** ");
+
+			FlowID[] allFlowIDs = new FlowID[numFlows];
+			int curfID=0;
+			Writer output1 = new BufferedWriter(new FileWriter("flowIDmap" + file_index));
+
+			for (int f = 0; f < noNodes; f++)
+				for (int t = 0; t < noNodes; t++)
+					if(switchLevelMatrix[f][t]>0)
+					{
+						allFlowIDs[curfID] = new FlowID(curfID, f, t);
+						output1.write(curfID + " " + f + " " + t + "\n");
+						curfID++;
+					}
+			output1.close();
+
+			Writer output2 = new BufferedWriter(new FileWriter("linkCaps" + file_index));
+
+			for (int f = 0; f < noNodes; f++)
+				for (int j=0; j<adjacencyList[f].size(); j++) {  //for each out link of f = (f,j)
+					String lType = "";
+
+					if (adjacencyList[f].elementAt(j).linkcapacity > 1) lType = "H-H";
+					else lType += adjacencyList[f].size() + "-" + adjacencyList[adjacencyList[f].elementAt(j).intValue()].size();
+
+					output2.write(f + "_" + adjacencyList[f].elementAt(j).intValue() + " " + adjacencyList[f].elementAt(j).linkcapacity + " " + adjacencyList[f].size() + " " + lType + "\n");
+				}
+			output2.close();
+
+			// Assumed fairness
+
+			// we need to set probability% of flows to large flows.
+			// Rand(100) < probability does not give desired distribution for small network sizes
+			// Hence, we shuffle the flows and choose the first round(prob% * totalFlows) number of flows
+			ArrayList<Integer> list = new ArrayList<Integer>();
+			for (int i = 0; i < curfID; i++) {
+				list.add(Integer.valueOf(i));
+			}
+			Collections.shuffle(list);
+			float prob = (float) probability / 100;
+			int chooseCount = Math.round(prob * curfID);
+
+			//< Objective
+			out.write("Maximize \n");
+			out.write("obj: ");
+			String objective = "K";
+
+			// To make CPLEX not fill pipes as freely as it does while keeping the optimal value same
+			// Simple idea: For each utilization of capacity, subtract a tiny amount from the objective.
+			// This forces CPLEX to keep the main 'K' part as large as possible, while avoiding wastage of capacity
+			out.write(objective);
+
+
+			// <Constraints of Type 0: fairness i.e. flow >= K
+			out.write("\n\nSUBJECT TO \n\\Type 0: Flow >= K\n");
+			System.out.println(new Date() + ": Starting part 0");
+			String constraint = "";
+			int flowid=0;
+			HashMap<FlowSrcDst, Integer> fidMapping = new HashMap<>(); // from <flowSrc, flowDst> to fid
+			for (int f = 0; f < noNodes; f++)
+			{
+				for (int t = 0; t < noNodes; t++)
+				{
+					if(switchLevelMatrix[f][t]>0) // for each flow flowid with source f and destination t
+					{
+						constraint = "c0_" + flowid + ": ";
+						ArrayList<HopWithDuplicate> outgoingHops = rackPool.get(f).outgoingHopsWithDuplicate[f][t];
+						for (HopWithDuplicate hop : outgoingHops) {
+							assert(hop.linkSrc == f);
+							constraint += "-f_" + flowid + "_" + hop.pid + "_" + f + "_" + hop.linkDst + " ";
+						}
+
+						if (list.indexOf(flowid) < chooseCount && probability < 100) {
+							constraint += " + " + 10*switchLevelMatrix[f][t] + " K <= 0\n";
+						} else {
+							constraint += " + " + switchLevelMatrix[f][t] + " K <= 0\n";
+						}
+						out.write(constraint);
+
+						fidMapping.put(new FlowSrcDst(f, t), flowid);
+
+						flowid++;
+					}
+				}
+			}
+
+
+			// <Constraints of Type 1: Load on link <= max_load
+			out.write("\n\\Type 1: Load on link <= max_load\n");
+			System.out.println(new Date() + ": Starting part 1");
+			for(int i=0; i<noNodes; i++)
+			{
+				for (int j=0; j<noNodes; j++)
+				{
+					if (linksUsageWithDuplicate[i][j].size() > 0) {
+						boolean shouldWrite = false;
+						constraint = "c1_" + i + "_" + j + ": ";
+						ArrayList<LinkUsageTupleWithDuplicate> tuples = linksUsageWithDuplicate[i][j];
+						for (LinkUsageTupleWithDuplicate tup : tuples) {
+							if (switchLevelMatrix[tup.flowSrc][tup.flowDst] == 0) continue;
+							int fid = fidMapping.get(new FlowSrcDst(tup.flowSrc, tup.flowDst));
+							constraint += "f_" + fid + "_" + tup.pid + "_" + i + "_" + j + " + ";
+							shouldWrite = true;
+						}
+						if(constraint.endsWith("+ "))
+							constraint = constraint.substring(0, constraint.lastIndexOf("+")-1);
+						if (shouldWrite) out.write(constraint + " <= " +  linkPool[i][j].linkCapacity + "\n");
+					}
+				}
+
+				if(i > 0 && i % 20 == 0)
+					System.out.println(new Date() + ": "+i+" of "+noNodes+" done");
+			}
+
+
+			// <Constraints of Type 2: Flow conservation at non-source, non-destination
+			int LARGE_VALUE = 1; // TOPO_COMPARISON
+			System.out.println(new Date() + ": Starting part 2");
+			out.write("\n\\Type 2: Flow conservation at non-source, non-destination\n");
+			for (int f = 0; f < noNodes; f++) {
+				for (int t = 0; t < noNodes; t++) {
+					if (switchLevelMatrix[f][t] > 0) // for each flow fid from f to t
+					{
+						int fid = fidMapping.get(new FlowSrcDst(f, t));
+						for (int u = 0; u < noNodes; u++) // for each node u
+						{
+							if (u == f) // src
+							{
+								constraint = "c2_" + fid + "_" + f + "_1: ";
+								ArrayList<HopWithDuplicate> outgoingHops = rackPool.get(f).outgoingHopsWithDuplicate[f][t];
+								for (HopWithDuplicate hop : outgoingHops) {
+									assert(hop.linkSrc == f);
+									constraint += "f_" + fid + "_" + hop.pid + "_" + f + "_" + hop.linkDst + " + ";
+								}
+								if (constraint.endsWith("+ "))
+									constraint = constraint.substring(0, constraint.lastIndexOf("+") - 1);
+								out.write(constraint + " <= " + switchLevelMatrix[f][t] * LARGE_VALUE + "\n");
+							}
+							else if (u == t) // dst
+							{
+								constraint = "c2_" + fid + "_" + u + "_2: ";
+								ArrayList<HopWithDuplicate> incomingHops = rackPool.get(f).incomingHopsWithDuplicate[f][t];
+								for (HopWithDuplicate hop : incomingHops) {
+									assert(hop.linkDst == t);
+									constraint += "f_" + fid + "_" + hop.pid + "_" + hop.linkSrc + "_" + t + " + ";
+								}
+								if (constraint.endsWith("+ "))
+									constraint = constraint.substring(0, constraint.lastIndexOf("+") - 1);
+								out.write(constraint + " <= " + switchLevelMatrix[f][t] * LARGE_VALUE + "\n");
+							}
+							else  // non-src and non-dest
+							{
+								boolean shouldWrite = false;
+								constraint = "c2_" + fid + "_" + u + "_3: ";
+								ArrayList<HopWithDuplicate> outgoingHops = rackPool.get(u).outgoingHopsWithDuplicate[f][t];
+								for (HopWithDuplicate hop : outgoingHops) {
+									assert(hop.linkSrc == u);
+									constraint += "f_" + fid + "_" + hop.pid + "_" + u + "_" + hop.linkDst + " + ";
+									shouldWrite = true;
+								}
+								if (constraint.endsWith("+ "))
+									constraint = constraint.substring(0, constraint.lastIndexOf("+") - 1);
+								constraint += " - ";
+
+								ArrayList<HopWithDuplicate> incomingHops = rackPool.get(u).incomingHopsWithDuplicate[f][t];
+								for (HopWithDuplicate hop : incomingHops) {
+									assert(hop.linkDst == u);
+									constraint += "f_" + fid + "_" + hop.pid + "_" + hop.linkSrc + "_" + u + " - ";
+									shouldWrite = true;
+								}
+								if (constraint.endsWith("- "))
+									constraint = constraint.substring(0, constraint.lastIndexOf("-") - 1);
+								if (shouldWrite) out.write(constraint + " = 0\n");
+							}
+						}
+					}
+				}
+
+				if (f > 0 && f % 20 == 0)
+					System.out.println(new Date() + ": " + f + " of " + noNodes + " done");
+			}
+
+
+			// <Constraints of Type 3: Flow >= 0 for any flow on any link
+			out.write("\n\\Type 3: Flow >= 0 for any flow on any link\n");
+			System.out.println(new Date() + ": Starting part 3");
+			for (int f = 0; f < noNodes; f++) {
+				for (int t = 0; t < noNodes; t++) {
+					if (switchLevelMatrix[f][t] > 0) // for each flow fid from f to t
+					{
+						int fid = fidMapping.get(new FlowSrcDst(f,t));
+						ArrayList<Path> paths = pathPool[f][t];
+						for (int i=0; i<paths.size(); i++) {
+							Path thisPath = paths.get(i);
+							int pid = thisPath.pid;
+							for (int l=0; l<thisPath.path.size(); l++) {
+								NPLink link = thisPath.path.get(l);
+								constraint = "c3_" + fid + "_" + pid + "_" + link.from + "_" + link.to + ": ";
+								constraint += "f_" + fid + "_" + pid + "_" + link.from + "_" + link.to + " >= 0\n";
+								out.write(constraint);
+							}
+						}
+					}
+				}
+			}
+
+
+			//<Constraints of Type 4: Flow conservation per path
+			System.out.println(new Date() + ": Starting part 4");
+			out.write("\n\\Type 4: Flow conservation per path\n");
+			for (int f = 0; f < noNodes; f++)
+			{
+				for (int t = 0; t < noNodes; t++)
+				{
+					if (switchLevelMatrix[f][t] > 0) // for each flow fid from f to t
+					{
+						int fid = fidMapping.get(new FlowSrcDst(f,t));
+						ArrayList<Path> paths = pathPool[f][t];
+						for (int i=0; i<paths.size(); i++) {
+							Path thisPath = paths.get(i);
+							int pid = thisPath.pid;
+							for (int l=1; l<thisPath.path.size(); l++) {
+								NPLink currLink = thisPath.path.get(l);
+								NPLink prevLink = thisPath.path.get(l-1);
+								constraint = "c4_" + fid + "_" + pid + "_" + currLink.from + "_" + currLink.to + ": ";
+								constraint += "f_" + fid + "_" + pid + "_" + currLink.from + "_" + currLink.to + " -f_" + fid + "_" + pid + "_" + prevLink.from + "_" + prevLink.to + " = 0\n";
+								out.write(constraint);
+							}
+						}
+					}
+				}
+
+				if (f > 0 && f % 20 == 0)
+					System.out.println(new Date() + ": " + f + " of " + noNodes + " done");
+			}
+
+
+			//<Constraints of Type 5: Equal share
+			System.out.println(new Date() + ": Starting part 5");
+			out.write("\n\\Type 5: Equal share\n");
+			for (int f = 0; f < noNodes; f++)
+			{
+				for (int t = 0; t < noNodes; t++)
+				{
+					if (switchLevelMatrix[f][t] > 0) // for each flow fid from f to t
+					{
+						int fid = fidMapping.get(new FlowSrcDst(f,t));
+						ArrayList<HopWithDuplicate> outgoingHops = rackPool.get(f).outgoingHopsWithDuplicate[f][t];
+						for (int i=1; i<outgoingHops.size(); i++) {
+							HopWithDuplicate currHop = outgoingHops.get(i);
+							HopWithDuplicate prevHop = outgoingHops.get(i-1);
+							assert(currHop.linkSrc == f);
+							assert(prevHop.linkSrc == f);
+							constraint += "f_" + fid + "_" + currHop.pid + "_" + f + "_" + currHop.linkDst + " -f_" + fid + "_" + prevHop.pid + "_" + f + "_" + prevHop.linkDst + " = 0\n";
+							out.write(constraint);
+						}
+					}
+				}
+
+				if (f > 0 && f % 20 == 0)
+					System.out.println(new Date() + ": " + f + " of " + noNodes + " done");
+			}
+
+
+			out.write("End\n");
+			out.close();
+		}
+		catch (Exception e)
+		{
+			System.err.println("PrintGraphforMCFFairCondensed Error: " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
+
+	public void PrintGraphforMCFFairCondensedForKnownRoutingUnequalShare(String filename, int probability, double[][] switchLevelMatrix, ArrayList<Rack> rackPool, ArrayList<Path>[][] pathPool, HashSet<LinkUsageTupleWithNoDuplicate>[][] linksUsageWithNoDuplicate, NPLink[][] linkPool)
+	{
+		modifiedFloydWarshall();
+		try
+		{
+			FileWriter fstream = new FileWriter(filename);
+			BufferedWriter out = new BufferedWriter(fstream);
+
+			int numFlows = 0;
+			for (int f = 0; f < noNodes; f++)
+				for (int t = 0; t < noNodes; t++)
+					if(switchLevelMatrix[f][t]>0)
+						numFlows++;
+
+			String file_index = filename.substring(3);
+			file_index = file_index.substring(0, file_index.length() - 4);
+
+			System.out.println(file_index + " ***************************** ");
+
+			FlowID[] allFlowIDs = new FlowID[numFlows];
+			int curfID=0;
+			Writer output1 = new BufferedWriter(new FileWriter("flowIDmap" + file_index));
+
+			for (int f = 0; f < noNodes; f++)
+				for (int t = 0; t < noNodes; t++)
+					if(switchLevelMatrix[f][t]>0)
+					{
+						allFlowIDs[curfID] = new FlowID(curfID, f, t);
+						output1.write(curfID + " " + f + " " + t + "\n");
+						curfID++;
+					}
+			output1.close();
+
+			Writer output2 = new BufferedWriter(new FileWriter("linkCaps" + file_index));
+
+			for (int f = 0; f < noNodes; f++)
+				for (int j=0; j<adjacencyList[f].size(); j++) {  //for each out link of f = (f,j)
+					String lType = "";
+
+					if (adjacencyList[f].elementAt(j).linkcapacity > 1) lType = "H-H";
+					else lType += adjacencyList[f].size() + "-" + adjacencyList[adjacencyList[f].elementAt(j).intValue()].size();
+
+					output2.write(f + "_" + adjacencyList[f].elementAt(j).intValue() + " " + adjacencyList[f].elementAt(j).linkcapacity + " " + adjacencyList[f].size() + " " + lType + "\n");
+				}
+			output2.close();
+
+			// Assumed fairness
+
+			// we need to set probability% of flows to large flows.
+			// Rand(100) < probability does not give desired distribution for small network sizes
+			// Hence, we shuffle the flows and choose the first round(prob% * totalFlows) number of flows
+			ArrayList<Integer> list = new ArrayList<Integer>();
+			for (int i = 0; i < curfID; i++) {
+				list.add(Integer.valueOf(i));
+			}
+			Collections.shuffle(list);
+			float prob = (float) probability / 100;
+			int chooseCount = Math.round(prob * curfID);
+
+			//< Objective
+			out.write("Maximize \n");
+			out.write("obj: ");
+			String objective = "K";
+
+			// To make CPLEX not fill pipes as freely as it does while keeping the optimal value same
+			// Simple idea: For each utilization of capacity, subtract a tiny amount from the objective.
+			// This forces CPLEX to keep the main 'K' part as large as possible, while avoiding wastage of capacity
+			out.write(objective);
+
+
+			// <Constraints of Type 0: fairness i.e. flow >= K
+			out.write("\n\nSUBJECT TO \n\\Type 0: Flow >= K\n");
+			System.out.println(new Date() + ": Starting part 0");
+			String constraint = "";
+			int flowid=0;
+			HashMap<FlowSrcDst, Integer> fidMapping = new HashMap<>(); // from <flowSrc, flowDst> to fid
+			for (int f = 0; f < noNodes; f++)
+			{
+				for (int t = 0; t < noNodes; t++)
+				{
+					if(switchLevelMatrix[f][t]>0) // for each flow flowid with source f and destination t
+					{
+						constraint = "c0_" + flowid + ": ";
+						HashSet<HopWithNoDuplicate> outgoingHops = rackPool.get(f).outgoingHopsWithNoDuplicate[f][t];
+						for (HopWithNoDuplicate hop : outgoingHops) {
+							assert(hop.linkSrc == f);
+							constraint += "-f_" + flowid + "_" + hop.pid + "_" + f + "_" + hop.linkDst + " ";
+						}
+
+						if (list.indexOf(flowid) < chooseCount && probability < 100) {
+							constraint += " + " + 10*switchLevelMatrix[f][t] + " K <= 0\n";
+						} else {
+							constraint += " + " + switchLevelMatrix[f][t] + " K <= 0\n";
+						}
+						out.write(constraint);
+
+						fidMapping.put(new FlowSrcDst(f, t), flowid);
+
+						flowid++;
+					}
+				}
+			}
+
+
+			// <Constraints of Type 1: Load on link <= max_load
+			out.write("\n\\Type 1: Load on link <= max_load\n");
+			System.out.println(new Date() + ": Starting part 1");
+			for(int i=0; i<noNodes; i++)
+			{
+				for (int j=0; j<noNodes; j++)
+				{
+					if (linksUsageWithNoDuplicate[i][j].size() > 0) {
+						boolean shouldWrite = false;
+						constraint = "c1_" + i + "_" + j + ": ";
+						HashSet<LinkUsageTupleWithNoDuplicate> tuples = linksUsageWithNoDuplicate[i][j];
+						for (LinkUsageTupleWithNoDuplicate tup : tuples) {
+							if (switchLevelMatrix[tup.flowSrc][tup.flowDst] == 0) continue;
+							int fid = fidMapping.get(new FlowSrcDst(tup.flowSrc, tup.flowDst));
+							constraint += "f_" + fid + "_" + tup.pid + "_" + i + "_" + j + " + ";
+							shouldWrite = true;
+						}
+						if(constraint.endsWith("+ "))
+							constraint = constraint.substring(0, constraint.lastIndexOf("+")-1);
+						if (shouldWrite) out.write(constraint + " <= " +  linkPool[i][j].linkCapacity + "\n");
+					}
+				}
+
+				if(i > 0 && i % 20 == 0)
+					System.out.println(new Date() + ": "+i+" of "+noNodes+" done");
+			}
+
+
+			// <Constraints of Type 2: Flow conservation at non-source, non-destination
+			int LARGE_VALUE = 1; // TOPO_COMPARISON
+			System.out.println(new Date() + ": Starting part 2");
+			out.write("\n\\Type 2: Flow conservation at non-source, non-destination\n");
+			for (int f = 0; f < noNodes; f++) {
+				for (int t = 0; t < noNodes; t++) {
+					if (switchLevelMatrix[f][t] > 0) // for each flow fid from f to t
+					{
+						int fid = fidMapping.get(new FlowSrcDst(f, t));
+						for (int u = 0; u < noNodes; u++) // for each node u
+						{
+							if (u == f) // src
+							{
+								constraint = "c2_" + fid + "_" + f + "_1: ";
+								HashSet<HopWithNoDuplicate> outgoingHops = rackPool.get(f).outgoingHopsWithNoDuplicate[f][t];
+								for (HopWithNoDuplicate hop : outgoingHops) {
+									assert(hop.linkSrc == f);
+									constraint += "f_" + fid + "_" + hop.pid + "_" + f + "_" + hop.linkDst + " + ";
+								}
+								if (constraint.endsWith("+ "))
+									constraint = constraint.substring(0, constraint.lastIndexOf("+") - 1);
+								out.write(constraint + " <= " + switchLevelMatrix[f][t] * LARGE_VALUE + "\n");
+							}
+							else if (u == t) // dst
+							{
+								constraint = "c2_" + fid + "_" + u + "_2: ";
+								HashSet<HopWithNoDuplicate> incomingHops = rackPool.get(f).incomingHopsWithNoDuplicate[f][t];
+								for (HopWithNoDuplicate hop : incomingHops) {
+									assert(hop.linkDst == t);
+									constraint += "f_" + fid + "_" + hop.pid + "_" + hop.linkSrc + "_" + t + " + ";
+								}
+								if (constraint.endsWith("+ "))
+									constraint = constraint.substring(0, constraint.lastIndexOf("+") - 1);
+								out.write(constraint + " <= " + switchLevelMatrix[f][t] * LARGE_VALUE + "\n");
+							}
+							else  // non-src and non-dest
+							{
+								boolean shouldWrite = false;
+								constraint = "c2_" + fid + "_" + u + "_3: ";
+								HashSet<HopWithNoDuplicate> outgoingHops = rackPool.get(u).outgoingHopsWithNoDuplicate[f][t];
+								for (HopWithNoDuplicate hop : outgoingHops) {
+									assert(hop.linkSrc == u);
+									constraint += "f_" + fid + "_" + hop.pid + "_" + u + "_" + hop.linkDst + " + ";
+									shouldWrite = true;
+								}
+								if (constraint.endsWith("+ "))
+									constraint = constraint.substring(0, constraint.lastIndexOf("+") - 1);
+								constraint += " - ";
+
+								HashSet<HopWithNoDuplicate> incomingHops = rackPool.get(u).incomingHopsWithNoDuplicate[f][t];
+								for (HopWithNoDuplicate hop : incomingHops) {
+									assert(hop.linkDst == u);
+									constraint += "f_" + fid + "_" + hop.pid + "_" + hop.linkSrc + "_" + u + " - ";
+									shouldWrite = true;
+								}
+								if (constraint.endsWith("- "))
+									constraint = constraint.substring(0, constraint.lastIndexOf("-") - 1);
+								if (shouldWrite) out.write(constraint + " = 0\n");
+							}
+						}
+					}
+				}
+
+				if (f > 0 && f % 20 == 0)
+					System.out.println(new Date() + ": " + f + " of " + noNodes + " done");
+			}
+
+
+			// <Constraints of Type 3: Flow >= 0 for any flow on any link
+			out.write("\n\\Type 3: Flow >= 0 for any flow on any link\n");
+			System.out.println(new Date() + ": Starting part 3");
+			for (int f = 0; f < noNodes; f++) {
+				for (int t = 0; t < noNodes; t++) {
+					if (switchLevelMatrix[f][t] > 0) // for each flow fid from f to t
+					{
+						int fid = fidMapping.get(new FlowSrcDst(f,t));
+						ArrayList<Path> paths = pathPool[f][t];
+						for (int i=0; i<paths.size(); i++) {
+							Path thisPath = paths.get(i);
+							int pid = thisPath.pid;
+							for (int l=0; l<thisPath.path.size(); l++) {
+								NPLink link = thisPath.path.get(l);
+								constraint = "c3_" + fid + "_" + pid + "_" + link.from + "_" + link.to + ": ";
+								constraint += "f_" + fid + "_" + pid + "_" + link.from + "_" + link.to + " >= 0\n";
+								out.write(constraint);
+							}
+						}
+					}
+				}
+			}
+
+
+			//<Constraints of Type 4: Flow conservation per path
+			System.out.println(new Date() + ": Starting part 4");
+			out.write("\n\\Type 4: Flow conservation per path\n");
+			for (int f = 0; f < noNodes; f++)
+			{
+				for (int t = 0; t < noNodes; t++)
+				{
+					if (switchLevelMatrix[f][t] > 0) // for each flow fid from f to t
+					{
+						int fid = fidMapping.get(new FlowSrcDst(f,t));
+						ArrayList<Path> paths = pathPool[f][t];
+						for (int i=0; i<paths.size(); i++) {
+							Path thisPath = paths.get(i);
+							int pid = thisPath.pid;
+							for (int l=1; l<thisPath.path.size(); l++) {
+								NPLink currLink = thisPath.path.get(l);
+								NPLink prevLink = thisPath.path.get(l-1);
+								constraint = "c4_" + fid + "_" + pid + "_" + currLink.from + "_" + currLink.to + ": ";
+								constraint += "f_" + fid + "_" + pid + "_" + currLink.from + "_" + currLink.to + " -f_" + fid + "_" + pid + "_" + prevLink.from + "_" + prevLink.to + " = 0\n";
+								out.write(constraint);
+							}
+						}
+					}
+				}
+
+				if (f > 0 && f % 20 == 0)
+					System.out.println(new Date() + ": " + f + " of " + noNodes + " done");
+			}
+
+
 			out.write("End\n");
 			out.close();
 		}
@@ -1218,40 +2017,39 @@ public class Graph
 			out.write("\n\\Type 2: Flow conservation at node\n");
 			System.out.println(new Date() + ": Starting part 2");
 
-			for(int i=0; i<noNodes; i++){
-				for(int k=0; k<noNodes; k++){
-					if (i!=k){
+			for (int i = 0; i < noNodes; i++) {
+				for (int k = 0; k < noNodes; k++) {
+					if (i != k) {
 						constraint = "c3_" + i + "_" + k + ": ";
-						if (switchLevelMatrix[i][k] > 0){
-							constraint += " f_" + i + "_" + k  ;	
-					
+						if (switchLevelMatrix[i][k] > 0) {
+							constraint += " f_" + i + "_" + k;
+
 						}
 
-						for(int j=0; j<adjacencyList[i].size(); j++){
-							constraint += " + l_" + adjacencyList[i].elementAt(j).intValue() +"_" + i +"_" + k + " ";		
-						}
-	
-						for(int j=0; j<adjacencyList[i].size(); j++){
-								constraint += " - l_" + i +"_" + adjacencyList[i].elementAt(j).intValue() +"_" + k + " ";
+						for (int j = 0; j < adjacencyList[i].size(); j++) {
+							constraint += " + l_" + adjacencyList[i].elementAt(j).intValue() + "_" + i + "_" + k + " ";
 						}
 
-						constraint+= " = 0\n";
+						for (int j = 0; j < adjacencyList[i].size(); j++) {
+							constraint += " - l_" + i + "_" + adjacencyList[i].elementAt(j).intValue() + "_" + k + " ";
+						}
+
+						constraint += " = 0\n";
 						out.write(constraint);
-					}
-					else if (i == k) {
+					} else if (i == k) {
 						constraint = "c3_" + i + "_" + k + ": ";
-						for(int j=0; j<noNodes; j++){
-							if(switchLevelMatrix[j][i] > 0){
+						for (int j = 0; j < noNodes; j++) {
+							if (switchLevelMatrix[j][i] > 0) {
 								constraint += " - f_" + j + "_" + i;
 							}
 						}
-	
-						for(int j=0; j<adjacencyList[i].size(); j++){
-								constraint += " + l_" + adjacencyList[i].elementAt(j).intValue() +"_" + i +"_" + i + " ";
+
+						for (int j = 0; j < adjacencyList[i].size(); j++) {
+							constraint += " + l_" + adjacencyList[i].elementAt(j).intValue() + "_" + i + "_" + i + " ";
 						}
-						constraint+= " = 0\n";
+						constraint += " = 0\n";
 						out.write(constraint);
-						
+
 					}
 				}
 			}
