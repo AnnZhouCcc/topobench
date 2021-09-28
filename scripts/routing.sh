@@ -1,4 +1,4 @@
-NRUNS=10
+NRUNS=1
 MYJAVAPATH="../"
 
 # Compile
@@ -13,16 +13,16 @@ numsvr=3072 # may not be needed
 topology=rrg
 graphfile=graphfiles/"$topology"_instance1_80_64.edgelist
 
-trafficmode=8
-a=60
-b=5
+trafficmode=9
+a=5
+b=0
 trafficfile=trafficfiles/fb_skewed.data
 
 isOptimal=false
 isEqualShare=true
 
-declare -a rs=("ecmp" "su2" "su3" "fhi" "16disjoint" "32disjoint" "16short" "32short")
-# declare -a rs=("opt")
+# declare -a rs=("ecmp" "su2" "su3" "fhi" "16disjoint" "32disjoint" "16short" "32short")
+declare -a rs=("ecmp")
 
 for routing in "${rs[@]}"
 do

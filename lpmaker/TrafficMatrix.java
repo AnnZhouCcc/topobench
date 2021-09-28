@@ -187,6 +187,60 @@ public class TrafficMatrix {
         System.out.println();
     }
 
+    public void TrafficGenMixA(int a, int[] numServersPerSwitch)
+    {
+        System.out.println("Half of the flows are in between " + a + " racks");
+
+        HashSet<Integer> r2rRacks = new HashSet<>();
+        while (r2rRacks.size() < a) {
+            r2rRacks.add(topology.rand.nextInt(numSwitches));
+        }
+
+        HashSet<Integer> a2aRacks = new HashSet<>();
+        for (int i=0; i<numSwitches; i++) {
+            if (!r2rRacks.contains(i)) a2aRacks.add(i);
+        }
+
+        // Hard-coding for now
+        double SNR = 0, SNA = 0;
+        if (a == 10) {
+            SNR = 53.6;
+            SNA = 1;
+        } else if (a == 5) {
+            SNR = 55.5;
+            SNA = 0.2;
+        } else if (a == 2) {
+            SNR = 30;
+            SNA = 0.01;
+        } else {
+            System.out.println("The parameters here are hard-coded. a=" + a + " does not have SNR and SNA hard-coded.");
+        }
+        System.out.println("SNR = " + SNR + ", SNA = " + SNA);
+
+        double numa2aFlows = 0;
+        for (int srca2a : a2aRacks) {
+            for (int dsta2a : a2aRacks) {
+                if (srca2a == dsta2a) continue;
+                switchLevelMatrix[srca2a][dsta2a] += trafficPerFlow * SNA;
+                numa2aFlows += SNA;
+            }
+        }
+        double numr2rFlows = 0;
+        for (int srcr2r : r2rRacks) {
+            for (int dstr2r : r2rRacks) {
+                if (srcr2r == dstr2r) continue;
+                switchLevelMatrix[srcr2r][dstr2r] += trafficPerFlow * SNR;
+                numr2rFlows += SNR;
+            }
+        }
+
+        System.out.println("Number of r2r flows = " + numr2rFlows + ", number of a2a flows = " + numa2aFlows);
+        System.out.print("r2r racks: ");
+        for (int r : r2rRacks) {
+            System.out.print(r + " ");
+        }
+    }
+
     public void RandomPermutationPairs(int size)
     {
         System.out.println("Random permutation flows");
@@ -304,6 +358,9 @@ public class TrafficMatrix {
         }
         else if (trafficmode == 8) {
             TrafficGenARackToBRack(a, b, numServersPerSwitches);
+        }
+        else if (trafficmode == 9) {
+            TrafficGenMixA(a, numServersPerSwitches);
         }
         else {
             System.out.println("Trafficmode is not recognized.");
