@@ -60,31 +60,31 @@ public class ProduceLP {
 
 		if(graphtype==0) // Vanilla Random Regular Graph
 		{	
-			System.out.println("sw:" + switches);
-			System.out.println("switchports:" + switchports);
-			System.out.println("svr port:" + serverports);
-			System.out.println("nsvrs" + nsvrs);
-			Graph mynet = new RandomRegularGraph(switches,switchports, switchports - serverports, 1, extended_switches, nsvrs, fail_rate);
-			TrafficMatrix tm = new TrafficMatrix(switches, trafficMode, "", mynet);
-
-			boolean useOptimalRouting = Boolean.parseBoolean(args[22]);
-			NetPath netpath = null;
-			if (!useOptimalRouting) {
-				String netpathFile = args[23];
-				System.out.println("netpath file: " + netpathFile);
-
-				netpath = new NetPath(netpathFile, mynet.adjacencyList, mynet.noNodes);
-			}
-
-			if (createLP == 1 && trafficMode == 0) mynet.PrintGraphforMCFFairCondensed("my." + runs + ".lp",100, tm.switchLevelMatrix, netpath==null?null:netpath.rackPool, netpath==null?null:netpath.pathPool);
-			if (createLP == 1 && trafficMode == 1) mynet.PrintSimpleGraph("my." + runs + ".lp", tm.switchLevelMatrix);
-                        if (createLP == 1 && trafficMode == 4) {
-                                mynet.printServerDistance("lpmaker/serverDist1.txt");
-                                String cmd = "python lpmaker/maxWeight.py lpmaker/serverDist1.txt maxWeightMatch.txt";
-                                runCommand(cmd);
-                                mynet.PrintGraphforMCFFairCondensed("my." + runs + ".lp", 100, tm.switchLevelMatrix, netpath==null?null:netpath.rackPool, netpath==null?null:netpath.pathPool);
-                        }
-			mynet.printPathLengths("pl." + runs);
+//			System.out.println("sw:" + switches);
+//			System.out.println("switchports:" + switchports);
+//			System.out.println("svr port:" + serverports);
+//			System.out.println("nsvrs" + nsvrs);
+//			Graph mynet = new RandomRegularGraph(switches,switchports, switchports - serverports, 1, extended_switches, nsvrs, fail_rate);
+//			TrafficMatrix tm = new TrafficMatrix(switches, trafficMode, "", mynet);
+//
+//			boolean useOptimalRouting = Boolean.parseBoolean(args[22]);
+//			NetPath netpath = null;
+//			if (!useOptimalRouting) {
+//				String netpathFile = args[23];
+//				System.out.println("netpath file: " + netpathFile);
+//
+//				netpath = new NetPath(netpathFile, mynet.adjacencyList, mynet.noNodes);
+//			}
+//
+//			if (createLP == 1 && trafficMode == 0) mynet.PrintGraphforMCFFairCondensed("my." + runs + ".lp",100, tm.switchLevelMatrix, netpath==null?null:netpath.rackPool, netpath==null?null:netpath.pathPool);
+//			if (createLP == 1 && trafficMode == 1) mynet.PrintSimpleGraph("my." + runs + ".lp", tm.switchLevelMatrix);
+//                        if (createLP == 1 && trafficMode == 4) {
+//                                mynet.printServerDistance("lpmaker/serverDist1.txt");
+//                                String cmd = "python lpmaker/maxWeight.py lpmaker/serverDist1.txt maxWeightMatch.txt";
+//                                runCommand(cmd);
+//                                mynet.PrintGraphforMCFFairCondensed("my." + runs + ".lp", 100, tm.switchLevelMatrix, netpath==null?null:netpath.rackPool, netpath==null?null:netpath.pathPool);
+//                        }
+//			mynet.printPathLengths("pl." + runs);
 		}
 		/*
 		else if(graphtype==1)	// Fat tree
@@ -440,9 +440,11 @@ public class ProduceLP {
 			String trafficFile = args[21];
 			System.out.println("graph file: " + graphFile);
 			System.out.println("traffic file: " + trafficFile);
+			int a = Integer.parseInt(args[25]);
+			int b = Integer.parseInt(args[26]);
 
 			Graph mynet = new GraphFromFileSrcDstPair(switches, graphFile, switchports);
-			TrafficMatrix tm = new TrafficMatrix(switches, trafficMode, trafficFile, mynet);
+			TrafficMatrix tm = new TrafficMatrix(switches, trafficMode, trafficFile, mynet, a, b, mynet.weightEachNode);
 
 			if (createLP == 1) {
 				boolean useOptimalRouting = Boolean.parseBoolean(args[22]);

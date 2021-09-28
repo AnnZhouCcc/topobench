@@ -23,20 +23,21 @@ class TrafficPair {
 public class TrafficMatrix {
     double[][] switchLevelMatrix;
     double trafficPerFlow = 1;
-    int packetSize = 1500;
+    double packetSize = 1500.0;
+    int numFlowCap = 50;
     int numSwitches;
     int numServers;
     int trafficmode;
     Graph topology;
 
-    public TrafficMatrix(int noNodes, int trafficMode, String trafficfile, Graph mynet) {
+    public TrafficMatrix(int noNodes, int trafficMode, String trafficfile, Graph mynet, int a, int b, int[] numServersPerSwitches) {
         numSwitches = noNodes;
         numServers = mynet.totalWeight;
         switchLevelMatrix = new double[numSwitches][numSwitches];
         trafficmode = trafficMode;
         topology = mynet;
 
-        generateTraffic(trafficfile);
+        generateTraffic(trafficfile, a, b, numServersPerSwitches);
     }
 
     // Send from all servers to some random server
@@ -110,9 +111,7 @@ public class TrafficMatrix {
     public void TrafficGenFromFile(String filename) {
         System.out.println("Flows from file " + filename);
         int numFlows = 0;
-
-        int[][] accumulativeTrafficMatrix = new int[numSwitches][numSwitches];
-        int minTraffic = Integer.MAX_VALUE;
+        double[][] accumulativeTrafficMatrix = new double[numSwitches][numSwitches];
 
         try {
             BufferedReader br = new BufferedReader(new FileReader(filename));
@@ -121,7 +120,7 @@ public class TrafficMatrix {
                 StringTokenizer strTok = new StringTokenizer(strLine);
                 int src = Integer.parseInt(strTok.nextToken());
                 int dst = Integer.parseInt(strTok.nextToken());
-                int traffic = (Integer.parseInt(strTok.nextToken()))/packetSize;
+                double traffic = (Integer.parseInt(strTok.nextToken()))/packetSize;
 
                 int src_sw = topology.svrToSwitch(src);
                 int dst_sw = topology.svrToSwitch(dst);
@@ -132,17 +131,18 @@ public class TrafficMatrix {
             e.printStackTrace();
         }
 
+        double maxTraffic = 0;
         for (int ssw=0; ssw<numSwitches; ssw++) {
             for (int dsw=0; dsw<numSwitches; dsw++) {
-                int traffic = accumulativeTrafficMatrix[ssw][dsw];
-                if (traffic > 0) minTraffic = Math.min(minTraffic, traffic);
+                double traffic = accumulativeTrafficMatrix[ssw][dsw];
+                maxTraffic = Math.max(maxTraffic, traffic);
             }
         }
 
-        int downscale = 1000;
+        double coefficient = maxTraffic/numFlowCap;
         for (int src = 0; src < numSwitches; src++) {
             for (int dst = 0; dst < numSwitches; dst++) {
-                int mult = accumulativeTrafficMatrix[src][dst] / (downscale*minTraffic);
+                int mult = (int)(accumulativeTrafficMatrix[src][dst] / coefficient);
                 switchLevelMatrix[src][dst] += trafficPerFlow * mult;
                 numFlows += mult;
             }
@@ -151,7 +151,7 @@ public class TrafficMatrix {
         System.out.println("Number of flows = " + numFlows);
     }
 
-    public void TrafficGenARackToBRack(int a, int b)
+    public void TrafficGenARackToBRack(int a, int b, int[] numServersPerSwitch)
     {
         System.out.println(a + " racks to " + b + " racks flows");
 
@@ -169,8 +169,8 @@ public class TrafficMatrix {
         for (int srcSw : srcRacks) {
             for (int dstSw : dstRacks) {
                 assert(srcSw != dstSw);
-                switchLevelMatrix[srcSw][dstSw] += trafficPerFlow;
-                numFlows++;
+                switchLevelMatrix[srcSw][dstSw] += trafficPerFlow * numServersPerSwitch[srcSw];
+                numFlows += numServersPerSwitch[srcSw];
             }
         }
 
@@ -277,7 +277,7 @@ public class TrafficMatrix {
         }
     }
 
-    public void generateTraffic(String trafficfile) {
+    public void generateTraffic(String trafficfile, int a, int b, int[] numServersPerSwitches) {
         // traffic-mode: 0 = randPerm; 1 = all-all; 2 = all-to-one; Any higher n means stride(n)
         System.out.println("trafficmode = " + trafficmode);
         ArrayList<TrafficPair> rndmap;
@@ -303,9 +303,7 @@ public class TrafficMatrix {
             TrafficGenFromFile(trafficfile);
         }
         else if (trafficmode == 8) {
-            int a = 1;
-            int b = 1;
-            TrafficGenARackToBRack(a, b);
+            TrafficGenARackToBRack(a, b, numServersPerSwitches);
         }
         else {
             System.out.println("Trafficmode is not recognized.");
