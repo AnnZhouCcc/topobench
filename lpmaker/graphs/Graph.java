@@ -1645,6 +1645,7 @@ public class Graph
 							HopWithDuplicate prevHop = outgoingHops.get(i-1);
 							assert(currHop.linkSrc == f);
 							assert(prevHop.linkSrc == f);
+							constraint = "c5_" + fid + "_" + currHop.pid + "_" + f + "_" + currHop.linkDst + ": ";
 							constraint += "f_" + fid + "_" + currHop.pid + "_" + f + "_" + currHop.linkDst + " -f_" + fid + "_" + prevHop.pid + "_" + f + "_" + prevHop.linkDst + " = 0\n";
 							out.write(constraint);
 						}
