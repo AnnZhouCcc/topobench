@@ -444,48 +444,41 @@ public class ProduceLP {
 			Graph mynet = new GraphFromFileSrcDstPair(switches, graphFile, switchports);
 			TrafficMatrix tm = new TrafficMatrix(switches, trafficMode, trafficFile, mynet);
 
-			boolean useOptimalRouting = Boolean.parseBoolean(args[22]);
-			NetPath netpath = null;
-			if (!useOptimalRouting) {
-				String netpathFile = args[23];
-				System.out.println("netpath file: " + netpathFile);
-
-				netpath = new NetPath(netpathFile, mynet.adjacencyList, mynet.noNodes);
-			}
-
 			if (createLP == 1) {
-				if (trafficMode == 1 || trafficMode == 5) {
-					System.out.println("PrintSimpleGraph");
-					mynet.PrintSimpleGraph("my." + runs + ".lp", tm.switchLevelMatrix);
+				boolean useOptimalRouting = Boolean.parseBoolean(args[22]);
+				if (useOptimalRouting) {
+					if (trafficMode == 1 || trafficMode == 5) {
+						System.out.println("PrintSimpleGraph");
+						mynet.PrintSimpleGraph("my." + runs + ".lp", tm.switchLevelMatrix);
+					} else {
+						System.out.println("PrintGraphforMCFFairCondensed");
+						mynet.PrintGraphforMCFFairCondensed("my." + runs + ".lp",100, tm.switchLevelMatrix, null, null);
+					}
 				} else {
-//					System.out.println("PrintGraphforMCFFairCondensed");
-//					mynet.PrintGraphforMCFFairCondensed("my." + runs + ".lp",100, tm.switchLevelMatrix, netpath==null?null:netpath.rackPool, netpath==null?null:netpath.pathPool);
-//					System.out.println("PrintGraphforMCFFairCondensedForKnownRoutingUnequalShare");
-//					mynet.PrintGraphforMCFFairCondensedForKnownRoutingUnequalShare("my." + runs + ".lp",100, tm.switchLevelMatrix, netpath.rackPool, netpath.pathPool, netpath.linksUsageWithNoDuplicate, netpath.linkPool);
-					System.out.println("PrintGraphforMCFFairCondensedForKnownRoutingEqualShare");
-					mynet.PrintGraphforMCFFairCondensedForKnownRoutingEqualShare("my." + runs + ".lp",100, tm.switchLevelMatrix, netpath.rackPool, netpath.pathPool, netpath.linksUsageWithDuplicate, netpath.linkPool);
+					String netpathFile = args[23];
+					System.out.println("netpath file: " + netpathFile);
+
+					NetPath netpath = new NetPath(netpathFile, mynet.adjacencyList, mynet.noNodes);
+
+					if (trafficMode == 1 || trafficMode == 5) {
+						System.out.println("PrintSimpleGraph");
+						mynet.PrintSimpleGraph("my." + runs + ".lp", tm.switchLevelMatrix);
+					} else {
+						boolean useEqualShare = Boolean.parseBoolean(args[24]);
+						if (useEqualShare) {
+							System.out.println("PrintGraphforMCFFairCondensedForKnownRoutingEqualShare");
+							mynet.PrintGraphforMCFFairCondensedForKnownRoutingEqualShare("my." + runs + ".lp",100, tm.switchLevelMatrix, netpath.rackPool, netpath.pathPool, netpath.linksUsageWithDuplicate, netpath.linkPool);
+						} else {
+							System.out.println("PrintGraphforMCFFairCondensedForKnownRoutingUnequalShare");
+							mynet.PrintGraphforMCFFairCondensedForKnownRoutingUnequalShare("my." + runs + ".lp",100, tm.switchLevelMatrix, netpath.rackPool, netpath.pathPool, netpath.linksUsageWithNoDuplicate, netpath.linkPool);
+						}
+					}
 				}
 			} else {
 				System.out.println("createLP != 1. Not implemented yet.");
 			}
 
-//			int[] degreeDist = new int[mynet.noNodes];
-//			for (int sw = 0; sw < mynet.noNodes; sw++) {
-//				degreeDist[sw] = mynet.adjacencyList[sw].size();
-//			}
-//			Graph randCompare = new RandDegreeDist(switches, degreeDist);
-//			if (createLP == 1) {
-//				if (trafficMode == 0) {
-//					randCompare.PrintGraphforMCFFairCondensed("randCompare." + runs + ".lp", trafficMode, 100);
-//				} else if (trafficMode == 1) {
-//					mynet.PrintSimpleGraph("randCompare." + runs + ".lp", trafficMode);
-//				}
-//			} else {
-//				System.out.println("createLP != 1. Not implemented yet.");
-//			}
-
 			mynet.printPathLengths("pl." + runs);
-//			randCompare.printPathLengths("pl_randCompare." + runs);
 		}
 		System.out.println("Done Constructing Graph");
 	}

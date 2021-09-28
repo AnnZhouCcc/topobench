@@ -1,4 +1,4 @@
-NRUNS=3         # Reduced for sake of running time.
+NRUNS=10
 MYJAVAPATH="../"
 
 # Compile
@@ -6,35 +6,54 @@ cd $MYJAVAPATH
 javac -nowarn lpmaker/ProduceLP.java
 cd -
 
-rm -rf ../resultfiles/result_routing.txt
+switches=80
+port=64
+numsvr=3072 # may not be needed
 
-#for port in 6 8 10 12 14 16	# Can run for larger sizes; for sake of demo run time, we'll run for only three sizes below
-for port in 6 8 10
+trafficmode=2
+topology=rrg
+
+graphfile=graphfiles/"$topology"_instance1_80_64.edgelist
+trafficfile=trafficfiles/fb_skewed.data
+
+isOptimal=false
+isEqualShare=true
+
+declare -a rs=("opt" "ecmp" "su2" "su3" "fhi" "16disjoint" "32disjoint" "16short" "32short")
+
+for routing in "${rs[@]}"
 do
-	switches=`expr $port \* $port \* 5 / 4`
-	numsvr=`expr $port \* $port \* $port / 4`
 
-	rm -rf flowtmp_fat pl_fat
+suffix="$topology"_"$routing"_"$trafficmode"_"$isOptimal"_"$isEqualShare"
+netpathfile=netpathfiles/netpath_"$routing"_"$topology".txt
+if [ "$routing" = "opt" ]
+then
+  isOptimal=true
+fi
 
-	for (( i=0 ; i < $NRUNS ; i++ ))
-	do
-		# We checked -- the fat-tree does give throughput = 1 each time, as expected. So need to run the LP for it!
-		cd $MYJAVAPATH
-		java lpmaker/ProduceLP 1 23 "../graphfiles/rrg_instance1_80_64.edgelist" 0 $switches $port 0 0 $numsvr 0.0 0 0 0 0 0 0 0 0 0 1 0 64
-		mv my.0.lp topology/my.lp
-		mv pl.0 topology/pathlengths/
-		cd -
-	
-		flowVal=`./lpRun.sh ../topology/my.lp`
-		rm -rf ../flowIDmap* ../linkCaps* flowIDmap* linkCaps*
-		echo "$flowVal" >> flowtmp_fat
-	done
-	
-	avgflow=`cat flowtmp_fat | awk '{if(NF>0){sum+=$1; cnt++;}} END{print sum/cnt}'`
-	echo "$switches $numsvr $port 1 $avgflow" >> ../resultfiles/result_fat.txt
+rm -rf ../resultfiles/result_"$suffix".txt
+rm -rf flowtmp_"$suffix" pl_"$suffix"
+
+for (( i=0 ; i < $NRUNS ; i++ ))
+do
+
+  randSeed=`expr $i + 1`
+
+  # We checked -- the fat-tree does give throughput = 1 each time, as expected. So need to run the LP for it!
+  cd $MYJAVAPATH
+  java lpmaker/ProduceLP 1 23 $graphfile $trafficmode $switches $port 0 0 $numsvr 0.0 0 0 0 0 0 0 0 0 0 1 $randSeed $trafficfile $isOptimal $netpathfile $isEqualShare
+
+  # Run LP for mynet
+  mv my.0.lp topology/my.lp
+  mv pl.0 topology/pathlengths/
+  cd -
+
+  flowVal=`./lpRun.sh ../topology/my.lp`
+  rm -rf ../flowIDmap* ../linkCaps* flowIDmap* linkCaps*
+  echo "$flowVal" >> flowtmp_"$suffix"
 done
 
-# PLOT!
-cd ../gnuplotscripts
-gnuplot fatCompare.plt
-cd -
+avgflow=`cat flowtmp_"$suffix" | awk '{if(NF>0 && $1>=0){sum+=$1; cnt++;}} END{print sum/cnt}'`
+echo "$switches $numsvr $port 1 $avgflow" >> ../resultfiles/result_"$suffix".txt
+
+done
