@@ -142,6 +142,7 @@ public class TrafficMatrix {
         double coefficient = maxTraffic/numFlowCap;
         for (int src = 0; src < numSwitches; src++) {
             for (int dst = 0; dst < numSwitches; dst++) {
+                if (src == dst) continue;
                 int mult = (int)(accumulativeTrafficMatrix[src][dst] / coefficient);
                 switchLevelMatrix[src][dst] += trafficPerFlow * mult;
                 numFlows += mult;
