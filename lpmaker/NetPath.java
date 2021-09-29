@@ -21,7 +21,10 @@ public class NetPath {
     ArrayList<LinkUsageTupleWithDuplicate>[][] linksUsageWithDuplicate;
     HashSet<LinkUsageTupleWithNoDuplicate>[][] linksUsageWithNoDuplicate;
 
-    public NetPath(String filename, Vector<Link>[] _adjacencyList, int _numSwitches) {
+    boolean shouldAvoidHotRacks;
+    HashSet<Integer> hotRacks;
+
+    public NetPath(String filename, Vector<Link>[] _adjacencyList, int _numSwitches, HashSet<Integer> _hotRacks) {
         netpathFileName = filename;
         adjacencyList = _adjacencyList;
         numSwitches = _numSwitches;
@@ -30,6 +33,13 @@ public class NetPath {
         rackPool = new ArrayList<>();
         linksUsageWithDuplicate = new ArrayList[numSwitches][numSwitches];
         linksUsageWithNoDuplicate = new HashSet[numSwitches][numSwitches];
+
+        if (_hotRacks == null) {
+            shouldAvoidHotRacks = false;
+        } else {
+            shouldAvoidHotRacks = true;
+        }
+        hotRacks = _hotRacks;
 
         populateLinkPool();
         initializePathPool();
@@ -75,10 +85,14 @@ public class NetPath {
                 int numPath = Integer.parseInt(strTok.nextToken());
 
                 if (numPath > 0) {
+                    ArrayList<Path> pathsThroughHotRacks = new ArrayList<>();
+
                     for (int i=0; i<numPath; i++) {
                         int prevEndingSw = -1;
                         int linkPosition = 0;
                         Path path = new Path(i);
+                        boolean shouldAddThisPath = true;
+
                         strLine = br.readLine();
                         strTok = new StringTokenizer(strLine);
                         while (strTok.hasMoreTokens()) {
@@ -88,6 +102,10 @@ public class NetPath {
                             if (matcher.find() && matcher.groupCount() == 2) {
                                 int linkSrcSw = Integer.parseInt(matcher.group(1));
                                 int linkDstSw = Integer.parseInt(matcher.group(2));
+
+                                if (shouldAvoidHotRacks) {
+                                    if (hotRacks.contains(linkSrcSw) || hotRacks.contains(linkDstSw)) shouldAddThisPath = false;
+                                }
 
                                 if (linkPosition == 0 && srcSw != linkSrcSw) {
                                     System.out.println("srcSw != linkSrcSw for srcSw = " + srcSw + " and dstSw = " + dstSw);
@@ -119,12 +137,22 @@ public class NetPath {
                             System.out.println("dstSw != prevEndingSw for srcSw = " + srcSw + " and dstSw = " + dstSw);
                         }
 
-                        pathPool[srcSw][dstSw].add(path);
+                        if (shouldAddThisPath) {
+                            pathPool[srcSw][dstSw].add(path);
+                        } else {
+                            pathsThroughHotRacks.add(path);
+                        }
+                    }
+
+                    if (pathPool[srcSw][dstSw].size() == 0) {
+                        for (int i=0; i<pathsThroughHotRacks.size(); i++) {
+                            pathPool[srcSw][dstSw].add(pathsThroughHotRacks.get(i));
+                        }
                     }
                 }
 
-                if (pathPool[srcSw][dstSw].size() != numPath) {
-                    System.out.println("pathPool[srcSw][dstSw].size() != numPath");
+                if (pathPool[srcSw][dstSw].size() > numPath) {
+                    System.out.println("pathPool[srcSw][dstSw].size() > numPath");
                 }
             }
             br.close();

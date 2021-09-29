@@ -29,6 +29,7 @@ public class TrafficMatrix {
     int numServers;
     int trafficmode;
     Graph topology;
+    HashSet<Integer> hotRacks;
 
     public TrafficMatrix(int noNodes, int trafficMode, String trafficfile, Graph mynet, int a, int b, int[] numServersPerSwitches) {
         numSwitches = noNodes;
@@ -36,6 +37,7 @@ public class TrafficMatrix {
         switchLevelMatrix = new double[numSwitches][numSwitches];
         trafficmode = trafficMode;
         topology = mynet;
+        hotRacks = new HashSet<>();
 
         generateTraffic(trafficfile, a, b, numServersPerSwitches);
     }
@@ -150,6 +152,25 @@ public class TrafficMatrix {
         }
 
         System.out.println("Number of flows = " + numFlows);
+
+        if (filename.equals("trafficfiles/fb_skewed.data")) {
+            System.out.print("Hot racks: ");
+            if (numServers == 3072) {
+                for (int i=65; i<80; i++) {
+                    hotRacks.add(i);
+                    System.out.print(i + " ");
+                }
+            } else {
+                assert(numServers == 2988);
+                for (int i=67; i<80; i++) {
+                    hotRacks.add(i);
+                    System.out.print(i + " ");
+                }
+            }
+            System.out.println();
+        } else {
+            System.out.println("No hotRacks for file " + filename);
+        }
     }
 
     public void TrafficGenARackToBRack(int a, int b, int[] numServersPerSwitch)
@@ -158,13 +179,22 @@ public class TrafficMatrix {
 
         HashSet<Integer> srcRacks = new HashSet<>();
         HashSet<Integer> dstRacks = new HashSet<>();
+        System.out.print("Hot racks: ");
         while (srcRacks.size() < a) {
-            srcRacks.add(topology.rand.nextInt(numSwitches));
+            int rack = topology.rand.nextInt(numSwitches);
+            srcRacks.add(rack);
+            hotRacks.add(rack);
+            System.out.print(rack + " ");
         }
         while (dstRacks.size() < b) {
             int rack = topology.rand.nextInt(numSwitches);
-            if (!srcRacks.contains(rack)) dstRacks.add(rack);
+            if (!srcRacks.contains(rack)) {
+                dstRacks.add(rack);
+                hotRacks.add(rack);
+                System.out.print(rack + " ");
+            }
         }
+        System.out.println();
 
         int numFlows = 0;
         for (int srcSw : srcRacks) {
@@ -193,9 +223,14 @@ public class TrafficMatrix {
         System.out.println("Half of the flows are in between " + a + " racks");
 
         HashSet<Integer> r2rRacks = new HashSet<>();
+        System.out.print("Hot racks: ");
         while (r2rRacks.size() < a) {
-            r2rRacks.add(topology.rand.nextInt(numSwitches));
+            int rack = topology.rand.nextInt(numSwitches);
+            r2rRacks.add(rack);
+            hotRacks.add(rack);
+            System.out.print(rack + " ");
         }
+        System.out.println();
 
         HashSet<Integer> a2aRacks = new HashSet<>();
         for (int i=0; i<numSwitches; i++) {
@@ -240,6 +275,7 @@ public class TrafficMatrix {
         for (int r : r2rRacks) {
             System.out.print(r + " ");
         }
+        System.out.println();
     }
 
     public void RandomPermutationPairs(int size)
@@ -366,5 +402,9 @@ public class TrafficMatrix {
         else {
             System.out.println("Trafficmode is not recognized.");
         }
+    }
+
+    public HashSet<Integer> getHotRacks() {
+        return hotRacks;
     }
 }

@@ -1629,32 +1629,32 @@ public class Graph
 			}
 
 
-			//<Constraints of Type 5: Equal share
-			System.out.println(new Date() + ": Starting part 5");
-			out.write("\n\\Type 5: Equal share\n");
-			for (int f = 0; f < noNodes; f++)
-			{
-				for (int t = 0; t < noNodes; t++)
-				{
-					if (switchLevelMatrix[f][t] > 0) // for each flow fid from f to t
-					{
-						int fid = fidMapping.get(new FlowSrcDst(f,t));
-						ArrayList<HopWithDuplicate> outgoingHops = rackPool.get(f).outgoingHopsWithDuplicate[f][t];
-						for (int i=1; i<outgoingHops.size(); i++) {
-							HopWithDuplicate currHop = outgoingHops.get(i);
-							HopWithDuplicate prevHop = outgoingHops.get(i-1);
-							assert(currHop.linkSrc == f);
-							assert(prevHop.linkSrc == f);
-							constraint = "c5_" + fid + "_" + currHop.pid + "_" + f + "_" + currHop.linkDst + ": ";
-							constraint += "f_" + fid + "_" + currHop.pid + "_" + f + "_" + currHop.linkDst + " -f_" + fid + "_" + prevHop.pid + "_" + f + "_" + prevHop.linkDst + " = 0\n";
-							out.write(constraint);
-						}
-					}
-				}
-
-				if (f > 0 && f % 20 == 0)
-					System.out.println(new Date() + ": " + f + " of " + noNodes + " done");
-			}
+//			//<Constraints of Type 5: Equal share
+//			System.out.println(new Date() + ": Starting part 5");
+//			out.write("\n\\Type 5: Equal share\n");
+//			for (int f = 0; f < noNodes; f++)
+//			{
+//				for (int t = 0; t < noNodes; t++)
+//				{
+//					if (switchLevelMatrix[f][t] > 0) // for each flow fid from f to t
+//					{
+//						int fid = fidMapping.get(new FlowSrcDst(f,t));
+//						ArrayList<HopWithDuplicate> outgoingHops = rackPool.get(f).outgoingHopsWithDuplicate[f][t];
+//						for (int i=1; i<outgoingHops.size(); i++) {
+//							HopWithDuplicate currHop = outgoingHops.get(i);
+//							HopWithDuplicate prevHop = outgoingHops.get(i-1);
+//							assert(currHop.linkSrc == f);
+//							assert(prevHop.linkSrc == f);
+//							constraint = "c5_" + fid + "_" + currHop.pid + "_" + f + "_" + currHop.linkDst + ": ";
+//							constraint += "f_" + fid + "_" + currHop.pid + "_" + f + "_" + currHop.linkDst + " -f_" + fid + "_" + prevHop.pid + "_" + f + "_" + prevHop.linkDst + " = 0\n";
+//							out.write(constraint);
+//						}
+//					}
+//				}
+//
+//				if (f > 0 && f % 20 == 0)
+//					System.out.println(new Date() + ": " + f + " of " + noNodes + " done");
+//			}
 
 
 			out.write("End\n");

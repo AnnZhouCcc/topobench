@@ -446,6 +446,10 @@ public class ProduceLP {
 			Graph mynet = new GraphFromFileSrcDstPair(switches, graphFile, switchports);
 			TrafficMatrix tm = new TrafficMatrix(switches, trafficMode, trafficFile, mynet, a, b, mynet.weightEachNode);
 
+			boolean shouldAvoidHotRacks = Boolean.parseBoolean(args[27]);
+			HashSet<Integer> hotRacks = null;
+			if (shouldAvoidHotRacks) hotRacks = tm.getHotRacks();
+
 			if (createLP == 1) {
 				boolean useOptimalRouting = Boolean.parseBoolean(args[22]);
 				if (useOptimalRouting) {
@@ -460,7 +464,7 @@ public class ProduceLP {
 					String netpathFile = args[23];
 					System.out.println("netpath file: " + netpathFile);
 
-					NetPath netpath = new NetPath(netpathFile, mynet.adjacencyList, mynet.noNodes);
+					NetPath netpath = new NetPath(netpathFile, mynet.adjacencyList, mynet.noNodes, hotRacks);
 
 					if (trafficMode == 1 || trafficMode == 5) {
 						System.out.println("PrintSimpleGraph");
