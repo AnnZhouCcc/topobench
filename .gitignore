@@ -24,6 +24,7 @@ scripts/8_false_true_5_60/*
 scripts/8_false_true_20_5/*
 scripts/8_false_true_60_5/*
 scripts/8_false_true_75_1/*
+scripts/9_false_false_5/*
 topobench.iml
 topology/my.lp
 topology/pathlengths/pl.0

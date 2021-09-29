@@ -471,13 +471,9 @@ public class ProduceLP {
 						mynet.PrintSimpleGraph("my." + runs + ".lp", tm.switchLevelMatrix);
 					} else {
 						boolean useEqualShare = Boolean.parseBoolean(args[24]);
-						if (useEqualShare) {
-							System.out.println("PrintGraphforMCFFairCondensedForKnownRoutingEqualShare");
-							mynet.PrintGraphforMCFFairCondensedForKnownRoutingEqualShare("my." + runs + ".lp",100, tm.switchLevelMatrix, netpath.rackPool, netpath.pathPool, netpath.linksUsageWithDuplicate, netpath.linkPool);
-						} else {
-							System.out.println("PrintGraphforMCFFairCondensedForKnownRoutingUnequalShare");
-							mynet.PrintGraphforMCFFairCondensedForKnownRoutingUnequalShare("my." + runs + ".lp",100, tm.switchLevelMatrix, netpath.rackPool, netpath.pathPool, netpath.linksUsageWithNoDuplicate, netpath.linkPool);
-						}
+						System.out.println("PrintGraphforMCFFairCondensedForKnownRoutingEqualShare");
+						System.out.println("Should use equal share? " + useEqualShare);
+						mynet.PrintGraphforMCFFairCondensedForKnownRouting("my." + runs + ".lp",100, tm.switchLevelMatrix, netpath.rackPool, netpath.pathPool, netpath.linksUsageWithDuplicate, netpath.linkPool, useEqualShare);
 					}
 				}
 			} else {
