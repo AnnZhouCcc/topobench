@@ -124,6 +124,8 @@ public class TrafficMatrix {
                 int dst = Integer.parseInt(strTok.nextToken());
                 double traffic = (Integer.parseInt(strTok.nextToken()))/packetSize;
 
+                if (src>=numServers || dst >=numServers) continue;
+
                 int src_sw = topology.svrToSwitch(src);
                 int dst_sw = topology.svrToSwitch(dst);
                 accumulativeTrafficMatrix[src_sw][dst_sw] += traffic;
