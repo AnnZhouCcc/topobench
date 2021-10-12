@@ -4,7 +4,6 @@ import lpmaker.graphs.Link;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.sql.SQLSyntaxErrorException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.StringTokenizer;
@@ -23,8 +22,7 @@ public class NetPath {
     ArrayList<Double>[][] pathWeights;
     NPLink[][] linkPool;
     ArrayList<Rack> rackPool;
-    ArrayList<LinkUsageTupleWithDuplicate>[][] linksUsageWithDuplicate;
-    HashSet<LinkUsageTupleWithNoDuplicate>[][] linksUsageWithNoDuplicate;
+    ArrayList<LinkUsageTuple>[][] linksUsage;
 
     boolean shouldAvoidHotRacks;
     HashSet<Integer> hotRacks;
@@ -40,8 +38,7 @@ public class NetPath {
         pathWeights = new ArrayList[numSwitches][numSwitches];
         linkPool = new NPLink[numSwitches][numSwitches];
         rackPool = new ArrayList<>();
-        linksUsageWithDuplicate = new ArrayList[numSwitches][numSwitches];
-        linksUsageWithNoDuplicate = new HashSet[numSwitches][numSwitches];
+        linksUsage = new ArrayList[numSwitches][numSwitches];
 
         if (_hotRacks == null) {
             shouldAvoidHotRacks = false;
@@ -209,8 +206,7 @@ public class NetPath {
     public void initializeLinksUsage() {
         for (int i=0; i<numSwitches; i++) {
             for (int j=0; j<numSwitches; j++) {
-                linksUsageWithDuplicate[i][j] = new ArrayList<>();
-                linksUsageWithNoDuplicate[i][j] = new HashSet<>();
+                linksUsage[i][j] = new ArrayList<>();
             }
         }
     }
@@ -225,8 +221,7 @@ public class NetPath {
                     int pid = thisPath.pid;
                     for (int l=0; l<thisPath.path.size(); l++) {
                         NPLink link = thisPath.path.get(l);
-                        linksUsageWithNoDuplicate[link.from][link.to].add(new LinkUsageTupleWithNoDuplicate(i,j,pid));
-                        linksUsageWithDuplicate[link.from][link.to].add(new LinkUsageTupleWithDuplicate(i,j,pid));
+                        linksUsage[link.from][link.to].add(new LinkUsageTuple(i,j,pid));
                     }
                 }
 

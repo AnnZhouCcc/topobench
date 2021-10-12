@@ -27,7 +27,7 @@ isPathWeighted=false
 pathweightfile=pathweightfiles/modelVars_su3_skewed_cutoff60_howmuch50.txt
 
 # declare -a rs=("ecmp" "su2" "su3" "fhi" "16disjoint" "32disjoint" "16short" "32short")
- declare -a rs=("su3")
+declare -a rs=("su3")
 
 for routing in "${rs[@]}"
 do
@@ -56,12 +56,12 @@ do
   mv pl.0 topology/pathlengths/
   cd -
 
-#  flowVal=`./lpRun.sh ../topology/my.lp`
-#  rm -rf ../flowIDmap* ../linkCaps* flowIDmap* linkCaps*
-#  echo "$flowVal" >> flowtmp_"$suffix"
+  flowVal=`./lpRun.sh ../topology/my.lp`
+  rm -rf ../flowIDmap* ../linkCaps* flowIDmap* linkCaps*
+  echo "$flowVal" >> flowtmp_"$suffix"
 done
 
-#avgflow=`cat flowtmp_"$suffix" | awk '{if(NF>0 && $1>=0){sum+=$1; cnt++;}} END{print sum/cnt}'`
-#echo "$switches $numsvr $port 1 $avgflow" >> ../resultfiles/result_"$suffix".txt
+avgflow=`cat flowtmp_"$suffix" | awk '{if(NF>0 && $1>=0){sum+=$1; cnt++;}} END{print sum/cnt}'`
+echo "$switches $numsvr $port 1 $avgflow" >> ../resultfiles/result_"$suffix".txt
 
 done

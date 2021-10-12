@@ -12,8 +12,6 @@
 
 package lpmaker;
 
-import java.lang.reflect.Array;
-import java.security.SecureRandom;
 import java.util.*;
 import java.io.*;
 
@@ -458,7 +456,7 @@ public class ProduceLP {
 						mynet.PrintSimpleGraph("my." + runs + ".lp", tm.switchLevelMatrix);
 					} else {
 						System.out.println("PrintGraphforMCFFairCondensed");
-						mynet.PrintGraphforMCFFairCondensed("my." + runs + ".lp",100, tm.switchLevelMatrix, null, null);
+						mynet.PrintGraphforMCFFairCondensed("my." + runs + ".lp",100, tm.switchLevelMatrix);
 					}
 				} else {
 					String netpathFile = args[23];
@@ -482,7 +480,7 @@ public class ProduceLP {
 						System.out.println("PrintGraphforMCFFairCondensedForKnownRouting");
 						boolean useEqualShare = Boolean.parseBoolean(args[24]);
 						System.out.println("Should use equal share? " + useEqualShare);
-						mynet.PrintGraphforMCFFairCondensedForKnownRouting("my." + runs + ".lp",100, tm.switchLevelMatrix, netpath.rackPool, netpath.pathPool, netpath.linksUsageWithDuplicate, netpath.linkPool, useEqualShare, isPathWeighted, netpath.pathWeights);
+						mynet.PrintGraphforMCFFairCondensedForKnownRouting("my." + runs + ".lp",100, tm.switchLevelMatrix, netpath.rackPool, netpath.pathPool, netpath.linksUsage, netpath.linkPool, useEqualShare, isPathWeighted, netpath.pathWeights);
 					}
 				}
 			} else {

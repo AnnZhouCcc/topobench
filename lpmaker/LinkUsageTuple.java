@@ -2,12 +2,12 @@ package lpmaker;
 
 import java.util.Objects;
 
-public class LinkUsageTupleWithNoDuplicate {
+public class LinkUsageTuple {
     public int flowSrc;
     public int flowDst;
     public int pid;
 
-    public LinkUsageTupleWithNoDuplicate(int _flowSrc, int _flowDst, int _pid) {
+    public LinkUsageTuple(int _flowSrc, int _flowDst, int _pid) {
         flowSrc = _flowSrc;
         flowDst = _flowDst;
         pid = _pid;
@@ -17,12 +17,12 @@ public class LinkUsageTupleWithNoDuplicate {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        LinkUsageTupleWithNoDuplicate that = (LinkUsageTupleWithNoDuplicate) o;
-        return flowSrc == that.flowSrc && flowDst == that.flowDst;
+        LinkUsageTuple that = (LinkUsageTuple) o;
+        return flowSrc == that.flowSrc && flowDst == that.flowDst && pid == that.pid;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(flowSrc, flowDst);
+        return Objects.hash(flowSrc, flowDst, pid);
     }
 }
