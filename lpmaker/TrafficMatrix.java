@@ -2,10 +2,7 @@ package lpmaker;
 
 import lpmaker.graphs.Graph;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.StringTokenizer;
@@ -143,15 +140,28 @@ public class TrafficMatrix {
             }
         }
 
-        double coefficient = maxTraffic/numFlowCap;
-        for (int src = 0; src < numSwitches; src++) {
-            for (int dst = 0; dst < numSwitches; dst++) {
-                if (src == dst) continue;
-                int mult = (int)(accumulativeTrafficMatrix[src][dst] / coefficient);
-                switchLevelMatrix[src][dst] += trafficPerFlow * mult;
-                numFlows += mult;
+//        try {
+//            String writeFilename = "trafficfiles/tm_raw_fb_uniform.txt";
+//            FileWriter fstream = new FileWriter(writeFilename);
+//            BufferedWriter out = new BufferedWriter(fstream);
+
+            double coefficient = maxTraffic/numFlowCap;
+            for (int src = 0; src < numSwitches; src++) {
+                for (int dst = 0; dst < numSwitches; dst++) {
+                    if (src == dst) continue;
+                    int mult = (int)(accumulativeTrafficMatrix[src][dst] / coefficient);
+                    switchLevelMatrix[src][dst] += trafficPerFlow * mult;
+//                    out.write(src + " " + dst + " " + trafficPerFlow * mult + "\n");
+                    numFlows += mult;
+                }
             }
-        }
+//            out.close();
+//        }
+//        catch (Exception e)
+//        {
+//            System.err.println("Write TM File FromFile Error: " + e.getMessage());
+//            e.printStackTrace();
+//        }
 
         System.out.println("Number of flows = " + numFlows);
 
@@ -255,29 +265,43 @@ public class TrafficMatrix {
         }
         System.out.println("SNR = " + SNR + ", SNA = " + SNA);
 
-        double numa2aFlows = 0;
-        for (int srca2a : a2aRacks) {
-            for (int dsta2a : a2aRacks) {
-                if (srca2a == dsta2a) continue;
-                switchLevelMatrix[srca2a][dsta2a] += trafficPerFlow * SNA;
-                numa2aFlows += SNA;
-            }
-        }
-        double numr2rFlows = 0;
-        for (int srcr2r : r2rRacks) {
-            for (int dstr2r : r2rRacks) {
-                if (srcr2r == dstr2r) continue;
-                switchLevelMatrix[srcr2r][dstr2r] += trafficPerFlow * SNR;
-                numr2rFlows += SNR;
-            }
-        }
+//        try {
+//            String writeFilename = "trafficfiles/tm_raw_mix5.txt";
+//            FileWriter fstream = new FileWriter(writeFilename);
+//            BufferedWriter out = new BufferedWriter(fstream);
 
-        System.out.println("Number of r2r flows = " + numr2rFlows + ", number of a2a flows = " + numa2aFlows);
-        System.out.print("r2r racks: ");
-        for (int r : r2rRacks) {
-            System.out.print(r + " ");
-        }
-        System.out.println();
+            double numa2aFlows = 0;
+            for (int srca2a : a2aRacks) {
+                for (int dsta2a : a2aRacks) {
+                    if (srca2a == dsta2a) continue;
+                    switchLevelMatrix[srca2a][dsta2a] += trafficPerFlow * SNA;
+//                    out.write(srca2a + " " + dsta2a + " " + trafficPerFlow * SNA + "\n");
+                    numa2aFlows += SNA;
+                }
+            }
+            double numr2rFlows = 0;
+            for (int srcr2r : r2rRacks) {
+                for (int dstr2r : r2rRacks) {
+                    if (srcr2r == dstr2r) continue;
+                    switchLevelMatrix[srcr2r][dstr2r] += trafficPerFlow * SNR;
+//                    out.write(srcr2r + " " + dstr2r + " " + trafficPerFlow * SNR + "\n");
+                    numr2rFlows += SNR;
+                }
+            }
+//            out.close();
+
+            System.out.println("Number of r2r flows = " + numr2rFlows + ", number of a2a flows = " + numa2aFlows);
+            System.out.print("r2r racks: ");
+            for (int r : r2rRacks) {
+                System.out.print(r + " ");
+            }
+            System.out.println();
+//        }
+//        catch (Exception e)
+//        {
+//            System.err.println("TestProgram Error: " + e.getMessage());
+//            e.printStackTrace();
+//        }
     }
 
     public void RandomPermutationPairs(int size)

@@ -1375,7 +1375,7 @@ public class Graph
 	}
 
 	// Uses a path-length based heuristic to determine that a certain flow on a certain link will be 0, so no need to factor in LP etc.
-	public void PrintGraphforMCFFairCondensedForKnownRouting(String filename, int probability, double[][] switchLevelMatrix, ArrayList<Rack> rackPool, ArrayList<Path>[][] pathPool, ArrayList<LinkUsageTupleWithDuplicate>[][] linksUsageWithDuplicate, NPLink[][] linkPool, boolean equalShare)
+	public void PrintGraphforMCFFairCondensedForKnownRouting(String filename, int probability, double[][] switchLevelMatrix, ArrayList<Rack> rackPool, ArrayList<Path>[][] pathPool, ArrayList<LinkUsageTupleWithDuplicate>[][] linksUsageWithDuplicate, NPLink[][] linkPool, boolean equalShare, boolean isPathWeighted, ArrayList<Double>[][] pathWeights)
 	{
 		modifiedFloydWarshall();
 		try
@@ -1506,7 +1506,7 @@ public class Graph
 					System.out.println(new Date() + ": "+i+" of "+noNodes+" done");
 			}
 
-
+/*
 			// <Constraints of Type 2: Flow conservation at non-source, non-destination
 			int LARGE_VALUE = 1; // TOPO_COMPARISON
 			System.out.println(new Date() + ": Starting part 2");
@@ -1573,6 +1573,7 @@ public class Graph
 				if (f > 0 && f % 20 == 0)
 					System.out.println(new Date() + ": " + f + " of " + noNodes + " done");
 			}
+ */
 
 
 			// <Constraints of Type 3: Flow >= 0 for any flow on any link
@@ -1654,6 +1655,36 @@ public class Graph
 					if (f > 0 && f % 20 == 0)
 						System.out.println(new Date() + ": " + f + " of " + noNodes + " done");
 				}
+			}
+
+
+			if (isPathWeighted) {
+				//<Constraints of Type 6: Path weights
+				System.out.println(new Date() + ": Starting part 6");
+				out.write("\n\\Type 6: Path weights\n");
+				for (int f = 0; f < noNodes; f++) {
+					for (int t = 0; t < noNodes; t++) {
+						if (switchLevelMatrix[f][t] > 0) // for each flow fid from f to t
+						{
+							int fid = fidMapping.get(new FlowSrcDst(f, t));
+							ArrayList<HopWithDuplicate> outgoingHops = rackPool.get(f).outgoingHopsWithDuplicate[f][t];
+							for (int i = 0; i < outgoingHops.size(); i++) {
+								HopWithDuplicate hop = outgoingHops.get(i);
+								assert (hop.linkSrc == f);
+								constraint = "c6_" + fid + "_" + hop.pid + "_" + f + "_" + hop.linkDst + ": ";
+								constraint += " -f_" + fid + "_" + hop.pid + "_" + f + "_" + hop.linkDst + " ";
+								constraint += " + " + pathWeights[f][t].get(hop.pid) + " a_" + fid + " = 0\n";
+								out.write(constraint);
+							}
+						}
+					}
+
+					if (f > 0 && f % 20 == 0)
+						System.out.println(new Date() + ": " + f + " of " + noNodes + " done");
+				}
+
+//				constraint = "c6_00: a > 0.2\n";
+//				out.write(constraint);
 			}
 
 

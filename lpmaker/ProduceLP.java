@@ -445,10 +445,10 @@ public class ProduceLP {
 
 			Graph mynet = new GraphFromFileSrcDstPair(switches, graphFile, switchports);
 			TrafficMatrix tm = new TrafficMatrix(switches, trafficMode, trafficFile, mynet, a, b, mynet.weightEachNode);
-
 			boolean shouldAvoidHotRacks = Boolean.parseBoolean(args[27]);
 			HashSet<Integer> hotRacks = null;
 			if (shouldAvoidHotRacks) hotRacks = tm.getHotRacks();
+			System.out.println("Should avoid hot racks? " + shouldAvoidHotRacks);
 
 			if (createLP == 1) {
 				boolean useOptimalRouting = Boolean.parseBoolean(args[22]);
@@ -463,17 +463,26 @@ public class ProduceLP {
 				} else {
 					String netpathFile = args[23];
 					System.out.println("netpath file: " + netpathFile);
+					int augmentMethod = -1;
+					System.out.println("augment method: " + augmentMethod);
+					boolean isPathWeighted = Boolean.parseBoolean(args[28]);
+					String pathweightFile = args[29];
+					if (isPathWeighted) {
+						System.out.println("path weight file: " + pathweightFile);
+					} else {
+						pathweightFile = null;
+					}
 
-					NetPath netpath = new NetPath(netpathFile, mynet.adjacencyList, mynet.noNodes, hotRacks);
+					NetPath netpath = new NetPath(netpathFile, mynet.adjacencyList, mynet.noNodes, hotRacks, augmentMethod, pathweightFile);
 
 					if (trafficMode == 1 || trafficMode == 5) {
 						System.out.println("PrintSimpleGraph");
 						mynet.PrintSimpleGraph("my." + runs + ".lp", tm.switchLevelMatrix);
 					} else {
+						System.out.println("PrintGraphforMCFFairCondensedForKnownRouting");
 						boolean useEqualShare = Boolean.parseBoolean(args[24]);
-						System.out.println("PrintGraphforMCFFairCondensedForKnownRoutingEqualShare");
 						System.out.println("Should use equal share? " + useEqualShare);
-						mynet.PrintGraphforMCFFairCondensedForKnownRouting("my." + runs + ".lp",100, tm.switchLevelMatrix, netpath.rackPool, netpath.pathPool, netpath.linksUsageWithDuplicate, netpath.linkPool, useEqualShare);
+						mynet.PrintGraphforMCFFairCondensedForKnownRouting("my." + runs + ".lp",100, tm.switchLevelMatrix, netpath.rackPool, netpath.pathPool, netpath.linksUsageWithDuplicate, netpath.linkPool, useEqualShare, isPathWeighted, netpath.pathWeights);
 					}
 				}
 			} else {
