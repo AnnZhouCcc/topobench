@@ -21,7 +21,7 @@ public class TrafficMatrix {
     double[][] switchLevelMatrix;
     double trafficPerFlow = 1;
     double packetSize = 1500.0;
-    int numFlowCap = 50;
+    double trafficCap = 50;
     int numSwitches;
     int numServers;
     int trafficmode;
@@ -119,7 +119,7 @@ public class TrafficMatrix {
                 StringTokenizer strTok = new StringTokenizer(strLine);
                 int src = Integer.parseInt(strTok.nextToken());
                 int dst = Integer.parseInt(strTok.nextToken());
-                double traffic = (Integer.parseInt(strTok.nextToken()))/packetSize;
+                int traffic = Integer.parseInt(strTok.nextToken());
 
                 if (src>=numServers || dst >=numServers) continue;
 
@@ -145,11 +145,11 @@ public class TrafficMatrix {
 //            FileWriter fstream = new FileWriter(writeFilename);
 //            BufferedWriter out = new BufferedWriter(fstream);
 
-            double coefficient = maxTraffic/numFlowCap;
+            double coefficient = maxTraffic/ trafficCap;
             for (int src = 0; src < numSwitches; src++) {
                 for (int dst = 0; dst < numSwitches; dst++) {
                     if (src == dst) continue;
-                    int mult = (int)(accumulativeTrafficMatrix[src][dst] / coefficient);
+                    double mult = accumulativeTrafficMatrix[src][dst] / coefficient;
                     switchLevelMatrix[src][dst] += trafficPerFlow * mult;
 //                    out.write(src + " " + dst + " " + trafficPerFlow * mult + "\n");
                     numFlows += mult;
@@ -251,18 +251,20 @@ public class TrafficMatrix {
 
         // Hard-coding for now
         double SNR = 0, SNA = 0;
-        if (a == 10) {
-            SNR = 53.6;
-            SNA = 1;
-        } else if (a == 5) {
-            SNR = 55.5;
-            SNA = 0.2;
-        } else if (a == 2) {
-            SNR = 30;
-            SNA = 0.01;
-        } else {
-            System.out.println("The parameters here are hard-coded. a=" + a + " does not have SNR and SNA hard-coded.");
-        }
+//        if (a == 10) {
+//            SNR = 53.6;
+//            SNA = 1;
+//        } else if (a == 5) {
+//            SNR = 55.5;
+//            SNA = 0.2;
+//        } else if (a == 2) {
+//            SNR = 30;
+//            SNA = 0.01;
+//        } else {
+//            System.out.println("The parameters here are hard-coded. a=" + a + " does not have SNR and SNA hard-coded.");
+//        }
+        SNR = trafficCap;
+        SNA = (trafficCap*a*(a-1))/((numSwitches-a)*(numSwitches-a-1));
         System.out.println("SNR = " + SNR + ", SNA = " + SNA);
 
 //        try {

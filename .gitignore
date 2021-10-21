@@ -10,6 +10,7 @@ scripts/gurobi.log
 scripts/templog
 scripts/dring
 scripts/rrg
+scripts/test-weights/
 topobench.iml
 topology/my.lp
 topology/pathlengths/pl.0

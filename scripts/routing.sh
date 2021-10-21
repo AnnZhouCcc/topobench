@@ -13,18 +13,18 @@ numsvr=3072 # may not be needed
 topology=rrg
 graphfile=graphfiles/"$topology"_instance1_80_64.edgelist
 
-trafficmode=6
-a=0
+trafficmode=9
+a=5
 b=0
-trafficfile=trafficfiles/fb_uniform.data
+trafficfile=none
 
 tag=ref_su3_skewed
 
-isOptimal=false
+isOptimal=true
 isEqualShare=false
 shouldAvoidHotRacks=false
 isPathWeighted=false
-pathweightfile=pathweightfiles/modelVars_su3_skewed_cutoff60_howmuch50.txt
+pathweightfile=none
 
 # declare -a rs=("ecmp" "su2" "su3" "fhi" "16disjoint" "32disjoint" "16short" "32short")
 declare -a rs=("su3")
