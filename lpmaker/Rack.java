@@ -29,8 +29,10 @@ public class Rack {
         incomingHops[flowSrc][flowDst].add(new Hop(pid, linkSrc, linkDst));
     }
 
-    void addOutgoingLink(int flowSrc, int flowDst, int linkSrc, int linkDst, int pid) {
+    void addOutgoingLink(int flowSrc, int flowDst, int linkSrc, int linkDst, int pid, int hid) {
         assert(linkSrc == id);
-        outgoingHops[flowSrc][flowDst].add(new Hop(pid, linkSrc, linkDst));
+        if (hid == 0) { // Only add the first hop.
+            outgoingHops[flowSrc][flowDst].add(new Hop(pid, linkSrc, linkDst));
+        }
     }
 }

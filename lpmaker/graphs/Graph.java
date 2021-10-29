@@ -1187,7 +1187,7 @@ public class Graph
 	}
 
 	// Uses a path-length based heuristic to determine that a certain flow on a certain link will be 0, so no need to factor in LP etc.
-	public void PrintGraphforMCFFairCondensedForKnownRouting(String filename, int probability, double[][] switchLevelMatrix, ArrayList<Rack> rackPool, ArrayList<Path>[][] pathPool, ArrayList<LinkUsageTuple>[][] linksUsageWithDuplicate, NPLink[][] linkPool, boolean equalShare, boolean isPathWeighted, ArrayList<Double>[][] pathWeights)
+	public void PrintGraphforMCFFairCondensedForKnownRouting(String filename, int probability, double[][] switchLevelMatrix, ArrayList<Rack> rackPool, ArrayList<Path>[][] pathPool, ArrayList<LinkUsageTuple>[][] linksUsageWithDuplicate, NPLink[][] linkPool, boolean equalShare, boolean isPathWeighted, HashMap<Integer, Double>[][] pathWeights)
 	{
 		modifiedFloydWarshall();
 		try
@@ -1414,9 +1414,17 @@ public class Graph
 							for (int i = 0; i < outgoingHops.size(); i++) {
 								Hop hop = outgoingHops.get(i);
 								assert (hop.linkSrc == f);
+
+								double weight;
+								if (!pathWeights[f][t].containsKey(hop.pid)) {
+									weight = 0;
+								} else {
+									weight = pathWeights[f][t].get(hop.pid);
+								}
+
 								constraint = "c6_" + fid + "_" + hop.pid + "_" + f + "_" + hop.linkDst + ": ";
 								constraint += " -f_" + fid + "_" + hop.pid + "_" + f + "_" + hop.linkDst + " ";
-								constraint += " + " + pathWeights[f][t].get(hop.pid) + " a_" + fid + " = 0\n";
+								constraint += " + " + weight + " a_" + fid + " = 0\n";
 								out.write(constraint);
 							}
 						}

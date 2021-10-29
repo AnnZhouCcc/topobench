@@ -4,12 +4,19 @@ import lpmaker.graphs.Link;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.StringTokenizer;
-import java.util.Vector;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+class FlowPair {
+    int flowSrc;
+    int flowDst;
+
+    FlowPair (int _flowSrc, int _flowDst) {
+        flowSrc = _flowSrc;
+        flowDst = _flowDst;
+    }
+}
 
 public class NetPath {
     String netpathFileName;
@@ -19,7 +26,7 @@ public class NetPath {
     int augmentMethod;
 
     ArrayList<Path>[][] pathPool;
-    ArrayList<Double>[][] pathWeights;
+    HashMap<Integer, Double>[][] pathWeights;
     NPLink[][] linkPool;
     ArrayList<Rack> rackPool;
     ArrayList<LinkUsageTuple>[][] linksUsage;
@@ -35,7 +42,7 @@ public class NetPath {
         augmentMethod = _augmentMethod;
 
         pathPool = new ArrayList[numSwitches][numSwitches];
-        pathWeights = new ArrayList[numSwitches][numSwitches];
+        pathWeights = new HashMap[numSwitches][numSwitches];
         linkPool = new NPLink[numSwitches][numSwitches];
         rackPool = new ArrayList<>();
         linksUsage = new ArrayList[numSwitches][numSwitches];
@@ -195,7 +202,7 @@ public class NetPath {
                         int linkSrc = thisLink.from;
                         int linkDst = thisLink.to;
 
-                        rackPool.get(linkSrc).addOutgoingLink(i,j,linkSrc, linkDst, pid);
+                        rackPool.get(linkSrc).addOutgoingLink(i,j,linkSrc, linkDst, pid, l);
                         rackPool.get(linkDst).addIncomingLink(i,j,linkSrc, linkDst, pid);
                     }
                 }
@@ -281,65 +288,76 @@ public class NetPath {
     public void initializePathWeights() {
         for (int i=0; i<numSwitches; i++) {
             for (int j=0; j<numSwitches; j++) {
-                pathWeights[i][j] = new ArrayList<>();
+                pathWeights[i][j] = new HashMap();
             }
         }
     }
 
     public void populatePathWeights() {
-        readPathWeightsFromFile(pathweightFileName);
+//        readPathWeightsFromFile(pathweightFileName);
+        readGlobalPathWeightsFromFile(pathweightFileName);
     }
 
     void readPathWeightsFromFile(String filename) {
+        String flowIDmapfile = "flowIDmapfiles/flowIDmap_fbs";
         try {
-            BufferedReader br = new BufferedReader(new FileReader(filename));
+            BufferedReader br = new BufferedReader(new FileReader(flowIDmapfile));
             String strLine = "";
+            HashMap<Integer, FlowPair> flowIDmap = new HashMap<>();
+            while ((strLine = br.readLine()) != null) {
+                StringTokenizer strTok = new StringTokenizer(strLine);
+                int flowID = Integer.parseInt(strTok.nextToken());
+                int flowSrc = Integer.parseInt(strTok.nextToken());
+                int flowDst = Integer.parseInt(strTok.nextToken());
+
+                flowIDmap.put(flowID, new FlowPair(flowSrc, flowDst));
+            }
+            br.close();
+
+            br = new BufferedReader(new FileReader(filename));
+            strLine = "";
             String regex = "f_(\\d*)_(\\d*)_(\\d*)_(\\d*)";
             while ((strLine = br.readLine()) != null){
                 StringTokenizer strTok = new StringTokenizer(strLine);
                 String name = strTok.nextToken();
-                double weight = Double.parseDouble(strTok.nextToken());
+                if (name.equals("K")) continue;
+                if (name.equals("f_766_1_0_1")) break;
+                double weight = Double.parseDouble(strTok.nextToken()); // Is actually absolute amount; but should be ok
 
                 Pattern pattern = Pattern.compile(regex);
                 Matcher matcher = pattern.matcher(name);
                 if (matcher.find() && matcher.groupCount() == 4) {
-                    boolean hasError = false;
-
                     int fid = Integer.parseInt(matcher.group(1));
-                    int flowSrc = fid/(numSwitches-1);
-                    int flowDst = fid%(numSwitches-1);
-                    if (flowDst >= flowSrc) flowDst++;
-
-                    if (flowSrc == flowDst) {
-                        hasError = true;
-                        System.out.println("Error in reading path weight file: flowSrc == flowDst");
-                    }
-
-                    pathWeights[flowSrc][flowDst].add(weight);
-
                     int pid = Integer.parseInt(matcher.group(2));
                     int linkSrc = Integer.parseInt(matcher.group(3));
                     int linkDst = Integer.parseInt(matcher.group(4));
+                    int flowSrc = flowIDmap.get(fid).flowSrc;
+                    int flowDst = flowIDmap.get(fid).flowDst;
 
-                    if (pathWeights[flowSrc][flowDst].size() != pid+1) {
-                        hasError = true;
-                        System.out.println("Error in reading path weight file: number of paths != pid+1");
-                        System.out.println("numPath = " + pathWeights[flowSrc][flowDst].size());
-                    }
-                    NPLink firstHop = pathPool[flowSrc][flowDst].get(pid).path.get(0);
-                    if (firstHop.from != linkSrc || firstHop.to != linkDst) {
-                        hasError = true;
-                        System.out.println("Error in reading path weight file: firstHop.from != linkSrc || firstHop.to != linkDst");
-                        System.out.println("firstHop.from = " + firstHop.from);
-                        System.out.println("firstHop.to = " + firstHop.to);
-                    }
-
-                    if (hasError) {
-                        System.out.println("name = " + name + ", weight = " + weight);
-                        System.out.println("fid = " + fid + ", pid = " + pid + ", linkSrc = " + linkSrc + ", linkDst = " + linkDst);
-                        System.out.println("flowSrc = " + flowSrc + ", flowDst = " + flowDst);
-                    }
+                    pathWeights[flowSrc][flowDst].put(pid, weight);
                 }
+            }
+            br.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    void readGlobalPathWeightsFromFile(String filename) {
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(filename));
+            String strLine = "";
+            while ((strLine = br.readLine()) != null){
+                StringTokenizer strTok = new StringTokenizer(strLine);
+                int flowSrc = Integer.parseInt(strTok.nextToken());
+                int flowDst = Integer.parseInt(strTok.nextToken());
+                int fid = Integer.parseInt(strTok.nextToken());
+                int firstHopSrc = Integer.parseInt(strTok.nextToken());
+                int firstHopDst = Integer.parseInt(strTok.nextToken());
+                int pid = Integer.parseInt(strTok.nextToken());
+                double weight = Double.parseDouble(strTok.nextToken());
+
+                pathWeights[flowSrc][flowDst].put(pid, weight);
             }
             br.close();
         } catch (Exception e) {
