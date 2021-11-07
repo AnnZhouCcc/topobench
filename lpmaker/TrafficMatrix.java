@@ -396,6 +396,78 @@ public class TrafficMatrix {
         }
     }
 
+    public void TrafficGenRacktoRackHardCoding(int[] numServersPerSwitch) {
+        System.out.println("Rack to rack hard coding.");
+
+        HashSet<Integer> sourceServers = new HashSet<>();
+        for (int i=1344; i<=1391; i++) {
+            sourceServers.add(i);
+        }
+        HashSet<Integer> destinationServers = new HashSet<>();
+        for (int i=2640; i<=2687; i++) {
+            destinationServers.add(i);
+        }
+
+        for (int srcServer : sourceServers) {
+            for (int dstServer : destinationServers) {
+                int srcSw = topology.svrToSwitch(srcServer);
+                int dstSw = topology.svrToSwitch(dstServer);
+//                System.out.println("source: server " + srcServer + " in rack " + srcSw);
+//                System.out.println("destination: server " + dstServer + " in rack " + dstSw);
+                switchLevelMatrix[srcSw][dstSw] += trafficPerFlow;
+            }
+        }
+    }
+
+    public void TrafficGenCsSkewedHardCoding() {
+        System.out.println("CsSkewed Hard Coding");
+
+//        int[] sender_starts = new int[] {1344,2640,2304,2880,96,1728,528,1920,2448,2112,2256,720,1824,432,1440,2592};
+//        int[] sender_ends = new int[] {1391,2687,2351,2927,143,1775,575,1967,2495,2159,2303,767,1871,479,1487,2639};
+//        int[] receiver_starts = new int[] {2496,2016,384,240};
+//        int[] receiver_ends = new int[] {2543,2063,431,287};
+        int[] receiver_starts = new int[] {1344,2640,2304,2880,96,1728,528,1920,2448,2112,2256,720,1824,432,1440,2592};
+        int[] receiver_ends = new int[] {1391,2687,2351,2927,143,1775,575,1967,2495,2159,2303,767,1871,479,1487,2639};
+        int[] sender_starts = new int[] {2496,2016,384,240};
+        int[] sender_ends = new int[] {2543,2063,431,287};
+        ArrayList<Integer> senders = new ArrayList<>();
+        ArrayList<Integer> receivers = new ArrayList<>();
+        for (int i=0; i<sender_starts.length; i++) {
+            for (int j=sender_starts[i]; j<=sender_ends[i]; j++) {
+                senders.add(j);
+            }
+        }
+        for (int i=0; i<receiver_starts.length; i++) {
+            for (int j=receiver_starts[i]; j<=receiver_ends[i]; j++) {
+                receivers.add(j);
+            }
+        }
+
+        for (int srcServer : senders) {
+            for (int dstServer : receivers) {
+                int srcSw = topology.svrToSwitch(srcServer);
+                int dstSw = topology.svrToSwitch(dstServer);
+                if (srcSw == dstSw) continue;
+                switchLevelMatrix[srcSw][dstSw] += trafficPerFlow*0.5;
+            }
+        }
+
+        double maxTraffic = 0;
+        for (int i=0; i<numSwitches; i++) {
+            for (int j=0; j<numSwitches; j++) {
+                maxTraffic = Math.max(maxTraffic, switchLevelMatrix[i][j]);
+            }
+        }
+
+        double downscale = maxTraffic / trafficCap;
+        for (int i=0; i<numSwitches; i++) {
+            for (int j=0; j<numSwitches; j++) {
+                double original = switchLevelMatrix[i][j];
+                switchLevelMatrix[i][j] = original / downscale;
+            }
+        }
+    }
+
     public void generateTraffic(String trafficfile, int a, int b, int[] numServersPerSwitches) {
         // traffic-mode: 0 = randPerm; 1 = all-all; 2 = all-to-one; Any higher n means stride(n)
         System.out.println("trafficmode = " + trafficmode);
@@ -426,6 +498,12 @@ public class TrafficMatrix {
         }
         else if (trafficmode == 9) {
             TrafficGenMixA(a, numServersPerSwitches);
+        }
+        else if (trafficmode == 10) {
+            TrafficGenRacktoRackHardCoding(numServersPerSwitches);
+        }
+        else if (trafficmode == 11) {
+            TrafficGenCsSkewedHardCoding();
         }
         else {
             System.out.println("Trafficmode is not recognized.");
