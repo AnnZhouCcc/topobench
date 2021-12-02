@@ -183,6 +183,9 @@ public class TrafficMatrix {
         } else {
             System.out.println("No hotRacks for file " + filename);
         }
+
+//        System.out.println("************Temporary fix: for SU3 with fbs, remove flow 5229 from rack 67 to rack 61***************");
+//        switchLevelMatrix[67][61] = 0;
     }
 
     public void TrafficGenARackToBRack(int a, int b, int[] numServersPerSwitch)
