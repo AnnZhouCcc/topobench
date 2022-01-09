@@ -294,8 +294,8 @@ public class NetPath {
     }
 
     public void populatePathWeights() {
-//        readPathWeightsFromFile(pathweightFileName);
-        readGlobalPathWeightsFromFile(pathweightFileName);
+        readPathWeightsFromFile(pathweightFileName);
+//        readGlobalPathWeightsFromFile(pathweightFileName);
     }
 
     void readPathWeightsFromFile(String filename) {
@@ -320,8 +320,8 @@ public class NetPath {
             while ((strLine = br.readLine()) != null){
                 StringTokenizer strTok = new StringTokenizer(strLine);
                 String name = strTok.nextToken();
-                if (name.equals("K")) continue;
-                if (name.equals("f_766_1_0_1")) break;
+                if (name.equals("K")) break;
+//                if (name.equals("f_223_12_0_1")) break;
                 double weight = Double.parseDouble(strTok.nextToken()); // Is actually absolute amount; but should be ok
 
                 Pattern pattern = Pattern.compile(regex);
@@ -334,7 +334,9 @@ public class NetPath {
                     int flowSrc = flowIDmap.get(fid).flowSrc;
                     int flowDst = flowIDmap.get(fid).flowDst;
 
-                    pathWeights[flowSrc][flowDst].put(pid, weight);
+                    if (!pathWeights[flowSrc][flowDst].containsKey(pid)) {
+                        pathWeights[flowSrc][flowDst].put(pid, weight);
+                    }
                 }
             }
             br.close();

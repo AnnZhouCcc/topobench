@@ -12,6 +12,8 @@ scripts/dring
 scripts/rrg
 scripts/test-weights/
 scripts/localrouting/
+scripts/localrouting2/
+scripts/variation/
 topobench.iml
 topology/my.lp
 topology/pathlengths/pl.0

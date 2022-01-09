@@ -5,6 +5,7 @@ import lpmaker.graphs.Graph;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.StringTokenizer;
 
 class TrafficPair {
@@ -107,6 +108,14 @@ public class TrafficMatrix {
         System.out.println("Number of flows = " + numFlows);
     }
 
+    public void TrafficGenFromFileHelper(int inaccuracymode, String filename) {
+        if (inaccuracymode == 0) {
+            TrafficGenFromFile(filename);
+        } else {
+            TrafficGenFromFileWithInaccuracy(inaccuracymode, filename);
+        }
+    }
+
     public void TrafficGenFromFile(String filename) {
         System.out.println("Flows from file " + filename);
         int numFlows = 0;
@@ -155,6 +164,174 @@ public class TrafficMatrix {
                     numFlows += mult;
                 }
             }
+//            out.close();
+//        }
+//        catch (Exception e)
+//        {
+//            System.err.println("Write TM File FromFile Error: " + e.getMessage());
+//            e.printStackTrace();
+//        }
+
+        System.out.println("Number of flows = " + numFlows);
+
+        if (filename.equals("trafficfiles/fb_skewed.data")) {
+            System.out.print("Hot racks: ");
+            if (numServers == 3072) {
+                for (int i=65; i<80; i++) {
+                    hotRacks.add(i);
+                    System.out.print(i + " ");
+                }
+            } else {
+                assert(numServers == 2988);
+                for (int i=67; i<80; i++) {
+                    hotRacks.add(i);
+                    System.out.print(i + " ");
+                }
+            }
+            System.out.println();
+        } else {
+            System.out.println("No hotRacks for file " + filename);
+        }
+
+//        System.out.println("************Temporary fix: for SU3 with fbs, remove flow 5229 from rack 67 to rack 61***************");
+//        switchLevelMatrix[67][61] = 0;
+    }
+
+    public void TrafficGenFromFileWithInaccuracy(int inaccuracymode, String filename) {
+        System.out.println("Flows from file " + filename);
+        int numFlows = 0;
+        double[][] accumulativeTrafficMatrix = new double[numSwitches][numSwitches];
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(filename));
+            String strLine = "";
+            while ((strLine = br.readLine()) != null){
+                StringTokenizer strTok = new StringTokenizer(strLine);
+                int src = Integer.parseInt(strTok.nextToken());
+                int dst = Integer.parseInt(strTok.nextToken());
+                int traffic = Integer.parseInt(strTok.nextToken());
+
+                if (src>=numServers || dst >=numServers) continue;
+
+                int src_sw = topology.svrToSwitch(src);
+                int dst_sw = topology.svrToSwitch(dst);
+                accumulativeTrafficMatrix[src_sw][dst_sw] += traffic;
+            }
+            br.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        double maxTraffic = 0;
+        for (int ssw=0; ssw<numSwitches; ssw++) {
+            for (int dsw=0; dsw<numSwitches; dsw++) {
+                double traffic = accumulativeTrafficMatrix[ssw][dsw];
+                maxTraffic = Math.max(maxTraffic, traffic);
+            }
+        }
+
+//        try {
+//            String writeFilename = "trafficfiles/tm_raw_fb_uniform.txt";
+//            FileWriter fstream = new FileWriter(writeFilename);
+//            BufferedWriter out = new BufferedWriter(fstream);
+
+        double coefficient = maxTraffic/ trafficCap;
+        for (int src = 0; src < numSwitches; src++) {
+            for (int dst = 0; dst < numSwitches; dst++) {
+                if (src == dst) continue;
+                double mult = accumulativeTrafficMatrix[src][dst] / coefficient;
+                switchLevelMatrix[src][dst] += trafficPerFlow * mult;
+//                    out.write(src + " " + dst + " " + trafficPerFlow * mult + "\n");
+                numFlows += mult;
+            }
+        }
+//            out.close();
+//        }
+//        catch (Exception e)
+//        {
+//            System.err.println("Write TM File FromFile Error: " + e.getMessage());
+//            e.printStackTrace();
+//        }
+
+        System.out.println("Number of flows = " + numFlows);
+
+        int case1variation = 100;
+        int case2variation = 100;
+        int case2probability = 20;
+        Random rand = new Random();
+        for (int src=0; src<numSwitches; src++) {
+            for (int dst=0; dst<numSwitches; dst++) {
+                double oldValue = switchLevelMatrix[src][dst];
+                switch (inaccuracymode) {
+                    case 1:
+                        double randomDouble = rand.nextDouble() * case1variation*2 - case1variation;
+                        switchLevelMatrix[src][dst] = oldValue*(1+randomDouble/100.0);
+                        break;
+                    case 2:
+                        int randomVary = rand.nextInt(case2probability);
+                        if (randomVary == 0) {
+                            int randomSign = rand.nextInt(2)*2-1;
+                            double multiplier = randomSign*case2variation/100.0;
+                            switchLevelMatrix[src][dst] = oldValue*(1+multiplier);
+                        }
+                        break;
+                    default:
+                        System.out.println("inaccuracymode = " + inaccuracymode + " is not recognized.");
+                }
+            }
+        }
+    }
+
+    public void TrafficGenFromFileClusterX(String filename) {
+        System.out.println("Flows from file " + filename);
+        int starttime = 30000;
+        int endtime = 40000;
+
+        int numFlows = 0;
+        double[][] accumulativeTrafficMatrix = new double[numSwitches][numSwitches];
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(filename));
+            String strLine = "";
+            while ((strLine = br.readLine()) != null){
+                StringTokenizer strTok = new StringTokenizer(strLine);
+                int timestamp = Integer.parseInt(strTok.nextToken());
+                int traffic = Integer.parseInt(strTok.nextToken());
+                int src_sw = Integer.parseInt(strTok.nextToken());
+                int dst_sw = Integer.parseInt(strTok.nextToken());
+
+                if (timestamp >= starttime && timestamp < endtime) {
+                    accumulativeTrafficMatrix[src_sw][dst_sw] += traffic;
+                }
+            }
+            br.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        double maxTraffic = 0;
+        for (int ssw=0; ssw<numSwitches; ssw++) {
+            for (int dsw=0; dsw<numSwitches; dsw++) {
+                double traffic = accumulativeTrafficMatrix[ssw][dsw];
+                maxTraffic = Math.max(maxTraffic, traffic);
+            }
+        }
+
+//        try {
+//            String writeFilename = "trafficfiles/tm_raw_fb_uniform.txt";
+//            FileWriter fstream = new FileWriter(writeFilename);
+//            BufferedWriter out = new BufferedWriter(fstream);
+
+        double coefficient = maxTraffic/ trafficCap;
+        for (int src = 0; src < numSwitches; src++) {
+            for (int dst = 0; dst < numSwitches; dst++) {
+                if (src == dst) continue;
+                double mult = accumulativeTrafficMatrix[src][dst] / coefficient;
+                switchLevelMatrix[src][dst] += trafficPerFlow * mult;
+//                    out.write(src + " " + dst + " " + trafficPerFlow * mult + "\n");
+                numFlows += mult;
+            }
+        }
 //            out.close();
 //        }
 //        catch (Exception e)
@@ -473,8 +650,10 @@ public class TrafficMatrix {
 
     public void generateTraffic(String trafficfile, int a, int b, int[] numServersPerSwitches) {
         // traffic-mode: 0 = randPerm; 1 = all-all; 2 = all-to-one; Any higher n means stride(n)
+        int inaccuracymode = 0;
         System.out.println("trafficmode = " + trafficmode);
-        ArrayList<TrafficPair> rndmap;
+        System.out.println("inaccuracymode = " + inaccuracymode);
+
         if (trafficmode == 0) {
             RandomPermutationPairs(numServers);
         }
@@ -494,7 +673,7 @@ public class TrafficMatrix {
             TrafficGenRackLevelAllToAll();
         }
         else if (trafficmode == 7) {
-            TrafficGenFromFile(trafficfile);
+            TrafficGenFromFileHelper(inaccuracymode, trafficfile);
         }
         else if (trafficmode == 8) {
             TrafficGenARackToBRack(a, b, numServersPerSwitches);
@@ -507,6 +686,9 @@ public class TrafficMatrix {
         }
         else if (trafficmode == 11) {
             TrafficGenCsSkewedHardCoding();
+        }
+        else if (trafficmode == 12) {
+            TrafficGenFromFileClusterX(trafficfile);
         }
         else {
             System.out.println("Trafficmode is not recognized.");
