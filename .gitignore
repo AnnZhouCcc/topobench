@@ -14,6 +14,10 @@ scripts/test-weights/
 scripts/localrouting/
 scripts/localrouting2/
 scripts/variation/
+scripts/cluster*
+scripts/delay*
 topobench.iml
 topology/my.lp
 topology/pathlengths/pl.0
+pathweightfiles/pathweight_equalshare_su3_fbs.txt
+trafficfiles/cluster*

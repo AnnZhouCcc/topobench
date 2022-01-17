@@ -441,8 +441,11 @@ public class ProduceLP {
 			int a = Integer.parseInt(args[25]);
 			int b = Integer.parseInt(args[26]);
 
+			int timeframeStart = Integer.parseInt(args[30]);
+			int timeframeEnd = Integer.parseInt(args[31]);
+
 			Graph mynet = new GraphFromFileSrcDstPair(switches, graphFile, switchports);
-			TrafficMatrix tm = new TrafficMatrix(switches, trafficMode, trafficFile, mynet, a, b, mynet.weightEachNode);
+			TrafficMatrix tm = new TrafficMatrix(switches, trafficMode, trafficFile, mynet, a, b, mynet.weightEachNode, timeframeStart, timeframeEnd);
 			boolean shouldAvoidHotRacks = Boolean.parseBoolean(args[27]);
 			HashSet<Integer> hotRacks = null;
 			if (shouldAvoidHotRacks) hotRacks = tm.getHotRacks();

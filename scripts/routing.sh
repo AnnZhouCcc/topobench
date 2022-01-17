@@ -13,27 +13,27 @@ numsvr=3072 # may not be needed
 topology=rrg
 graphfile=graphfiles/"$topology"_instance1_80_64.edgelist
 
-trafficmode=7
+trafficmode=12
 a=0
 b=0
-trafficfile=trafficfiles/fb_skewed.data
+trafficfile=trafficfiles/cluster_b_parsed_data
 
-tag=hot2_ecmp_equal_fbs
+tag=clusterb_80000_90000
 
 isOptimal=false
-isEqualShare=false
+isEqualShare=true
 shouldAvoidHotRacks=false
-isPathWeighted=true
-pathweightfile=pathweightfiles/globalpathweight_hot2_ecmp_equal_fbs.txt
+isPathWeighted=false
+pathweightfile=none
 
 # declare -a rs=("ecmp" "su2" "su3" "fhi" "16disjoint" "32disjoint" "16short" "32short")
-declare -a rs=("ecmp")
+declare -a rs=("su2")
 
 for routing in "${rs[@]}"
 do
 
 suffix="$topology"_"$routing"_"$trafficmode"_"$isEqualShare"_"$shouldAvoidHotRacks"_"$isPathWeighted"_"$tag"
-netpathfile=netpathfilescopy/netpath_"$routing"_"$topology".txt
+netpathfile=netpathfiles/netpath_"$routing"_"$topology".txt
 if [ "$routing" = "opt" ]
 then
   isOptimal=true

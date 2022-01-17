@@ -21,21 +21,25 @@ class TrafficPair {
 public class TrafficMatrix {
     double[][] switchLevelMatrix;
     double trafficPerFlow = 1;
-    double packetSize = 1500.0;
+    int packetSize = 1500;
     double trafficCap = 50;
     int numSwitches;
     int numServers;
     int trafficmode;
     Graph topology;
     HashSet<Integer> hotRacks;
+    int timeframeStart;
+    int timeframeEnd;
 
-    public TrafficMatrix(int noNodes, int trafficMode, String trafficfile, Graph mynet, int a, int b, int[] numServersPerSwitches) {
+    public TrafficMatrix(int noNodes, int trafficMode, String trafficfile, Graph mynet, int a, int b, int[] numServersPerSwitches, int _timeframeStart, int _timeframeEnd) {
         numSwitches = noNodes;
         numServers = mynet.totalWeight;
         switchLevelMatrix = new double[numSwitches][numSwitches];
         trafficmode = trafficMode;
         topology = mynet;
         hotRacks = new HashSet<>();
+        timeframeStart = _timeframeStart;
+        timeframeEnd = _timeframeEnd;
 
         generateTraffic(trafficfile, a, b, numServersPerSwitches);
     }
@@ -284,8 +288,8 @@ public class TrafficMatrix {
 
     public void TrafficGenFromFileClusterX(String filename) {
         System.out.println("Flows from file " + filename);
-        int starttime = 30000;
-        int endtime = 40000;
+        int starttime = timeframeStart;
+        int endtime = timeframeEnd;
 
         int numFlows = 0;
         double[][] accumulativeTrafficMatrix = new double[numSwitches][numSwitches];
@@ -300,7 +304,93 @@ public class TrafficMatrix {
                 int src_sw = Integer.parseInt(strTok.nextToken());
                 int dst_sw = Integer.parseInt(strTok.nextToken());
 
+                if (timestamp >= endtime) break;
                 if (timestamp >= starttime && timestamp < endtime) {
+                    accumulativeTrafficMatrix[src_sw][dst_sw] += traffic;
+                }
+            }
+            br.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        double maxTraffic = 0;
+        for (int ssw=0; ssw<numSwitches; ssw++) {
+            for (int dsw=0; dsw<numSwitches; dsw++) {
+                double traffic = accumulativeTrafficMatrix[ssw][dsw];
+                maxTraffic = Math.max(maxTraffic, traffic);
+            }
+        }
+
+//        try {
+//            String writeFilename = "trafficfiles/tm_raw_fb_uniform.txt";
+//            FileWriter fstream = new FileWriter(writeFilename);
+//            BufferedWriter out = new BufferedWriter(fstream);
+
+        double coefficient = maxTraffic/ trafficCap;
+        for (int src = 0; src < numSwitches; src++) {
+            for (int dst = 0; dst < numSwitches; dst++) {
+                if (src == dst) continue;
+                double mult = accumulativeTrafficMatrix[src][dst] / coefficient;
+                switchLevelMatrix[src][dst] += trafficPerFlow * mult;
+//                    out.write(src + " " + dst + " " + trafficPerFlow * mult + "\n");
+                numFlows += mult;
+            }
+        }
+//            out.close();
+//        }
+//        catch (Exception e)
+//        {
+//            System.err.println("Write TM File FromFile Error: " + e.getMessage());
+//            e.printStackTrace();
+//        }
+
+        System.out.println("Number of flows = " + numFlows);
+
+        if (filename.equals("trafficfiles/fb_skewed.data")) {
+            System.out.print("Hot racks: ");
+            if (numServers == 3072) {
+                for (int i=65; i<80; i++) {
+                    hotRacks.add(i);
+                    System.out.print(i + " ");
+                }
+            } else {
+                assert(numServers == 2988);
+                for (int i=67; i<80; i++) {
+                    hotRacks.add(i);
+                    System.out.print(i + " ");
+                }
+            }
+            System.out.println();
+        } else {
+            System.out.println("No hotRacks for file " + filename);
+        }
+
+//        System.out.println("************Temporary fix: for SU3 with fbs, remove flow 5229 from rack 67 to rack 61***************");
+//        switchLevelMatrix[67][61] = 0;
+    }
+
+    public void TrafficGenFromFileClusterXPacketAdjusted(String filename) {
+        System.out.println("Flows from file " + filename);
+        int starttime = timeframeStart;
+        int endtime = timeframeEnd;
+
+        int numFlows = 0;
+        double[][] accumulativeTrafficMatrix = new double[numSwitches][numSwitches];
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(filename));
+            String strLine = "";
+            while ((strLine = br.readLine()) != null){
+                StringTokenizer strTok = new StringTokenizer(strLine);
+                int timestamp = Integer.parseInt(strTok.nextToken());
+                int traffic = Integer.parseInt(strTok.nextToken());
+                int src_sw = Integer.parseInt(strTok.nextToken());
+                int dst_sw = Integer.parseInt(strTok.nextToken());
+
+                if (timestamp >= endtime) break;
+                if (timestamp >= starttime && timestamp < endtime) {
+                    traffic = packetSize * ((traffic+packetSize-1) / packetSize);
                     accumulativeTrafficMatrix[src_sw][dst_sw] += traffic;
                 }
             }
@@ -689,6 +779,9 @@ public class TrafficMatrix {
         }
         else if (trafficmode == 12) {
             TrafficGenFromFileClusterX(trafficfile);
+        }
+        else if (trafficmode == 13) {
+            TrafficGenFromFileClusterXPacketAdjusted(trafficfile);
         }
         else {
             System.out.println("Trafficmode is not recognized.");
