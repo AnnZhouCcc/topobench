@@ -455,6 +455,75 @@ public class TrafficMatrix {
 //        switchLevelMatrix[67][61] = 0;
     }
 
+    public void TrafficGenClusterX(String cluster) {
+        System.out.println("Flows from cluster " + cluster);
+        int starttime = timeframeStart;
+        int endtime = timeframeEnd;
+
+        String file_prefix = "../DataParsing/outputs/cluster_" + cluster + "/traffic/parsed_data_2pods";
+        String[] file_suffix = {};
+        int timestamp_offset = 0;
+        if (cluster.equals("a")) {
+            file_suffix = new String[]{"_0_273"};
+            timestamp_offset = 0;
+        } else if (cluster.equals("b")) {
+            file_suffix = new String[]{"_0_1000","_1000_1500","_1500_2000","_2000_2500","_2500_2900"};
+            timestamp_offset = 1;
+        } else if (cluster.equals("c")) {
+            file_suffix = new String[]{"_0_273"};
+            timestamp_offset = 614;
+        }
+
+        double numFlows = 0;
+        double[][] accumulativeTrafficMatrix = new double[numSwitches][numSwitches];
+
+        try {
+            BufferedReader br;
+            String strLine = "";
+
+            for (int i=0; i<file_suffix.length; i++) {
+                String trafficfile = file_prefix + file_suffix[i];
+                br = new BufferedReader(new FileReader(trafficfile));
+                while ((strLine = br.readLine()) != null) {
+                    StringTokenizer strTok = new StringTokenizer(strLine);
+                    int timestamp = Integer.parseInt(strTok.nextToken());
+                    timestamp = timestamp - timestamp_offset;
+                    int traffic = Integer.parseInt(strTok.nextToken());
+                    int src_sw = Integer.parseInt(strTok.nextToken());
+                    int dst_sw = Integer.parseInt(strTok.nextToken());
+
+                    if (timestamp >= endtime) break;
+                    if (timestamp >= starttime && timestamp < endtime) {
+                        accumulativeTrafficMatrix[src_sw][dst_sw] += traffic;
+                    }
+                }
+                br.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        double maxTraffic = 0;
+        for (int ssw=0; ssw<numSwitches; ssw++) {
+            for (int dsw=0; dsw<numSwitches; dsw++) {
+                double traffic = accumulativeTrafficMatrix[ssw][dsw];
+                maxTraffic = Math.max(maxTraffic, traffic);
+            }
+        }
+
+        double coefficient = maxTraffic/ trafficCap;
+        for (int src = 0; src < numSwitches; src++) {
+            for (int dst = 0; dst < numSwitches; dst++) {
+                if (src == dst) continue;
+                double mult = accumulativeTrafficMatrix[src][dst] / coefficient;
+                switchLevelMatrix[src][dst] += trafficPerFlow * mult;
+                numFlows += mult;
+            }
+        }
+
+        System.out.println("Number of flows = " + numFlows);
+    }
+
     public void TrafficGenARackToBRack(int a, int b, int[] numServersPerSwitch)
     {
         System.out.println(a + " racks to " + b + " racks flows");
@@ -782,6 +851,9 @@ public class TrafficMatrix {
         }
         else if (trafficmode == 13) {
             TrafficGenFromFileClusterXPacketAdjusted(trafficfile);
+        }
+        else if (trafficmode == 14) {
+            TrafficGenClusterX(trafficfile);
         }
         else {
             System.out.println("Trafficmode is not recognized.");

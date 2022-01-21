@@ -16,6 +16,8 @@ scripts/localrouting2/
 scripts/variation/
 scripts/cluster*
 scripts/delay*
+scripts/onethirdtraffic/
+scripts/experiment*
 topobench.iml
 topology/my.lp
 topology/pathlengths/pl.0
