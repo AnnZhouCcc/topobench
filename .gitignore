@@ -18,6 +18,7 @@ scripts/cluster*
 scripts/delay*
 scripts/onethirdtraffic/
 scripts/experiment*
+scripts/serverlevelpermutation/
 topobench.iml
 topology/my.lp
 topology/pathlengths/pl.0
