@@ -3,6 +3,7 @@ package lpmaker;
 import lpmaker.graphs.Graph;
 
 import java.io.*;
+import java.net.StandardSocketOptions;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
@@ -704,6 +705,106 @@ public class TrafficMatrix {
         }
     }
 
+    public void TrafficGenPermutationRackLevel()
+    {
+        System.out.println("Rack-level permutation TM");
+
+        boolean[] receivers = new boolean[numSwitches];
+        for (int i=0; i<numSwitches; i++) {
+            int numServersAttached = topology.adjacencyList[i].size();
+            while (true) {
+                int dst = topology.rand.nextInt(numSwitches);
+                if (dst == i) continue;
+                if (!receivers[dst]) {
+                    receivers[dst] = true;
+                    switchLevelMatrix[i][dst] = trafficPerFlow*numServersAttached;
+                    break;
+                }
+            }
+        }
+
+//        try {
+//            FileWriter fstream = new FileWriter("resultfiles/tm.txt");
+//            BufferedWriter out = new BufferedWriter(fstream);
+//            for (int ii = numSwitches - 1; ii >= 0; ii--) {
+//                out.write(ii + "\t");
+//                for (int jj = 0; jj < numSwitches; jj++) {
+//                    if (ii == jj) {
+//                        out.write(0 + "\t");
+//                    } else {
+//                        out.write(switchLevelMatrix[ii][jj] + "\t");
+//                    }
+//                }
+//                out.write("\n");
+//            }
+//
+//            out.write("\t");
+//            for (int jj = 0; jj < numSwitches; jj++) {
+//                out.write(jj + "\t");
+//            }
+//            out.write("\n");
+//            out.close();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+    }
+
+    public void TrafficGenPermutationServerLevel()
+    {
+        System.out.println("Server-level permutation TM");
+        int countThreshold = 1000000;
+        int numFlows = 0;
+
+        boolean[] receivers = new boolean[numServers];
+        for (int i=0; i<numServers; i++) {
+            int senderRack = topology.svrToSwitch(i);
+            int count = 0;
+            while (true) {
+                count++;
+                if (count > countThreshold) { // Approximate server-level permutation; can have really unfortunate situations where i=3071 but the only false server is 3068
+                    System.out.println("count=" + count);
+                    break;
+                }
+                int dst = topology.rand.nextInt(numServers);
+                int receiverRack = topology.svrToSwitch(dst);
+                if (senderRack == receiverRack) continue;
+                if (!receivers[dst]) {
+                    receivers[dst] = true;
+                    switchLevelMatrix[senderRack][receiverRack] += trafficPerFlow;
+                    numFlows++;
+                    break;
+                }
+            }
+        }
+
+        System.out.println("Number of flows = " + numFlows);
+
+//        try {
+//            FileWriter fstream = new FileWriter("resultfiles/tm.txt");
+//            BufferedWriter out = new BufferedWriter(fstream);
+//            for (int ii = numSwitches - 1; ii >= 0; ii--) {
+//                out.write(ii + "\t");
+//                for (int jj = 0; jj < numSwitches; jj++) {
+//                    if (ii == jj) {
+//                        out.write(0 + "\t");
+//                    } else {
+//                        out.write(switchLevelMatrix[ii][jj] + "\t");
+//                    }
+//                }
+//                out.write("\n");
+//            }
+//
+//            out.write("\t");
+//            for (int jj = 0; jj < numSwitches; jj++) {
+//                out.write(jj + "\t");
+//            }
+//            out.write("\n");
+//            out.close();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+    }
+
     public void MaxWeightPairs(String filename){
         System.out.println ("Max weight pairs from file " + filename);
 
@@ -854,6 +955,12 @@ public class TrafficMatrix {
         }
         else if (trafficmode == 14) {
             TrafficGenClusterX(trafficfile);
+        }
+        else if (trafficmode == 15) {
+            TrafficGenPermutationRackLevel();
+        }
+        else if (trafficmode == 16) {
+            TrafficGenPermutationServerLevel();
         }
         else {
             System.out.println("Trafficmode is not recognized.");
