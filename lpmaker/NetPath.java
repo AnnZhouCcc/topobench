@@ -294,8 +294,8 @@ public class NetPath {
     }
 
     public void populatePathWeights() {
-        readPathWeightsFromFile(pathweightFileName);
-//        readGlobalPathWeightsFromFile(pathweightFileName);
+//        readPathWeightsFromFile(pathweightFileName);
+        readGlobalPathWeightsFromFile(pathweightFileName);
     }
 
     void readPathWeightsFromFile(String filename) {

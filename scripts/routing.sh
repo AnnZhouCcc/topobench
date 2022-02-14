@@ -1,4 +1,4 @@
-NRUNS=1
+NRUNS=5
 MYJAVAPATH="../"
 
 # Compile
@@ -13,12 +13,14 @@ numsvr=3072 # may not be needed
 topology=rrg
 graphfile=graphfiles/"$topology"_instance1_80_64.edgelist
 
-trafficmode=12
+trafficmode=15
 a=0
 b=0
-trafficfile=trafficfiles/cluster_b_parsed_data
+trafficfile=none
+timeframestart=0
+timeframeend=0
 
-tag=clusterb_80000_90000
+tag=permutation_mult
 
 isOptimal=false
 isEqualShare=true
@@ -34,6 +36,10 @@ do
 
 suffix="$topology"_"$routing"_"$trafficmode"_"$isEqualShare"_"$shouldAvoidHotRacks"_"$isPathWeighted"_"$tag"
 netpathfile=netpathfiles/netpath_"$routing"_"$topology".txt
+if [ "$routing" = "racke" ] || [ "$routing" = "wracke" ]
+then
+  netpathfile=../WTHelpers/yatesfiles/netpathfiles/racke.txt
+fi
 if [ "$routing" = "opt" ]
 then
   isOptimal=true
@@ -49,7 +55,7 @@ do
 
   # We checked -- the fat-tree does give throughput = 1 each time, as expected. So need to run the LP for it!
   cd $MYJAVAPATH
-  java lpmaker/ProduceLP 1 23 $graphfile $trafficmode $switches $port 0 0 $numsvr 0.0 0 0 0 0 0 0 0 0 0 1 $randSeed $trafficfile $isOptimal $netpathfile $isEqualShare $a $b $shouldAvoidHotRacks $isPathWeighted $pathweightfile
+  java lpmaker/ProduceLP 1 23 $graphfile $trafficmode $switches $port 0 0 $numsvr 0.0 0 0 0 0 0 0 0 0 0 1 $randSeed $trafficfile $isOptimal $netpathfile $isEqualShare $a $b $shouldAvoidHotRacks $isPathWeighted $pathweightfile "$timeframestart" "$timeframeend"
 
   # Run LP for mynet
   mv my.0.lp topology/my.lp
