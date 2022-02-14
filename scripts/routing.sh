@@ -1,4 +1,4 @@
-NRUNS=5
+NRUNS=1
 MYJAVAPATH="../"
 
 # Compile
@@ -13,23 +13,26 @@ numsvr=3072 # may not be needed
 topology=rrg
 graphfile=graphfiles/"$topology"_instance1_80_64.edgelist
 
-trafficmode=15
+trafficmode=14
 a=0
 b=0
-trafficfile=none
+trafficfile=b
 timeframestart=0
-timeframeend=0
+timeframeend=100000000
 
-tag=permutation_mult
+tag=clusterb_mult
 
 isOptimal=false
-isEqualShare=true
+isEqualShare=false
 shouldAvoidHotRacks=false
-isPathWeighted=false
-pathweightfile=none
+isPathWeighted=true
+#pathweightfile=none
+pathweightfile=../WTHelpers/yatesfiles/pathweightfiles/racke.txt
 
 # declare -a rs=("ecmp" "su2" "su3" "fhi" "16disjoint" "32disjoint" "16short" "32short")
-declare -a rs=("su2")
+#declare -a rs=("su2" "su3" "fhi" "32disjoint" "100random3" "racke")
+declare -a rs=("wracke")
+declare -a rs=("opt")
 
 for routing in "${rs[@]}"
 do
