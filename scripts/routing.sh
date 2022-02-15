@@ -13,14 +13,14 @@ numsvr=3072 # may not be needed
 topology=rrg
 graphfile=graphfiles/"$topology"_instance1_80_64.edgelist
 
-trafficmode=14
+trafficmode=11
 a=0
 b=0
-trafficfile=b
+trafficfile=none
 timeframestart=0
-timeframeend=100000000
+timeframeend=0
 
-tag=clusterb_mult
+tag=alltoall_mult
 
 isOptimal=false
 isEqualShare=false
@@ -30,9 +30,9 @@ isPathWeighted=true
 pathweightfile=../WTHelpers/yatesfiles/pathweightfiles/racke.txt
 
 # declare -a rs=("ecmp" "su2" "su3" "fhi" "16disjoint" "32disjoint" "16short" "32short")
-#declare -a rs=("su2" "su3" "fhi" "32disjoint" "100random3" "racke")
+#declare -a rs=("su3" "fhi" "32disjoint" "100random3" "racke")
+#declare -a rs=("su2")
 declare -a rs=("wracke")
-declare -a rs=("opt")
 
 for routing in "${rs[@]}"
 do

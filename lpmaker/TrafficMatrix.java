@@ -461,8 +461,8 @@ public class TrafficMatrix {
         int starttime = timeframeStart;
         int endtime = timeframeEnd;
 
-//        String file_prefix = "../DataParsing/outputs/cluster_" + cluster + "/traffic/parsed_data_2pods";
-        String file_prefix = "../DRing/src/emp/datacentre/trafficfiles/cluster_" + cluster + "/parsed_data_2pods";
+        String file_prefix = "../DataParsing/outputs/cluster_" + cluster + "/traffic/parsed_data_2pods";
+//        String file_prefix = "../DRing/src/emp/datacentre/trafficfiles/cluster_" + cluster + "/parsed_data_2pods";
         String[] file_suffix = {};
         int timestamp_offset = 0;
         if (cluster.equals("a")) {
