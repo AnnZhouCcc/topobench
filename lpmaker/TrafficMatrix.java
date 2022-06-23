@@ -1139,6 +1139,25 @@ public class TrafficMatrix {
     }
      */
 
+    public void generateTrafficAllServerToAllServer() {
+        System.out.println("Generate traffic all server to all server.");
+        double unitTraffic = 0.000001;
+        double totalTraffic = 0;
+
+        for (int srcsvr=0; srcsvr<numServers; srcsvr++) {
+            for (int dstsvr=0; dstsvr<numServers; dstsvr++) {
+                int srcSw = topology.svrToSwitch(srcsvr);
+                int dstSw = topology.svrToSwitch(dstsvr);
+                if (srcSw != dstSw) {
+                    switchLevelMatrix[srcSw][dstSw] += unitTraffic;
+                    totalTraffic += unitTraffic;
+                }
+            }
+        }
+
+        System.out.println("Total traffic = " + totalTraffic);
+    }
+
     public void generateTraffic(String trafficfile, int a, int b, int[] numServersPerSwitches) {
         // traffic-mode: 0 = randPerm; 1 = all-all; 2 = all-to-one; Any higher n means stride(n)
         int inaccuracymode = 0;
@@ -1210,6 +1229,9 @@ public class TrafficMatrix {
             TrafficGenPermutationHardCoding2();
         }
          */
+        else if (trafficmode == 100) {
+            generateTrafficAllServerToAllServer();
+        }
         else {
             System.out.println("Trafficmode is not recognized.");
         }

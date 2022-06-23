@@ -11,19 +11,22 @@ port=64
 numsvr=3072 # may not be needed
 numspinesw=16
 
-topology=leafspine
-graphtype=24
-#graphfile=graphfiles/"$topology"_instance1_80_64.edgelist
-graphfile=none
+topology=rrg
+graphtype=23
+graphfile=graphfiles/"$topology"_instance1_80_64.edgelist
 
-trafficmode=18
+#topology=leafspine
+#graphtype=24
+#graphfile=none
+
+trafficmode=100
 a=0
 b=0
 trafficfile=none
 timeframestart=0
 timeframeend=0
 
-tag=test
+tag=sum
 
 isOptimal=true
 isEqualShare=false
@@ -35,8 +38,8 @@ pathweightfile=none
 # declare -a rs=("ecmp" "su2" "su3" "fhi" "16disjoint" "32disjoint" "16short" "32short")
 #declare -a rs=("ecmp" "su2" "su3" "fhi" "32disjoint" "32short")
 #declare -a rs=("su3" "fhi" "32disjoint" "100random3" "racke")
-#declare -a rs=("ecmp")
-declare -a rs=("opt")
+declare -a rs=("ecmp")
+#declare -a rs=("opt")
 
 for routing in "${rs[@]}"
 do
