@@ -458,22 +458,17 @@ public class TrafficMatrix {
 
     public void TrafficGenClusterX(String cluster) {
         System.out.println("Flows from cluster " + cluster);
-        int starttime = timeframeStart;
-        int endtime = timeframeEnd;
+        int solve_starttime = timeframeStart;
+        int solve_endtime = timeframeEnd;
 
-        String file_prefix = "../DataParsing/outputs/cluster_" + cluster + "/traffic/parsed_data_2pods";
-//        String file_prefix = "../DRing/src/emp/datacentre/trafficfiles/cluster_" + cluster + "/parsed_data_2pods";
+        String file_prefix = "../DataParsing/outputs/cluster_" + cluster + "/traffic/traffic_64racks";
         String[] file_suffix = {};
-        int timestamp_offset = 0;
         if (cluster.equals("a")) {
             file_suffix = new String[]{"_0_273"};
-            timestamp_offset = 0;
         } else if (cluster.equals("b")) {
-            file_suffix = new String[]{"_0_1000","_1000_1500","_1500_2000","_2000_2500","_2500_2900"};
-            timestamp_offset = 1;
+            file_suffix = new String[]{"_0_500","_500_1000","_1000_1500","_1500_2000","_2000_2500","_2500_2900"};
         } else if (cluster.equals("c")) {
             file_suffix = new String[]{"_0_273"};
-            timestamp_offset = 614;
         }
 
         double numFlows = 0;
@@ -486,16 +481,18 @@ public class TrafficMatrix {
             for (int i=0; i<file_suffix.length; i++) {
                 String trafficfile = file_prefix + file_suffix[i];
                 br = new BufferedReader(new FileReader(trafficfile));
-                while ((strLine = br.readLine()) != null) {
+                while ((strLine = br.readLine()) != null){
                     StringTokenizer strTok = new StringTokenizer(strLine);
                     int timestamp = Integer.parseInt(strTok.nextToken());
-                    timestamp = timestamp - timestamp_offset;
                     int traffic = Integer.parseInt(strTok.nextToken());
-                    int src_sw = Integer.parseInt(strTok.nextToken());
-                    int dst_sw = Integer.parseInt(strTok.nextToken());
+                    int src_svr = Integer.parseInt(strTok.nextToken());
+                    int dst_svr = Integer.parseInt(strTok.nextToken());
+                    int src_sw = topology.svrToSwitch(src_svr);
+                    int dst_sw = topology.svrToSwitch(dst_svr);
+                    if (src_sw == dst_sw) continue;
 
-                    if (timestamp >= endtime) break;
-                    if (timestamp >= starttime && timestamp < endtime) {
+                    if (timestamp >= solve_endtime) break;
+                    if (timestamp >= solve_starttime && timestamp < solve_endtime) {
                         accumulativeTrafficMatrix[src_sw][dst_sw] += traffic;
                     }
                 }
@@ -909,6 +906,239 @@ public class TrafficMatrix {
         }
     }
 
+    public void TrafficGenCss16to4HardCoding() {
+        System.out.println("16-to-4 Hard Coding");
+        int[] receiver_starts = new int[] {0};
+        int[] receiver_ends = new int[] {191};
+        int[] sender_starts = new int[] {2304};
+        int[] sender_ends = new int[] {3071};
+        ArrayList<Integer> senders = new ArrayList<>();
+        ArrayList<Integer> receivers = new ArrayList<>();
+        for (int i=0; i<sender_starts.length; i++) {
+            for (int j=sender_starts[i]; j<=sender_ends[i]; j++) {
+                senders.add(j);
+            }
+        }
+        for (int i=0; i<receiver_starts.length; i++) {
+            for (int j=receiver_starts[i]; j<=receiver_ends[i]; j++) {
+                receivers.add(j);
+            }
+        }
+
+        for (int srcServer : senders) {
+            for (int dstServer : receivers) {
+                int srcSw = topology.svrToSwitch(srcServer);
+                int dstSw = topology.svrToSwitch(dstServer);
+                if (srcSw == dstSw) continue;
+                switchLevelMatrix[srcSw][dstSw] += trafficPerFlow;
+            }
+        }
+
+        double maxTraffic = 0;
+        for (int i=0; i<numSwitches; i++) {
+            for (int j=0; j<numSwitches; j++) {
+                maxTraffic = Math.max(maxTraffic, switchLevelMatrix[i][j]);
+            }
+        }
+
+        double downscale = maxTraffic / trafficCap;
+        for (int i=0; i<numSwitches; i++) {
+            for (int j=0; j<numSwitches; j++) {
+                double original = switchLevelMatrix[i][j];
+                switchLevelMatrix[i][j] = original / downscale;
+            }
+        }
+    }
+
+    public void TrafficGenAlltoAllHardCoding() {
+        System.out.println("All-to-all flows hard-coding");
+        int numFlows = 0;
+
+        for (int srcsvr=0; srcsvr<3072; srcsvr++) {
+            for (int dstsvr=0; dstsvr<3072; dstsvr++) {
+                int srcSw = topology.svrToSwitch(srcsvr);
+                int dstSw = topology.svrToSwitch(dstsvr);
+                if (srcSw == dstSw) continue;
+                switchLevelMatrix[srcSw][dstSw] += trafficPerFlow;
+            }
+        }
+
+        double maxTraffic = 0;
+        for (int i=0; i<numSwitches; i++) {
+            for (int j=0; j<numSwitches; j++) {
+                maxTraffic = Math.max(maxTraffic, switchLevelMatrix[i][j]);
+            }
+        }
+
+        double downscale = maxTraffic / trafficCap;
+        for (int i=0; i<numSwitches; i++) {
+            for (int j=0; j<numSwitches; j++) {
+                double original = switchLevelMatrix[i][j];
+                switchLevelMatrix[i][j] = original / downscale;
+            }
+        }
+
+        System.out.println("Number of flows = " + numFlows);
+    }
+
+    /*
+    public void TrafficGenAlltoAllHardCoding2() {
+        System.out.println("All-to-all flows hard-coding -- half servers");
+        int numFlows = 0;
+
+        for (int srcsvr=0; srcsvr<3072; srcsvr++) {
+            if (srcsvr%48<24) continue;
+            for (int dstsvr=0; dstsvr<3072; dstsvr++) {
+                if (dstsvr%48>=24) continue;
+
+                int srcSw = topology.svrToSwitch(srcsvr);
+                int dstSw = topology.svrToSwitch(dstsvr);
+
+                if (srcSw == dstSw) continue;
+                switchLevelMatrix[srcSw][dstSw] += trafficPerFlow;
+            }
+        }
+
+        double maxTraffic = 0;
+        for (int i=0; i<numSwitches; i++) {
+            for (int j=0; j<numSwitches; j++) {
+                maxTraffic = Math.max(maxTraffic, switchLevelMatrix[i][j]);
+            }
+        }
+
+        double downscale = maxTraffic / trafficCap;
+        for (int i=0; i<numSwitches; i++) {
+            for (int j=0; j<numSwitches; j++) {
+                double original = switchLevelMatrix[i][j];
+                switchLevelMatrix[i][j] = original / downscale;
+            }
+        }
+
+        System.out.println("Number of flows = " + numFlows);
+    }
+     */
+
+    public void TrafficGenPermutationHardCoding() {
+        System.out.println("Permutation hard-coding");
+        int numFlows = 0;
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader("trafficfiles/permutation_rack_pairs.txt"));
+            ArrayList<Integer> srcracks = new ArrayList<>();
+            ArrayList<Integer> dstracks = new ArrayList<>();
+            String strLine = "";
+            for (int l=0; l<2; l++) {
+                strLine = br.readLine();
+                StringTokenizer strTok = new StringTokenizer(strLine);
+                for (int i = 0; i < 64; i++) {
+                    if (l==0) {
+                        srcracks.add(Integer.parseInt(strTok.nextToken()));
+                    } else if (l==1) {
+                        dstracks.add(Integer.parseInt(strTok.nextToken()));
+                    }
+                }
+            }
+            br.close();
+
+            for (int r=0; r<64; r++) {
+                int srcrack = srcracks.get(r);
+                int dstrack = dstracks.get(r);
+                for (int m=0; m<48; m++) {
+                    for (int n=0; n<48; n++) {
+                        int srcsvr = srcrack*48+m;
+                        int dstsvr = dstrack*48+n;
+
+                        int srcSw = topology.svrToSwitch(srcsvr);
+                        int dstSw = topology.svrToSwitch(dstsvr);
+                        if (srcSw == dstSw) continue;
+                        switchLevelMatrix[srcSw][dstSw] += trafficPerFlow;
+                    }
+                }
+            }
+
+            double maxTraffic = 0;
+            for (int i = 0; i < numSwitches; i++) {
+                for (int j = 0; j < numSwitches; j++) {
+                    maxTraffic = Math.max(maxTraffic, switchLevelMatrix[i][j]);
+                }
+            }
+
+            double downscale = maxTraffic / trafficCap;
+            for (int i = 0; i < numSwitches; i++) {
+                for (int j = 0; j < numSwitches; j++) {
+                    double original = switchLevelMatrix[i][j];
+                    switchLevelMatrix[i][j] = original / downscale;
+                }
+            }
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+
+        System.out.println("Number of flows = " + numFlows);
+    }
+
+    /*
+    public void TrafficGenPermutationHardCoding2() {
+        System.out.println("Permutation hard-coding -- half servers");
+        int numFlows = 0;
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader("trafficfiles/permutation_rack_pairs.txt"));
+            ArrayList<Integer> srcracks = new ArrayList<>();
+            ArrayList<Integer> dstracks = new ArrayList<>();
+            String strLine = "";
+            for (int l=0; l<2; l++) {
+                strLine = br.readLine();
+                StringTokenizer strTok = new StringTokenizer(strLine);
+                for (int i = 0; i < 64; i++) {
+                    if (l==0) {
+                        srcracks.add(Integer.parseInt(strTok.nextToken()));
+                    } else if (l==1) {
+                        dstracks.add(Integer.parseInt(strTok.nextToken()));
+                    }
+                }
+            }
+            br.close();
+
+            for (int r=0; r<64; r++) {
+                int srcrack = srcracks.get(r);
+                int dstrack = dstracks.get(r);
+                for (int m=0; m<24; m++) {
+                    for (int n=0; n<24; n++) {
+                        int srcsvr = srcrack*48+m;
+                        int dstsvr = dstrack*48+n;
+
+                        int srcSw = topology.svrToSwitch(srcsvr);
+                        int dstSw = topology.svrToSwitch(dstsvr);
+
+                        if (srcSw == dstSw) continue;
+                        switchLevelMatrix[srcSw][dstSw] += trafficPerFlow;
+                    }
+                }
+            }
+
+            double maxTraffic = 0;
+            for (int i = 0; i < numSwitches; i++) {
+                for (int j = 0; j < numSwitches; j++) {
+                    maxTraffic = Math.max(maxTraffic, switchLevelMatrix[i][j]);
+                }
+            }
+
+            double downscale = maxTraffic / trafficCap;
+            for (int i = 0; i < numSwitches; i++) {
+                for (int j = 0; j < numSwitches; j++) {
+                    double original = switchLevelMatrix[i][j];
+                    switchLevelMatrix[i][j] = original / downscale;
+                }
+            }
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+
+        System.out.println("Number of flows = " + numFlows);
+    }
+     */
+
     public void generateTraffic(String trafficfile, int a, int b, int[] numServersPerSwitches) {
         // traffic-mode: 0 = randPerm; 1 = all-all; 2 = all-to-one; Any higher n means stride(n)
         int inaccuracymode = 0;
@@ -963,6 +1193,23 @@ public class TrafficMatrix {
         else if (trafficmode == 16) {
             TrafficGenPermutationServerLevel();
         }
+        else if (trafficmode == 17) {
+            TrafficGenCss16to4HardCoding();
+        }
+        else if (trafficmode == 18) {
+            TrafficGenAlltoAllHardCoding();
+        }
+        else if (trafficmode == 19) {
+            TrafficGenPermutationHardCoding();
+        }
+        /*
+        else if (trafficmode == 20) {
+            TrafficGenAlltoAllHardCoding2();
+        }
+        else if (trafficmode == 21) {
+            TrafficGenPermutationHardCoding2();
+        }
+         */
         else {
             System.out.println("Trafficmode is not recognized.");
         }
