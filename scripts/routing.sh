@@ -9,30 +9,34 @@ cd -
 switches=80
 port=64
 numsvr=3072 # may not be needed
+numspinesw=16
 
-topology=rrg
-graphfile=graphfiles/"$topology"_instance1_80_64.edgelist
+topology=leafspine
+graphtype=24
+#graphfile=graphfiles/"$topology"_instance1_80_64.edgelist
+graphfile=none
 
-trafficmode=11
+trafficmode=18
 a=0
 b=0
 trafficfile=none
 timeframestart=0
 timeframeend=0
 
-tag=alltoall_mult
+tag=test
 
-isOptimal=false
+isOptimal=true
 isEqualShare=false
 shouldAvoidHotRacks=false
-isPathWeighted=true
-#pathweightfile=none
-pathweightfile=../WTHelpers/yatesfiles/pathweightfiles/racke.txt
+isPathWeighted=false
+pathweightfile=none
+#pathweightfile=../WTHelpers/yatesfiles/pathweightfiles/racke.txt
 
 # declare -a rs=("ecmp" "su2" "su3" "fhi" "16disjoint" "32disjoint" "16short" "32short")
+#declare -a rs=("ecmp" "su2" "su3" "fhi" "32disjoint" "32short")
 #declare -a rs=("su3" "fhi" "32disjoint" "100random3" "racke")
-#declare -a rs=("su2")
-declare -a rs=("wracke")
+#declare -a rs=("ecmp")
+declare -a rs=("opt")
 
 for routing in "${rs[@]}"
 do
@@ -58,7 +62,7 @@ do
 
   # We checked -- the fat-tree does give throughput = 1 each time, as expected. So need to run the LP for it!
   cd $MYJAVAPATH
-  java lpmaker/ProduceLP 1 23 $graphfile $trafficmode $switches $port 0 0 $numsvr 0.0 0 0 0 0 0 0 0 0 0 1 $randSeed $trafficfile $isOptimal $netpathfile $isEqualShare $a $b $shouldAvoidHotRacks $isPathWeighted $pathweightfile "$timeframestart" "$timeframeend"
+  java lpmaker/ProduceLP 1 $graphtype $graphfile $trafficmode $switches $port 0 0 $numsvr 0.0 0 0 0 0 0 0 0 0 0 1 $randSeed $trafficfile $isOptimal $netpathfile $isEqualShare $a $b $shouldAvoidHotRacks $isPathWeighted $pathweightfile "$timeframestart" "$timeframeend" $numspinesw
 
   # Run LP for mynet
   mv my.0.lp topology/my.lp
