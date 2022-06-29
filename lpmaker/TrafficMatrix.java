@@ -1396,7 +1396,9 @@ public class TrafficMatrix {
                 int[] srcsvrs = lsnet.getServersForSwitch(srcsw);
                 int[] dstsvrs = lsnet.getServersForSwitch(dstsw);
                 for (int srcsvr : srcsvrs) {
+                    if (srcsvr >= topology.totalWeight) continue;
                     for (int dstsvr : dstsvrs) {
+                        if (dstsvr >= topology.totalWeight) continue;
                         int mysrcsw = topology.svrToSwitch(srcsvr);
                         int mydstsw = topology.svrToSwitch(dstsvr);
                         if (mysrcsw != mydstsw) {
@@ -1495,7 +1497,9 @@ public class TrafficMatrix {
                 int[] srcsvrs = lsnet.getServersForSwitch(srcsw);
                 int[] dstsvrs = lsnet.getServersForSwitch(dstsw);
                 for (int srcsvr : srcsvrs) {
+                    if (srcsvr>=topology.totalWeight) continue;
                     for (int dstsvr : dstsvrs) {
+                        if (dstsvr>=topology.totalWeight) continue;
                         int mysrcsw = topology.svrToSwitch(srcsvr);
                         int mydstsw = topology.svrToSwitch(dstsvr);
                         if (mysrcsw != mydstsw) {
@@ -1512,7 +1516,9 @@ public class TrafficMatrix {
                 int[] srcsvrs = lsnet.getServersForSwitch(srcsw);
                 int[] dstsvrs = lsnet.getServersForSwitch(dstsw);
                 for (int srcsvr : srcsvrs) {
+                    if (srcsvr>=topology.totalWeight) continue;
                     for (int dstsvr : dstsvrs) {
+                        if (dstsvr>=topology.totalWeight) continue;
                         int mysrcsw = topology.svrToSwitch(srcsvr);
                         int mydstsw = topology.svrToSwitch(dstsvr);
                         if (mysrcsw != mydstsw) {
