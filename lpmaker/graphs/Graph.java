@@ -40,6 +40,7 @@ public class Graph
 
 	public int noNodes;
 	public int numEdges;
+	public int numPorts;
 	public Vector<Link>[] adjacencyList;
 
 	public int[][] shortestPathLen;
@@ -450,6 +451,11 @@ public class Graph
 	public int svrToSwitch(int index)
 	{
 		throw new RuntimeException("svrToSwitch should be overloaded in derived classes");
+	}
+
+	public int[] getServersForSwitch(int whichServer)
+	{
+		throw new RuntimeException("getServersForSwitch should be overloaded in derived classes");
 	}
 
 	//should be overloaded

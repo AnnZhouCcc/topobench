@@ -8,8 +8,6 @@ import java.util.regex.Pattern;
 
 public class GraphFromFileSrcDstPair extends Graph {
 
-	int numPorts;
-
 	public GraphFromFileSrcDstPair(int size, String fileName, int totalPorts){
 		super(size);
 		numPorts = totalPorts;
@@ -70,5 +68,21 @@ public class GraphFromFileSrcDstPair extends Graph {
 		System.out.println("Failed to locate the server on any switch.");
 		System.out.println("server id = " + i + ", number of switches = " + noNodes + ", number of ports = " + numPorts);
 		return -1;
+	}
+
+	public int[] getServersForSwitch(int whichSwitch) {
+		int startServer = 0;
+		for (int sw=0; sw<noNodes; sw++) {
+			if (sw < whichSwitch) {
+				startServer += weightEachNode[sw];
+			}
+		}
+
+		int numServers = weightEachNode[whichSwitch];
+		int[] serverarr = new int[numServers];
+		for (int s=0; s<numServers; s++) {
+			serverarr[s] = s+startServer;
+		}
+		return serverarr;
 	}
 }

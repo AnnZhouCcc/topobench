@@ -8,38 +8,40 @@ cd -
 
 switches=80
 port=64
-numsvr=3072 # may not be needed
+#numsvr=3072
+numsvr=2988
 numspinesw=16
 
-topology=rrg
+topology=dring
 graphtype=23
-graphfile=graphfiles/"$topology"_instance1_80_64.edgelist
-
 #topology=leafspine
 #graphtype=24
-#graphfile=none
+#graphfile=graphfiles/rrg_instance1_80_64.edgelist
+graphfile=graphfiles/dring_instance1_80_64.edgelist
 
-trafficmode=100
+method=2
+#declare -a rs=("su3")
+#declare -a rs=("ecmp")
+#declare -a rs=("opt")
+
+trafficmode=106
 a=0
 b=0
-trafficfile=none
+trafficfile=b
 timeframestart=0
-timeframeend=0
+timeframeend=86400
 
-tag=sum
+tag=
 
-isOptimal=true
+isOptimal=false
 isEqualShare=false
 shouldAvoidHotRacks=false
 isPathWeighted=false
 pathweightfile=none
 #pathweightfile=../WTHelpers/yatesfiles/pathweightfiles/racke.txt
 
-# declare -a rs=("ecmp" "su2" "su3" "fhi" "16disjoint" "32disjoint" "16short" "32short")
-#declare -a rs=("ecmp" "su2" "su3" "fhi" "32disjoint" "32short")
-#declare -a rs=("su3" "fhi" "32disjoint" "100random3" "racke")
-declare -a rs=("ecmp")
-#declare -a rs=("opt")
+# declare -a rs=("ecmp" "su2" "su3" "fhi" "16disjoint" "32disjoint" "16short" "32short" "100random3" "racke" "wracke" "opt")
+declare -a rs=("ecmp" "su2" "su3" "32disjoint" "32short")
 
 for routing in "${rs[@]}"
 do
@@ -72,7 +74,7 @@ do
   mv pl.0 topology/pathlengths/
   cd -
 
-  flowVal=`./lpRun.sh ../topology/my.lp`
+  flowVal=`./lpRun.sh ../topology/my.lp $method`
   rm -rf ../flowIDmap* ../linkCaps* flowIDmap* linkCaps*
   echo "$flowVal" >> flowtmp_"$suffix"
 done

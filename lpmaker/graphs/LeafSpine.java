@@ -2,16 +2,14 @@ package lpmaker.graphs;
 
 public class LeafSpine extends Graph {
 
-	int numPorts;
 	int numLeafSwitches;
 	int numSpineSwitches;
-	int numSwitches;
 	int numServers;
 
 	public LeafSpine(int _numSwitches, int _numPorts, int _numSpineSwitches, int _numServers){
 		super(_numSwitches);
 		numPorts = _numPorts;
-		numSwitches = _numSwitches;
+		noNodes = _numSwitches;
 		numLeafSwitches = _numSwitches - _numSpineSwitches;
 		numSpineSwitches = _numSpineSwitches;
 		numServers = _numServers;
@@ -39,7 +37,7 @@ public class LeafSpine extends Graph {
 
 	private void populateAdjacencyList(){
 		for (int spinesw=0; spinesw<numSpineSwitches; spinesw++) {
-			for (int leafsw=numSpineSwitches; leafsw<numSwitches; leafsw++) {
+			for (int leafsw=numSpineSwitches; leafsw<noNodes; leafsw++) {
 				if (!isNeighbor(spinesw,leafsw)) addBidirNeighbor(spinesw,leafsw);
 			}
 		}
@@ -48,7 +46,7 @@ public class LeafSpine extends Graph {
 		for (int spinesw=0; spinesw<numSpineSwitches; spinesw++) {
 			weightEachNode[spinesw] = 0;
 		}
-		for (int leafsw=numSpineSwitches; leafsw<numSwitches; leafsw++) {
+		for (int leafsw=numSpineSwitches; leafsw<noNodes; leafsw++) {
 			weightEachNode[leafsw] = numPorts - numSpineSwitches;
 		}
 
@@ -58,7 +56,7 @@ public class LeafSpine extends Graph {
 
 	public int svrToSwitch(int whichServer) {
 		int currentServers = 0;
-		for (int sw=0; sw<numSwitches; sw++) {
+		for (int sw=0; sw<noNodes; sw++) {
 			int numServersThisSw = weightEachNode[sw];
 			if (currentServers + numServersThisSw > whichServer) {
 				return sw;
@@ -69,5 +67,21 @@ public class LeafSpine extends Graph {
 		System.out.println("Failed to locate the server on any switch.");
 		System.out.println("server id = " + whichServer + ", number of switches = " + noNodes + ", number of ports = " + numPorts);
 		return -1;
+	}
+
+	public int[] getServersForSwitch(int whichSwitch) {
+		int startServer = 0;
+		for (int sw=0; sw<noNodes; sw++) {
+			if (sw < whichSwitch) {
+				startServer += weightEachNode[sw];
+			}
+		}
+
+		int numServers = weightEachNode[whichSwitch];
+		int[] serverarr = new int[numServers];
+		for (int s=0; s<numServers; s++) {
+			serverarr[s] = s+startServer;
+		}
+		return serverarr;
 	}
 }

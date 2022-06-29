@@ -434,6 +434,7 @@ public class ProduceLP {
 		}
 		*/
 		else if (graphtype == 23){ // Read graph from file, print linear program for both that graph, and equivalent random graph for comparison; graph file has lines of type "<source switch>-><destination switch>"
+			int numSpineSwitches = Integer.parseInt(args[32]);
 			String graphFile = args[2];
 			String trafficFile = args[21];
 			System.out.println("graph file: " + graphFile);
@@ -446,7 +447,9 @@ public class ProduceLP {
 
 			System.out.println("number of switches: " + switches);
 			Graph mynet = new GraphFromFileSrcDstPair(switches, graphFile, switchports);
-			TrafficMatrix tm = new TrafficMatrix(switches, trafficMode, trafficFile, mynet, a, b, mynet.weightEachNode, timeframeStart, timeframeEnd);
+			Graph lsnet = new LeafSpine(switches, switchports, numSpineSwitches,  3072); // Hard-coded for DRing, which only has 2988 servers
+
+			TrafficMatrix tm = new TrafficMatrix(switches, trafficMode, trafficFile, mynet, a, b, mynet.weightEachNode, timeframeStart, timeframeEnd, mynet, lsnet);
 			boolean shouldAvoidHotRacks = Boolean.parseBoolean(args[27]);
 			HashSet<Integer> hotRacks = null;
 			if (shouldAvoidHotRacks) hotRacks = tm.getHotRacks();
@@ -495,7 +498,9 @@ public class ProduceLP {
 		}
 		else if (graphtype == 24){ // LeafSpine
 			int numSpineSwitches = Integer.parseInt(args[32]);
+			String graphFile = args[2];
 			String trafficFile = args[21];
+			System.out.println("graph file: " + graphFile);
 			System.out.println("traffic file: " + trafficFile);
 			int a = Integer.parseInt(args[25]);
 			int b = Integer.parseInt(args[26]);
@@ -505,8 +510,9 @@ public class ProduceLP {
 
 			System.out.println("number of switches: " + switches);
 			Graph mynet = new LeafSpine(switches, switchports, numSpineSwitches, nsvrs);
+			Graph rrgnet = new GraphFromFileSrcDstPair(switches, graphFile, switchports);
 
-			TrafficMatrix tm = new TrafficMatrix(switches, trafficMode, trafficFile, mynet, a, b, mynet.weightEachNode, timeframeStart, timeframeEnd);
+			TrafficMatrix tm = new TrafficMatrix(switches, trafficMode, trafficFile, mynet, a, b, mynet.weightEachNode, timeframeStart, timeframeEnd, rrgnet, mynet);
 			boolean shouldAvoidHotRacks = Boolean.parseBoolean(args[27]);
 			HashSet<Integer> hotRacks = null;
 			if (shouldAvoidHotRacks) hotRacks = tm.getHotRacks();
