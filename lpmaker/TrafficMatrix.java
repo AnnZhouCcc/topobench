@@ -1483,7 +1483,6 @@ public class TrafficMatrix {
             heavyRacks.add(lsnet.rand.nextInt(numLeafspineRacks)+minLeafspineRack);
         }
         System.out.println("Number of heavy racks = " + heavyRacks.size());
-
         HashSet<Integer> lightRacks = new HashSet<>();
         for (int s=minLeafspineRack; s<=maxLeafspineRack; s++) {
             if (!heavyRacks.contains(s)) {
@@ -1492,6 +1491,46 @@ public class TrafficMatrix {
         }
         System.out.println("Number of light racks = " + lightRacks.size());
 
+        HashSet<Integer> heavyServers = new HashSet<>();
+        for (int hr : heavyRacks) {
+            int[] servers = lsnet.getServersForSwitch(hr);
+            for (int svr : servers) {
+                heavyServers.add(svr);
+            }
+        }
+        System.out.println("Number of heavy servers = " + heavyServers.size());
+        HashSet<Integer> lightServers = new HashSet<>();
+        for (int lr : lightRacks) {
+            int[] servers = lsnet.getServersForSwitch(lr);
+            for (int svr : servers) {
+                lightServers.add(svr);
+            }
+        }
+        System.out.println("Number of light servers = " + lightServers.size());
+
+        for (int srcsvr=0; srcsvr<heavyServers.size(); srcsvr++) {
+            for (int dstsvr=0; dstsvr<heavyServers.size(); dstsvr++) {
+                if (srcsvr>=topology.totalWeight | dstsvr>=topology.totalWeight) continue;
+                int srcsw = topology.svrToSwitch(srcsvr);
+                int dstsw = topology.svrToSwitch(dstsvr);
+                if (srcsw == dstsw) continue;
+                switchLevelMatrix[srcsw][dstsw] += unitTraffic*t;
+                totalTraffic += unitTraffic*t;
+            }
+        }
+
+        for (int srcsvr=0; srcsvr<lightServers.size(); srcsvr++) {
+            for (int dstsvr=0; dstsvr<lightServers.size(); dstsvr++) {
+                if (srcsvr>=topology.totalWeight | dstsvr>=topology.totalWeight) continue;
+                int srcsw = topology.svrToSwitch(srcsvr);
+                int dstsw = topology.svrToSwitch(dstsvr);
+                if (srcsw == dstsw) continue;
+                switchLevelMatrix[srcsw][dstsw] += unitTraffic;
+                totalTraffic += unitTraffic;
+            }
+        }
+
+        /*
         for (int srcsw : heavyRacks) {
             for (int dstsw : heavyRacks) {
                 int[] srcsvrs = lsnet.getServersForSwitch(srcsw);
@@ -1529,6 +1568,8 @@ public class TrafficMatrix {
                 }
             }
         }
+
+         */
 
         System.out.println("Total traffic = " + totalTraffic);
     }

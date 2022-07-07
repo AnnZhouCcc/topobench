@@ -1087,6 +1087,7 @@ public class Graph
 							int writeCons = 0;
 							if (u == f)    //src
 							{
+								/*
 								constraint = "c2_" + fid + "_" + u + "_1: ";
 
 								for (int j = 0; j < adjacencyList[u].size(); j++)   //for each out link of u = (u,j)
@@ -1101,6 +1102,8 @@ public class Graph
 								if (writeCons == 1)
 									out.write(constraint + " <= " + switchLevelMatrix[f][t] * LARGE_VALUE + "\n");
 								writeCons = 0;
+
+								 */
 								constraint = "c2_" + fid + "_" + u + "_2: ";
 								for (int j = 0; j < adjacencyList[u].size(); j++)   //for each in link of u = (j,u)
 								{
