@@ -484,10 +484,12 @@ public class ProduceLP {
 						System.out.println("PrintSimpleGraph");
 						mynet.PrintSimpleGraph("my." + runs + ".lp", tm.switchLevelMatrix);
 					} else {
-						System.out.println("PrintGraphforMCFFairCondensedForKnownRouting");
+//						System.out.println("PrintGraphforMCFFairCondensedForKnownRouting");
 						boolean useEqualShare = Boolean.parseBoolean(args[24]);
 						System.out.println("Should use equal share? " + useEqualShare);
-						mynet.PrintGraphforMCFFairCondensedForKnownRouting("my." + runs + ".lp",100, tm.switchLevelMatrix, netpath.rackPool, netpath.pathPool, netpath.linksUsage, netpath.linkPool, useEqualShare, isPathWeighted, netpath.pathWeights);
+//						mynet.PrintGraphforMCFFairCondensedForKnownRouting("my." + runs + ".lp",100, tm.switchLevelMatrix, netpath.rackPool, netpath.pathPool, netpath.linksUsage, netpath.linkPool, useEqualShare, isPathWeighted, netpath.pathWeights);
+						System.out.println("PrintGraphforMCFFairCondensedForKnownRouting2");
+						mynet.PrintGraphforMCFFairCondensedForKnownRouting2("my." + runs + ".lp",100, tm.switchLevelMatrix, netpath.pathPool);
 					}
 				}
 			} else {
