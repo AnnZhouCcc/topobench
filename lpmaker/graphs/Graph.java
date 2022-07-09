@@ -2083,8 +2083,8 @@ public class Graph
 			//<Constraints of Type 0: fairness i.e. flow >= K
 			out.write("\n\nSUBJECT TO \n\\Type 0: Flow >= K\n");
 			System.out.println(new Date() + ": Starting part 0");
-			for (int f = 0; f < noNodes; f++) {
-				for (int t = 0; t < noNodes; t++) {
+			for (int f = 0; f < numServers; f++) {
+				for (int t = 0; t < numServers; t++) {
 					if(serverLevelMatrix[f][t]>0) {
 						int fid = allFlowIDs[f][t].flowID;
 						String constraint = "c0_" + fid + ": ";
@@ -2109,9 +2109,9 @@ public class Graph
 			for(int i=0; i<noNodes; i++) {
 				for(int j=0; j<adjacencyList[i].size(); j++) {
 					boolean shouldWriteConstraint = false;
-					String constraint = "c1_" + i + "_" + adjacencyList[i].get(j).linkTo + ": ";
-					for (int f=0; f<noNodes; f++) {
-						for (int t=0; t<noNodes; t++) {
+					String constraint = "c1_" + i + "_" + adjacencyList[i].get(j).linkTo + ": 0 ";
+					for (int f=0; f<numServers; f++) {
+						for (int t=0; t<numServers; t++) {
 							if (serverLevelMatrix[f][t] > 0) {
 								int fid = allFlowIDs[f][t].flowID;
 								if (!isFlowZero(allFlowIDs[f][t],i,adjacencyList[i].get(j).linkTo)) {
@@ -2134,15 +2134,15 @@ public class Graph
 			//<Constraints of Type 2: Flow conservation at non-source, non-destination
 			System.out.println(new Date() + ": Starting part 2");
 			out.write("\n\\Type 2: Flow conservation at non-source, non-destination\n");
-			for (int f = 0; f < noNodes; f++) {
-				for (int t = 0; t < noNodes; t++) {
+			for (int f = 0; f < numServers; f++) {
+				for (int t = 0; t < numServers; t++) {
 					if (serverLevelMatrix[f][t] > 0) { //for each flow fid
 						int fid = allFlowIDs[f][t].flowID;
 						for (int u = 0; u < noNodes; u++) { //for each node u
 							String constraint = "";
 							boolean shouldWriteConstraint = false;
 							if (u == f) { //src
-								constraint = "c2_" + fid + "_" + u + "_2: ";
+								constraint = "c2_" + fid + "_" + u + "_2: 0 ";
 								for (int j = 0; j < adjacencyList[u].size(); j++) { //for each in link of u = (j,u)
 									if (!isFlowZero(allFlowIDs[f][t], adjacencyList[u].get(j).linkTo, u)) {
 										constraint += " + f_" + fid + "_" + adjacencyList[u].get(j).linkTo + "_" + u;
@@ -2155,7 +2155,7 @@ public class Graph
 							} else if (u == t) {
 							} else  // non-src and non-dest
 							{
-								constraint = "c2_" + fid + "_" + u + "_3: ";
+								constraint = "c2_" + fid + "_" + u + "_3: 0 ";
 								for (int j = 0; j < adjacencyList[u].size(); j++) { //for each out link of u = (u,j)
 									if (!isFlowZero(allFlowIDs[f][t], u, adjacencyList[u].get(j).linkTo)) {
 										constraint += "+ f_" + fid + "_" + u + "_" + adjacencyList[u].get(j).linkTo;
@@ -2185,8 +2185,8 @@ public class Graph
 			// <Constraints of Type 3: Flow >= 0 for any flow on any link
 			out.write("\n\\Type 3: Flow >= 0 for any flow on any link\n");
 			System.out.println(new Date() + ": Starting part 3");
-			for (int f = 0; f < noNodes; f++) {
-				for (int t = 0; t < noNodes; t++) {
+			for (int f = 0; f < numServers; f++) {
+				for (int t = 0; t < numServers; t++) {
 					if (serverLevelMatrix[f][t] > 0) { // for each flow fid from f to t
 						int fid = allFlowIDs[f][t].flowID;
 						for (int u = 0; u < noNodes; u++) { // for each node u
