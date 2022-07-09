@@ -2158,14 +2158,14 @@ public class Graph
 								constraint = "c2_" + fid + "_" + u + "_3: 0 ";
 								for (int j = 0; j < adjacencyList[u].size(); j++) { //for each out link of u = (u,j)
 									if (!isFlowZero(allFlowIDs[f][t], u, adjacencyList[u].get(j).linkTo)) {
-										constraint += "+ f_" + fid + "_" + u + "_" + adjacencyList[u].get(j).linkTo;
+										constraint += " + f_" + fid + "_" + u + "_" + adjacencyList[u].get(j).linkTo;
 										shouldWriteConstraint = true;
 									}
 								}
 
 								for (int j = 0; j < adjacencyList[u].size(); j++) { //for each in link of u = (j,u)
 									if (!isFlowZero(allFlowIDs[f][t], adjacencyList[u].get(j).linkTo, u)) {
-										constraint += "- f_" + fid + "_" + adjacencyList[u].get(j).linkTo + "_" + u;
+										constraint += " - f_" + fid + "_" + adjacencyList[u].get(j).linkTo + "_" + u;
 										shouldWriteConstraint= true;
 									}
 								}

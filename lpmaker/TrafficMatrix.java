@@ -1423,7 +1423,7 @@ public class TrafficMatrix {
         int solve_starttime = timeframeStart;
         int solve_endtime = timeframeEnd;
 
-        String file_prefix = "../DataParsing/outputs/cluster_" + cluster + "/traffic/traffic_64racks";
+        String file_prefix = "../DRing/src/emp/datacentre/trafficfiles/cluster_" + cluster + "/traffic/traffic_64racks";
         String[] file_suffix = {};
         if (cluster.equals("a")) {
             file_suffix = new String[]{"_0_273"};
