@@ -2023,6 +2023,200 @@ public class Graph
 		}
 	}
 
+
+	public void PrintServerGraphforMCFFairCondensed(String filename, double[][] serverLevelMatrix, int numSwitches, int numServers) {
+		modifiedFloydWarshall();
+
+		try
+		{
+			FileWriter fstream = new FileWriter(filename);
+			BufferedWriter out = new BufferedWriter(fstream);
+
+			int numFlows = 0;
+			for (int f = 0; f < noNodes; f++) {
+				for (int t = 0; t < noNodes; t++) {
+					if (serverLevelMatrix[f][t] > 0) {
+						numFlows++;
+					}
+				}
+			}
+			System.out.println("numFlows=" + numFlows);
+
+			String file_index = filename.substring(3);
+			file_index = file_index.substring(0, file_index.length() - 4);
+			System.out.println(file_index + " ***************************** ");
+
+			FlowID[][] allFlowIDs = new FlowID[numServers][numServers];
+			int curfID=0;
+			Writer output1 = new BufferedWriter(new FileWriter("flowIDmap" + file_index));
+			for (int f = 0; f < noNodes; f++) {
+				for (int t = 0; t < noNodes; t++) {
+					if (serverLevelMatrix[f][t] > 0) {
+						allFlowIDs[f][t] = new FlowID(curfID, f, t);
+						output1.write(curfID + " " + f + " " + t + "\n");
+						curfID++;
+					}
+				}
+			}
+			output1.close();
+
+			Writer output2 = new BufferedWriter(new FileWriter("linkCaps" + file_index));
+			for (int f = 0; f < noNodes; f++) {
+				for (int j = 0; j < adjacencyList[f].size(); j++) {  //for each out link of f = (f,j)
+					String lType = "";
+					if (adjacencyList[f].get(j).linkcapacity > 1) {
+						lType = "H-H";
+					} else {
+						lType += adjacencyList[f].size() + "-" + adjacencyList[adjacencyList[f].get(j).linkTo].size();
+					}
+					output2.write(f + "_" + adjacencyList[f].get(j).linkTo + " " + adjacencyList[f].get(j).linkcapacity + " " + adjacencyList[f].size() + " " + lType + "\n");
+				}
+			}
+			output2.close();
+
+			//< Objective
+			out.write("Maximize \n");
+			out.write("obj: ");
+			String objective = "K";
+			out.write(objective);
+
+			//<Constraints of Type 0: fairness i.e. flow >= K
+			out.write("\n\nSUBJECT TO \n\\Type 0: Flow >= K\n");
+			System.out.println(new Date() + ": Starting part 0");
+			for (int f = 0; f < noNodes; f++) {
+				for (int t = 0; t < noNodes; t++) {
+					if(serverLevelMatrix[f][t]>0) {
+						int fid = allFlowIDs[f][t].flowID;
+						String constraint = "c0_" + fid + ": ";
+						boolean shouldWriteConstraint = false;
+						for(int j=0; j<adjacencyList[f].size(); j++) { //for each out link of f = (f,j)
+							if (!isFlowZero(allFlowIDs[f][t], f, adjacencyList[f].get(j).linkTo)) {
+								constraint += "-f_" + fid + "_" + f + "_" + adjacencyList[f].get(j).linkTo + " ";
+								shouldWriteConstraint = true;
+							}
+						}
+						if (shouldWriteConstraint) {
+							constraint += " + " + serverLevelMatrix[f][t] + " K <= 0\n";
+							out.write(constraint);
+						}
+					}
+				}
+			}
+
+			//<Constraints of Type 1: Load on link <= max_load
+			out.write("\n\\Type 1: Load on link <= max_load\n");
+			System.out.println(new Date() + ": Starting part 1");
+			for(int i=0; i<noNodes; i++) {
+				for(int j=0; j<adjacencyList[i].size(); j++) {
+					boolean shouldWriteConstraint = false;
+					String constraint = "c1_" + i + "_" + adjacencyList[i].get(j).linkTo + ": ";
+					for (int f=0; f<noNodes; f++) {
+						for (int t=0; t<noNodes; t++) {
+							if (serverLevelMatrix[f][t] > 0) {
+								int fid = allFlowIDs[f][t].flowID;
+								if (!isFlowZero(allFlowIDs[f][t],i,adjacencyList[i].get(j).linkTo)) {
+									constraint += " + f_" + fid + "_" + i + "_" + adjacencyList[i].get(j).linkTo;
+									shouldWriteConstraint = true;
+								}
+							}
+						}
+					}
+					if(shouldWriteConstraint) {
+						out.write(constraint + " <= " +  adjacencyList[i].get(j).linkcapacity + "\n");
+					}
+				}
+
+				if(i > 0 && i % 20 == 0) {
+					System.out.println(new Date() + ": " + i + " of " + noNodes + " done");
+				}
+			}
+
+			//<Constraints of Type 2: Flow conservation at non-source, non-destination
+			System.out.println(new Date() + ": Starting part 2");
+			out.write("\n\\Type 2: Flow conservation at non-source, non-destination\n");
+			for (int f = 0; f < noNodes; f++) {
+				for (int t = 0; t < noNodes; t++) {
+					if (serverLevelMatrix[f][t] > 0) { //for each flow fid
+						int fid = allFlowIDs[f][t].flowID;
+						for (int u = 0; u < noNodes; u++) { //for each node u
+							String constraint = "";
+							boolean shouldWriteConstraint = false;
+							if (u == f) { //src
+								constraint = "c2_" + fid + "_" + u + "_2: ";
+								for (int j = 0; j < adjacencyList[u].size(); j++) { //for each in link of u = (j,u)
+									if (!isFlowZero(allFlowIDs[f][t], adjacencyList[u].get(j).linkTo, u)) {
+										constraint += " + f_" + fid + "_" + adjacencyList[u].get(j).linkTo + "_" + u;
+										shouldWriteConstraint = true;
+									}
+								}
+								if (shouldWriteConstraint) {
+									out.write(constraint + " = 0\n");
+								}
+							} else if (u == t) {
+							} else  // non-src and non-dest
+							{
+								constraint = "c2_" + fid + "_" + u + "_3: ";
+								for (int j = 0; j < adjacencyList[u].size(); j++) { //for each out link of u = (u,j)
+									if (!isFlowZero(allFlowIDs[f][t], u, adjacencyList[u].get(j).linkTo)) {
+										constraint += "+ f_" + fid + "_" + u + "_" + adjacencyList[u].get(j).linkTo;
+										shouldWriteConstraint = true;
+									}
+								}
+
+								for (int j = 0; j < adjacencyList[u].size(); j++) { //for each in link of u = (j,u)
+									if (!isFlowZero(allFlowIDs[f][t], adjacencyList[u].get(j).linkTo, u)) {
+										constraint += "- f_" + fid + "_" + adjacencyList[u].get(j).linkTo + "_" + u;
+										shouldWriteConstraint= true;
+									}
+								}
+								if (shouldWriteConstraint) {
+									out.write(constraint + " = 0\n");
+								}
+							}
+						}
+					}
+				}
+
+				if (f > 0 && f % 20 == 0) {
+					System.out.println(new Date() + ": " + f + " of " + noNodes + " done");
+				}
+			}
+
+			// <Constraints of Type 3: Flow >= 0 for any flow on any link
+			out.write("\n\\Type 3: Flow >= 0 for any flow on any link\n");
+			System.out.println(new Date() + ": Starting part 3");
+			for (int f = 0; f < noNodes; f++) {
+				for (int t = 0; t < noNodes; t++) {
+					if (serverLevelMatrix[f][t] > 0) { // for each flow fid from f to t
+						int fid = allFlowIDs[f][t].flowID;
+						for (int u = 0; u < noNodes; u++) { // for each node u
+							for (int j = 0; j < adjacencyList[u].size(); j++) {
+								if (!isFlowZero(allFlowIDs[f][t], u, adjacencyList[u].get(j).linkTo)) { // for each out link of u = (u,j)
+									String constraint = "c3_" + fid + "_" + u + "_" + adjacencyList[u].get(j).linkTo + ": f_" + fid + "_" + u + "_" + adjacencyList[u].get(j).linkTo + " >= 0\n";
+									out.write(constraint);
+								}
+
+								if (!isFlowZero(allFlowIDs[f][t], adjacencyList[u].get(j).linkTo, u)) { // for each in link of u = (j,u)
+									String constraint = "c3_" + fid + "_" + adjacencyList[u].get(j).linkTo + "_" + u + ": f_" + fid + "_" + adjacencyList[u].get(j).linkTo + "_" + u + " >= 0\n";
+									out.write(constraint);
+								}
+							}
+						}
+					}
+				}
+			}
+
+			out.write("End\n");
+			out.close();
+		}
+		catch (Exception e)
+		{
+			System.err.println("PrintServerGraphforMCFFairCondensed Error: " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
+
+
 	/*
 	// Uses a path-length based heuristic to determine that a certain flow on a certain link will be 0, so no need to factor in LP etc.
 	public void PrintGraphforMCFFairCondensed(String filename, int trafficmode, int probability)

@@ -8,28 +8,30 @@ cd -
 
 switches=80
 port=64
-#numsvr=3072
-numsvr=2988
+numsvr=3072
+#numsvr=2988
 numspinesw=16
 
-topology=dring
-graphtype=23
+topology=rrg
+#topology=dring
 #topology=leafspine
+#graphtype=23
 #graphtype=24
-#graphfile=graphfiles/rrg_instance1_80_64.edgelist
-graphfile=graphfiles/dring_instance1_80_64.edgelist
+graphtype=25
+graphfile=graphfiles/rrg_instance1_80_64.edgelist
+#graphfile=graphfiles/dring_instance1_80_64.edgelist
 
 method=2
-#declare -a rs=("su3")
-#declare -a rs=("ecmp")
-#declare -a rs=("opt")
+declare -a rs=("opt")
+# declare -a rs=("ecmp" "su2" "su3" "fhi" "16disjoint" "32disjoint" "16short" "32short" "100random3" "racke" "wracke" "opt")
+#declare -a rs=("ecmp" "su2" "su3" "32disjoint" "32short")
 
-trafficmode=106
-a=0
-b=0
-trafficfile=b
+trafficmode=205
+a=16
+b=4
+trafficfile=none
 timeframestart=0
-timeframeend=86400
+timeframeend=0
 
 tag=
 
@@ -39,9 +41,6 @@ shouldAvoidHotRacks=false
 isPathWeighted=false
 pathweightfile=none
 #pathweightfile=../WTHelpers/yatesfiles/pathweightfiles/racke.txt
-
-# declare -a rs=("ecmp" "su2" "su3" "fhi" "16disjoint" "32disjoint" "16short" "32short" "100random3" "racke" "wracke" "opt")
-declare -a rs=("ecmp" "su2" "su3" "32disjoint" "32short")
 
 for routing in "${rs[@]}"
 do

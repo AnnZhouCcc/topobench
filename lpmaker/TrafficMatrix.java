@@ -18,6 +18,7 @@ class TrafficPair {
 
 public class TrafficMatrix {
     double[][] switchLevelMatrix;
+    double[][] serverLevelMatrix;
     double trafficPerFlow = 1;
     int packetSize = 1500;
     double trafficCap = 50;
@@ -29,10 +30,12 @@ public class TrafficMatrix {
     int timeframeStart;
     int timeframeEnd;
 
-    public TrafficMatrix(int noNodes, int trafficMode, String trafficfile, Graph mynet, int a, int b, int[] numServersPerSwitches, int _timeframeStart, int _timeframeEnd, Graph rrgnet, Graph lsnet) {
-        numSwitches = noNodes;
+    public TrafficMatrix(int _numSwitches, int trafficMode, String trafficfile, Graph mynet, int a, int b, int[] numServersPerSwitches, int _timeframeStart, int _timeframeEnd, Graph rrgnet, Graph lsnet) {
+        numSwitches = _numSwitches;
         numServers = mynet.totalWeight;
-        switchLevelMatrix = new double[numSwitches][numSwitches];
+        int numNodes = numServers+numSwitches;
+        switchLevelMatrix = new double[numNodes][numNodes];
+        serverLevelMatrix = new double[numNodes][numNodes];
         trafficmode = trafficMode;
         topology = mynet;
         hotRacks = new HashSet<>();
@@ -1574,6 +1577,49 @@ public class TrafficMatrix {
         System.out.println("Total traffic = " + totalTraffic);
     }
 
+    public void generateServerTrafficARackToBRack(int a, int b, Graph lsnet) {
+        System.out.println("Generate server traffic a rack to b rack: a=" + a + ", b=" + b + ".");
+        double unitTraffic = 1;
+        double totalTraffic = 0;
+
+        ArrayList<Integer> srcswslist = new ArrayList<>();
+        ArrayList<Integer> dstswslist = new ArrayList<>();
+        while (srcswslist.size() < a) {
+            int srcsw = lsnet.rand.nextInt(lsnet.noNodes);
+            if (srcswslist.contains(srcsw)) continue;
+            srcswslist.add(srcsw);
+        }
+        // It is possible to have intra-rack traffic.
+        while (dstswslist.size() < b) {
+            int dstsw = lsnet.rand.nextInt(lsnet.noNodes);
+            if (dstswslist.contains(dstsw)) continue;
+            dstswslist.add(dstsw);
+        }
+
+        for (int srcsw : srcswslist) {
+            for (int dstsw : dstswslist) {
+                int[] srcsvrs = lsnet.getServersForSwitch(srcsw);
+                int[] dstsvrs = lsnet.getServersForSwitch(dstsw);
+                for (int srcsvr : srcsvrs) {
+                    if (srcsvr >= topology.totalWeight) continue;
+                    for (int dstsvr : dstsvrs) {
+                        if (dstsvr >= topology.totalWeight) continue;
+//                        int mysrcsw = topology.svrToSwitch(srcsvr);
+//                        int mydstsw = topology.svrToSwitch(dstsvr);
+//                        if (mysrcsw != mydstsw) {
+//                            switchLevelMatrix[mysrcsw][mydstsw] += unitTraffic;
+//                            totalTraffic += unitTraffic;
+//                        }
+                        serverLevelMatrix[srcsvr][dstsvr] += unitTraffic;
+                        totalTraffic += unitTraffic;
+                    }
+                }
+            }
+        }
+
+        System.out.println("Total traffic = " + totalTraffic);
+    }
+
     public void generateTraffic(String trafficfile, int a, int b, int[] numServersPerSwitches, Graph rrgnet, Graph lsnet) {
         // traffic-mode: 0 = randPerm; 1 = all-all; 2 = all-to-one; Any higher n means stride(n)
         int inaccuracymode = 0;
@@ -1668,6 +1714,9 @@ public class TrafficMatrix {
         }
         else if (trafficmode == 107) {
             generateTrafficMix(a,b,lsnet);
+        }
+        else if (trafficmode == 205) {
+            generateServerTrafficARackToBRack(a,b,lsnet);
         }
         else {
             System.out.println("Trafficmode is not recognized.");
