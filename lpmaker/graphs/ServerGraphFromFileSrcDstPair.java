@@ -18,6 +18,7 @@ public class ServerGraphFromFileSrcDstPair extends Graph {
 		numSwitches = _numSwitches;
 		numPorts = totalPorts;
 		populateAdjacencyList(fileName);
+		checkAdjacencyList();
 		name="fromfile";
 	}
 
@@ -89,6 +90,25 @@ public class ServerGraphFromFileSrcDstPair extends Graph {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	public void checkAdjacencyList() {
+		for (int i=0; i<numServers; i++) {
+			if (adjacencyList[i].size() != 1) {
+				System.out.println("**Error: server node has degree not 1: degree=" + adjacencyList[i].size());
+			}
+		}
+		for (int i=numServers; i<noNodes; i++) {
+			for (int j = 0; j < adjacencyList[i].size(); j++) {
+				int v = adjacencyList[i].get(j).linkTo;
+				if (!adjacencyList[v].contains(i)) {
+					System.out.println("**Error: link is not bi-directional: linkfrom=" + i + ",linkto=" + v);
+				}
+			}
+			if (adjacencyList[i].size() != numPorts) {
+				System.out.println("**Error: switch node has degree not numPorts: degree=" + adjacencyList[i].size() + ",numPorts=" + numPorts);
+			}
 		}
 	}
 
