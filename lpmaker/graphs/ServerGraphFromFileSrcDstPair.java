@@ -102,7 +102,14 @@ public class ServerGraphFromFileSrcDstPair extends Graph {
 		for (int i=numServers; i<noNodes; i++) {
 			for (int j = 0; j < adjacencyList[i].size(); j++) {
 				int v = adjacencyList[i].get(j).linkTo;
-				if (!adjacencyList[v].contains(i)) {
+				boolean foundMatch = false;
+				for (int k=0; k<adjacencyList[v].size();k++) {
+					if (adjacencyList[v].get(k).linkTo == i) {
+						foundMatch = true;
+						break;
+					}
+				}
+				if (!foundMatch) {
 					System.out.println("**Error: link is not bi-directional: linkfrom=" + i + ",linkto=" + v);
 				}
 			}

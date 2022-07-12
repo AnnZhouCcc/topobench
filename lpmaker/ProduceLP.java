@@ -576,7 +576,8 @@ public class ProduceLP {
 			System.out.println("number of switches: " + switches);
 			System.out.println("number of servers: " + nsvrs);
 			Graph mynet = new ServerGraphFromFileSrcDstPair(nsvrs, switches, graphFile, switchports);
-			Graph lsnet = new LeafSpine(switches, switchports, numSpineSwitches,  3072); // Hard-coded for DRing, which only has 2988 servers
+//			Graph lsnet = new LeafSpine(switches, switchports, numSpineSwitches,  3072); // Hard-coded for DRing, which only has 2988 servers
+			Graph lsnet = new LeafSpine(switches, switchports, numSpineSwitches, nsvrs);
 
 			TrafficMatrix tm = new TrafficMatrix(switches, trafficMode, trafficFile, mynet, a, b, mynet.weightEachNode, timeframeStart, timeframeEnd, mynet, lsnet);
 			boolean shouldAvoidHotRacks = Boolean.parseBoolean(args[27]);
@@ -591,10 +592,10 @@ public class ProduceLP {
 						System.out.println("**Error: trafficmode is not available: trafficmode=" + trafficMode);
 						System.exit(0);
 					} else {
-//						System.out.println("PrintServerGraphforMCFFairCondensed");
-//						mynet.PrintServerGraphforMCFFairCondensed("my." + runs + ".lp", tm.serverLevelMatrix, switches, nsvrs);
-						System.out.println("fasterPrintServerGraphforMCFFairCondensed");
-						mynet.fasterPrintServerGraphforMCFFairCondensed("my." + runs + ".lp", tm.serverLevelMatrix, switches, nsvrs);
+						System.out.println("PrintServerGraphforMCFFairCondensed");
+						mynet.PrintServerGraphforMCFFairCondensed("my." + runs + ".lp", tm.serverLevelMatrix, switches, nsvrs);
+//						System.out.println("fasterPrintServerGraphforMCFFairCondensed");
+//						mynet.fasterPrintServerGraphforMCFFairCondensed("my." + runs + ".lp", tm.serverLevelMatrix, switches, nsvrs);
 
 
 

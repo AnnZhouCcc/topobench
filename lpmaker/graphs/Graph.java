@@ -870,7 +870,7 @@ public class Graph
 	// If slack is set to 3, flows can not deviate more than 2 hops from their shortest path distance
 	private boolean isFlowZero(FlowID flowID, int linkFrom, int linkTo)
 	{
-		int SLACK = 6;
+		int SLACK = 2;
 		int srcSw = flowID.srcSwitch;
 		int destSw = flowID.dstSwitch;
 
@@ -880,10 +880,10 @@ public class Graph
 			return false;
 	}
 
-	private boolean fasterIsFlowZero(int flowFromServer, int flowToServer, int linkFrom, int linkTo) {
-		int SLACK = 3;
-		int srcSw = adjacencyList[flowFromServer].get(0).linkTo;
-		int destSw = adjacencyList[flowToServer].get(0).linkTo;
+	private boolean fasterIsFlowZero(int srcSw, int destSw, int linkFrom, int linkTo) {
+		int SLACK = 2;
+		//int srcSw = adjacencyList[flowFromServer].get(0).linkTo;
+		//int destSw = adjacencyList[flowToServer].get(0).linkTo;
 
 		if((shortestPathLen[srcSw][linkFrom] + 1 + shortestPathLen[linkTo][destSw]) >= (shortestPathLen[srcSw][destSw] + SLACK)) {
 			return true;
@@ -2257,7 +2257,8 @@ public class Graph
 
 
 	public void fasterPrintServerGraphforMCFFairCondensed(String filename, double[][] serverLevelMatrix, int numSwitches, int numServers) {
-		fasterModifiedFloydWarshall(numServers);
+		//fasterModifiedFloydWarshall(numServers);
+		modifiedFloydWarshall();
 
 		try
 		{
@@ -2374,7 +2375,7 @@ public class Graph
 					}
 				}
 
-				if(i > 0 && i % 20 == 0) {
+				if(i > 0 && i % 100 == 0) {
 					System.out.println(new Date() + ": " + i + " of " + noNodes + " done");
 				}
 			}
@@ -2420,7 +2421,7 @@ public class Graph
 					}
 				}
 
-				if (f > 0 && f % 20 == 0) {
+				if (f > 0 && f % 100 == 0) {
 					System.out.println(new Date() + ": " + f + " of " + noNodes + " done");
 				}
 			}

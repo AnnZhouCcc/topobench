@@ -6,11 +6,16 @@ cd $MYJAVAPATH
 javac -nowarn lpmaker/ProduceLP.java
 cd -
 
-switches=80
-port=64
-numsvr=3072
+#switches=80
+#port=64
+#numsvr=3072
 #numsvr=2988
-numspinesw=16
+#numspinesw=16
+
+switches=6
+port=4
+numsvr=8
+numspinesw=2
 
 topology=rrg
 #topology=dring
@@ -18,17 +23,19 @@ topology=rrg
 #graphtype=23
 #graphtype=24
 graphtype=25
-graphfile=graphfiles/rrg_instance1_80_64.edgelist
+#graphfile=graphfiles/rrg_instance1_80_64.edgelist
 #graphfile=graphfiles/dring_instance1_80_64.edgelist
+graphfile=graphfiles/test_instance1_80_64.edgelist
 
 method=2
 declare -a rs=("opt")
 # declare -a rs=("ecmp" "su2" "su3" "fhi" "16disjoint" "32disjoint" "16short" "32short" "100random3" "racke" "wracke" "opt")
 #declare -a rs=("ecmp" "su2" "su3" "32disjoint" "32short")
 
+#trafficmode=105
 trafficmode=205
-a=16
-b=4
+a=1
+b=1
 trafficfile=none
 timeframestart=0
 timeframeend=0
