@@ -592,10 +592,12 @@ public class ProduceLP {
 						System.out.println("**Error: trafficmode is not available: trafficmode=" + trafficMode);
 						System.exit(0);
 					} else {
-						System.out.println("PrintServerGraphforMCFFairCondensed");
-						mynet.PrintServerGraphforMCFFairCondensed("my." + runs + ".lp", tm.serverLevelMatrix, switches, nsvrs);
+//						System.out.println("PrintServerGraphforMCFFairCondensed");
+//						mynet.PrintServerGraphforMCFFairCondensed("my." + runs + ".lp", tm.serverLevelMatrix, switches, nsvrs);
 //						System.out.println("fasterPrintServerGraphforMCFFairCondensed");
 //						mynet.fasterPrintServerGraphforMCFFairCondensed("my." + runs + ".lp", tm.serverLevelMatrix, switches, nsvrs);
+						System.out.println("testPrintServerGraphforMCFFairCondensed");
+						mynet.testPrintServerGraphforMCFFairCondensed("my." + runs + ".lp", tm.serverLevelMatrix, switches, nsvrs);
 
 
 
