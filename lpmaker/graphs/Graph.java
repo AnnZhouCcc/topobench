@@ -2353,7 +2353,8 @@ public class Graph
 
 
 	public void fasterPrintServerGraphforMCFFairCondensed(String filename, double[][] serverLevelMatrix, int numSwitches, int numServers) {
-		fasterModifiedFloydWarshall(numServers);
+//		fasterModifiedFloydWarshall(numServers);
+		modifiedFloydWarshall();
 
 		try
 		{
@@ -2433,6 +2434,16 @@ public class Graph
 				}
 			}
 
+			System.out.println("Printing linkMapping");
+			for (int i=0; i<3; i++) {
+				System.out.println("fid=" + i);
+				HashSet<LinkSrcDst> links = linkMapping.get(i);
+				for (LinkSrcDst link : links) {
+					System.out.print(link.src + "-" + link.dst + " ");
+				}
+				System.out.println();
+			}
+
 			// Create variables
 			String[][] fVarNames = new String[numFlows][linkcount];
 			for (int fid = 0; fid < numFlows; fid++) {
@@ -2445,6 +2456,9 @@ public class Graph
 					fVarNames[fid][linkid] = linkName;
 				}
 			}
+
+			System.out.println(linkMapping.get(0).contains(new LinkSrcDst(3072,3095)));
+			System.out.println(fVarNames[0][linkidMapping.get(new LinkSrcDst(3072, 3095))] != null);
 
 			//< Objective
 			out.write("Maximize \n");
@@ -2514,8 +2528,7 @@ public class Graph
 						}
 					}
 					if(shouldWriteConstraint) {
-						out.write(" - " + adjacencyList[i].get(j).linkcapacity);
-						out.write(constraint + " <= 0\n");
+						out.write(constraint + " <= " + adjacencyList[i].get(j).linkcapacity + "\n");
 					}
 				}
 
