@@ -20,6 +20,7 @@ import lpmaker.graphs.*;
 public class ProduceLP {
 
 	// Make it so that there's only one source of randomness in all, so I can control it if need be.
+	public static long randSeed;
 	public static Random universalRand;
 
 	public static int switches = 80; 	// # of switch
@@ -28,14 +29,17 @@ public class ProduceLP {
 	public static int extended_switches = 0; // # switches added in expansion
 	public static int nsvrs = 0;	// # of servers we want to support (this, if non-zero, overrides the server ports arguments.)
 
-	public static void main(String args[]) throws IOException{
-		long randSeed = Long.parseLong(args[20]);	// In case I want to control the randomness for replicability etc.
-
+	public static void generateRand() {
 		if (randSeed == 0) universalRand = new Random();
-		else { 
+		else {
 			System.out.println("NEWSFLASH: USING YOUR RANDOM SEED -----------------------------------------------");
 			universalRand = new Random(randSeed);
 		}
+	}
+
+	public static void main(String args[]) throws IOException{
+		randSeed = Long.parseLong(args[20]);	// In case I want to control the randomness for replicability etc.
+		generateRand();
 
 //		int NUMRUNS = Integer.parseInt(args[0]);
 		int createLP = Integer.parseInt(args[19]);	// If 1, lp is created; otherwise, only the path lengths are analyzed

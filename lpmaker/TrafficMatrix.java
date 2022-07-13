@@ -18,7 +18,7 @@ class TrafficPair {
 
 public class TrafficMatrix {
     double[][] switchLevelMatrix;
-    double[][] serverLevelMatrix;
+    public double[][] serverLevelMatrix;
     double trafficPerFlow = 1;
     int packetSize = 1500;
     double trafficCap = 50;

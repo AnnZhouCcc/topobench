@@ -43,7 +43,7 @@ public class Graph
 	public int numPorts;
 	public Vector<Link>[] adjacencyList;
 
-	public int[][] shortestPathLen;
+	static public int[][] shortestPathLen;
 
 	//no of sub-hosts of a switch
 	public int[] weightEachNode;
@@ -799,6 +799,43 @@ public class Graph
 		}
 	}
 
+	private static boolean isNeighbor(Graph mynet, int n1, int n2) {
+		for (int i = 0; i < mynet.adjacencyList[n1].size(); i++) {
+			if (mynet.adjacencyList[n1].get(i).linkTo == n2) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static void modifiedFloydWarshall(int noNodes, Graph mynet)
+	{
+		shortestPathLen = new int[noNodes][noNodes];
+
+		for(int i = 0; i < noNodes; i++) {
+			for(int j = 0; j < noNodes; j++) {
+				if(i == j) {
+					shortestPathLen[i][j] = 0;
+				} else if(isNeighbor(mynet, i,j)) {
+					shortestPathLen[i][j] = 1;//adjacencyMatrix[i][j];
+				} else {
+					shortestPathLen[i][j] = Graph.INFINITY;
+				}
+			}
+		}
+
+		//floyd warshall
+		for(int k = 0; k < noNodes; k++) {
+			for(int i = 0; i < noNodes; i++) {
+				for(int j = 0; j < noNodes; j++) {
+					if(shortestPathLen[i][j] > shortestPathLen[i][k] + shortestPathLen[k][j]) {
+						shortestPathLen[i][j] = shortestPathLen[i][k] + shortestPathLen[k][j];
+					}
+				}
+			}
+		}
+	}
+
 	public void fasterModifiedFloydWarshall(int numServers) {
 		shortestPathLen = new int[noNodes][noNodes];
 
@@ -818,6 +855,33 @@ public class Graph
 		for(int k = numServers; k < noNodes; k++) {
 			for(int i = numServers; i < noNodes; i++) {
 				for(int j = numServers; j < noNodes; j++) {
+					if(shortestPathLen[i][j] > shortestPathLen[i][k] + shortestPathLen[k][j]) {
+						shortestPathLen[i][j] = shortestPathLen[i][k] + shortestPathLen[k][j];
+					}
+				}
+			}
+		}
+	}
+
+	static public void fasterModifiedFloydWarshall(int numServers, Graph mynet) {
+		shortestPathLen = new int[mynet.noNodes][mynet.noNodes];
+
+		for(int i = numServers; i < mynet.noNodes; i++) {
+			for(int j = numServers; j < mynet.noNodes; j++) {
+				if(i == j) {
+					shortestPathLen[i][j] = 0;
+				} else if(isNeighbor(mynet,i,j)) {
+					shortestPathLen[i][j] = 1;//adjacencyMatrix[i][j];
+				} else {
+					shortestPathLen[i][j] = Graph.INFINITY;
+				}
+			}
+		}
+
+		//floyd warshall
+		for(int k = numServers; k < mynet.noNodes; k++) {
+			for(int i = numServers; i < mynet.noNodes; i++) {
+				for(int j = numServers; j < mynet.noNodes; j++) {
 					if(shortestPathLen[i][j] > shortestPathLen[i][k] + shortestPathLen[k][j]) {
 						shortestPathLen[i][j] = shortestPathLen[i][k] + shortestPathLen[k][j];
 					}
@@ -870,7 +934,7 @@ public class Graph
 	// If slack is set to 3, flows can not deviate more than 2 hops from their shortest path distance
 	private boolean isFlowZero(FlowID flowID, int linkFrom, int linkTo)
 	{
-		int SLACK = 2;
+		int SLACK = 3;
 		int srcSw = flowID.srcSwitch;
 		int destSw = flowID.dstSwitch;
 
@@ -880,14 +944,40 @@ public class Graph
 			return false;
 	}
 
+	static public boolean isFlowZero(int srcSw, int destSw, int linkFrom, int linkTo)
+	{
+		int SLACK = 3;
+//		int srcSw = flowID.srcSwitch;
+//		int destSw = flowID.dstSwitch;
+
+		if((shortestPathLen[srcSw][linkFrom] + 1 + shortestPathLen[linkTo][destSw]) >= (shortestPathLen[srcSw][destSw] + SLACK))
+			return true;
+		else
+			return false;
+	}
+
 	private boolean fasterIsFlowZero(int srcSw, int destSw, int linkFrom, int linkTo) {
-		int SLACK = 2;
+		int SLACK = 3;
 		//int srcSw = adjacencyList[flowFromServer].get(0).linkTo;
 		//int destSw = adjacencyList[flowToServer].get(0).linkTo;
 
 		if((shortestPathLen[srcSw][linkFrom] + 1 + shortestPathLen[linkTo][destSw]) >= (shortestPathLen[srcSw][destSw] + SLACK)) {
 			return true;
 		} else {
+			return false;
+		}
+	}
+
+	static public boolean fasterIsFlowZero(int srcSw, int destSw, int linkFrom, int linkTo, int numServers) {
+		int SLACK = 3;
+		if (linkFrom < numServers) {
+			if (linkFrom == srcSw) return false;
+			return true;
+		} else if (linkTo < numServers) {
+			if (linkTo == destSw) return false;
+			return true;
+		} else {
+			if ((shortestPathLen[srcSw][linkFrom] + 1 + shortestPathLen[linkTo][destSw]) >= (shortestPathLen[srcSw][destSw] + SLACK)) return true;
 			return false;
 		}
 	}
