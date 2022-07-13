@@ -33,6 +33,29 @@ class FlowSrcDst {
 	}
 }
 
+class LinkSrcDst {
+	int src;
+	int dst;
+
+	LinkSrcDst (int _src, int _dst) {
+		src = _src;
+		dst = _dst;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		LinkSrcDst that = (LinkSrcDst) o;
+		return src == that.src && dst == that.dst;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(src, dst);
+	}
+}
+
 public class Graph
 {
 	public static final int INFINITY = 999999999;
@@ -2379,6 +2402,50 @@ public class Graph
 			}
 			output2.close();
 
+			// Create linkidMapping
+			int linkcount = 0;
+			HashMap<LinkSrcDst, Integer> linkidMapping = new HashMap<>();
+			for (int u=0; u<noNodes; u++) {
+				for (int j=0; j<adjacencyList[u].size(); j++) {
+					int v = adjacencyList[u].get(j).linkTo;
+					linkidMapping.put(new LinkSrcDst(u,v), linkcount);
+					linkcount++;
+				}
+			}
+
+			// Create linkMapping
+			HashMap<Integer, HashSet<LinkSrcDst>> linkMapping = new HashMap<>();
+			for (int f=0; f<numServers; f++) {
+				for (int t=0; t<numServers; t++) {
+					if (serverLevelMatrix[f][t] > 0) {
+						int fid = allFlowIDs[f][t].flowID;
+						HashSet<LinkSrcDst> links = new HashSet<>();
+						for (int u = 0; u < noNodes; u++) {
+							for (int j = 0; j < adjacencyList[u].size(); j++) {
+								int v = adjacencyList[u].get(j).linkTo;
+								if (!fasterIsFlowZero(f, t, u, v, numServers)) {
+									links.add(new LinkSrcDst(u, v));
+								}
+							}
+						}
+						linkMapping.put(fid, links);
+					}
+				}
+			}
+
+			// Create variables
+			String[][] fVarNames = new String[numFlows][linkcount];
+			for (int fid = 0; fid < numFlows; fid++) {
+				HashSet<LinkSrcDst> links = linkMapping.get(fid);
+				for (LinkSrcDst link : links) {
+					int linkSrc = link.src;
+					int linkDst = link.dst;
+					int linkid = linkidMapping.get(new LinkSrcDst(linkSrc, linkDst));
+					String linkName = "f_" + fid + "_" + linkSrc + "_" + linkDst;
+					fVarNames[fid][linkid] = linkName;
+				}
+			}
+
 			//< Objective
 			out.write("Maximize \n");
 			out.write("obj: ");
@@ -2393,7 +2460,8 @@ public class Graph
 					if(serverLevelMatrix[f][t]>0) {
 						int fid = allFlowIDs[f][t].flowID;
 						int v = adjacencyList[f].get(0).linkTo; // the first hop of each flow
-						String constraint = "c0_" + fid + ": -f_" + fid + "_" + f + "_" + v + " + " + serverLevelMatrix[f][t] + " K <= 0\n";
+						int linkid = linkidMapping.get(new LinkSrcDst(f,v));
+						String constraint = "c0_" + fid + ": -" + fVarNames[fid][linkid] + " + " + serverLevelMatrix[f][t] + " K <= 0\n";
 						out.write(constraint);
 					}
 				}
@@ -2412,8 +2480,9 @@ public class Graph
 						for (int t=0; t<numServers; t++) {
 							if (serverLevelMatrix[f][t]>0) {
 								int fid = allFlowIDs[f][t].flowID;
-								if (!fasterIsFlowZero(f, t, i, v, numServers)) {
-									constraint += " + f_" + fid + "_" + i + "_" + v;
+								int linkid = linkidMapping.get(new LinkSrcDst(i,v));
+								if (fVarNames[fid][linkid] != null) {
+									constraint += " + " + fVarNames[fid][linkid];
 									shouldWriteConstraint = true;
 								}
 							}
@@ -2423,8 +2492,9 @@ public class Graph
 						for (int f=0; f<numServers; f++) {
 							if (serverLevelMatrix[f][t]>0) {
 								int fid = allFlowIDs[f][t].flowID;
-								if(!fasterIsFlowZero(f,t,i,v,numServers)) {
-									constraint += " + f_" + fid + "_" + i + "_" + v;
+								int linkid = linkidMapping.get(new LinkSrcDst(i,v));
+								if (fVarNames[fid][linkid] != null) {
+									constraint += " + " + fVarNames[fid][linkid];
 									shouldWriteConstraint = true;
 								}
 							}
@@ -2434,8 +2504,9 @@ public class Graph
 							for (int t=0; t<numServers; t++) {
 								if (serverLevelMatrix[f][t]>0) {
 									int fid = allFlowIDs[f][t].flowID;
-									if(!fasterIsFlowZero(f,t,i,v,numServers)) {
-										constraint += " + f_" + fid + "_" + i + "_" + v;
+									int linkid = linkidMapping.get(new LinkSrcDst(i,v));
+									if(fVarNames[fid][linkid] != null) {
+										constraint += " + " + fVarNames[fid][linkid];
 										shouldWriteConstraint = true;
 									}
 								}
@@ -2443,7 +2514,8 @@ public class Graph
 						}
 					}
 					if(shouldWriteConstraint) {
-						out.write(constraint + " <= " + adjacencyList[i].get(j).linkcapacity + "\n");
+						out.write(" - " + adjacencyList[i].get(j).linkcapacity);
+						out.write(constraint + " <= 0\n");
 					}
 				}
 
@@ -2462,25 +2534,30 @@ public class Graph
 						for (int u = 0; u < noNodes; u++) { //for each node u
 							if (u == f) { //src
 								int v = adjacencyList[u].get(0).linkTo;
-								if (!fasterIsFlowZero(f,t,v,u,numServers)) {
-									String constraint = "c2_" + fid + "_" + u + "_2: f_" + fid + "_" + v + "_" + u + " = 0\n";
+								int linkid = linkidMapping.get(new LinkSrcDst(v,u));
+								if (fVarNames[fid][linkid] != null) {
+									String constraint = "c2_" + fid + "_" + u + "_2: " + fVarNames[fid][linkid] + " = 0\n";
 									out.write(constraint);
 								}
 							} else if (u == t) {
 							} else { // non-src and non-dest
 								if (u<numServers) { // SVR node
 								} else { // SW node
-									String constraint = "c2_" + fid + "_" + u + "_5: 0";
+									String constraint = "c2_" + fid + "_" + u + "_3: 0";
 									boolean shouldWriteConstraint = false;
 									for (int j=0; j<adjacencyList[u].size(); j++) {
-										if (!fasterIsFlowZero(f,t,u,adjacencyList[u].get(j).linkTo,numServers)) {
-											constraint += " + f_" + fid + "_" + u + "_" + adjacencyList[u].get(j).linkTo;
+										int v = adjacencyList[u].get(j).linkTo;
+										int linkid = linkidMapping.get(new LinkSrcDst(u,v));
+										if (fVarNames[fid][linkid] != null) {
+											constraint += " + " + fVarNames[fid][linkid];
 											shouldWriteConstraint = true;
 										}
 									}
 									for (int j=0; j<adjacencyList[u].size(); j++) {
-										if (!fasterIsFlowZero(f,t,adjacencyList[u].get(j).linkTo,u,numServers)) {
-											constraint += " - f_" + fid + "_" + adjacencyList[u].get(j).linkTo + "_" + u;
+										int v = adjacencyList[u].get(j).linkTo;
+										int linkid = linkidMapping.get(new LinkSrcDst(v,u));
+										if (fVarNames[fid][linkid] != null) {
+											constraint += " - " + fVarNames[fid][linkid];
 											shouldWriteConstraint = true;
 										}
 									}
@@ -2501,32 +2578,11 @@ public class Graph
 			// <Constraints of Type 3: Flow >= 0 for any flow on any link
 			out.write("\n\\Type 3: Flow >= 0 for any flow on any link\n");
 			System.out.println(new Date() + ": Starting part 3");
-			for (int f = 0; f < numServers; f++) {
-				for (int t = 0; t < numServers; t++) {
-					if (serverLevelMatrix[f][t] > 0) { // for each flow fid from f to t
-						int fid = allFlowIDs[f][t].flowID;
-						for (int u = 0; u < numServers; u++) {
-							if (u==f) {
-								int v = adjacencyList[u].get(0).linkTo;
-								String constraint = "c3_" + fid + "_" + u + "_" + v + ": f_" + fid + "_" + u + "_" + v + " >= 0\n";
-								out.write(constraint);
-							} else if (u==t) {
-								int v = adjacencyList[u].get(0).linkTo;
-								String constraint = "c3_" + fid + "_" + v + "_" + u + ": f_" + fid + "_" + v + "_" + u + " >= 0\n";
-								out.write(constraint);
-							} else {
-							}
-						}
-						for (int u = numServers; u < noNodes; u++) {
-							for (int j=0; j<adjacencyList[u].size(); j++) {
-								int v = adjacencyList[u].get(j).linkTo;
-								if (v<numServers) continue;
-								if (!fasterIsFlowZero(f,t,u,v,numServers)) {
-									String constraint = "c3_" + fid + "_" + u + "_" + v + ": f_" + fid + "_" + u + "_" + v + " >= 0\n";
-									out.write(constraint);
-								}
-							}
-						}
+			for (int i=0; i<numFlows; i++) {
+				for (int j=0; j<linkcount; j++) {
+					if (fVarNames[i][j] != null) {
+						String constraint = "c3_" + i + "_" + j + ": " + fVarNames[i][j] + " >= 0\n";
+						out.write(constraint);
 					}
 				}
 			}
