@@ -2351,6 +2351,7 @@ public class Graph
 
 
 	public void fasterPrintServerGraphforMCFFairCondensed(String filename, double[][] serverLevelMatrix, int numSwitches, int numServers) {
+		int linkcapacity = 1;
 		fasterModifiedFloydWarshall(numServers);
 
 		try
@@ -2417,6 +2418,7 @@ public class Graph
 
 			// Create linkMapping
 			HashMap<Integer, HashSet<LinkSrcDst>> linkMapping = new HashMap<>();
+			HashMap<LinkSrcDst, HashSet<Integer>> linkReverseMapping = new HashMap<>();
 			for (int fid=0; fid<flowcount; fid++) {
 				int f = fidMapping.get(fid).src;
 				int t = fidMapping.get(fid).dst;
@@ -2425,7 +2427,16 @@ public class Graph
 					for (int j = 0; j < adjacencyList[u].size(); j++) {
 						int v = adjacencyList[u].get(j).linkTo;
 						if (!fasterIsFlowZero(f, t, u, v, numServers)) {
-							links.add(new LinkSrcDst(u, v));
+							LinkSrcDst link = new LinkSrcDst(u, v);
+							links.add(link);
+
+							if (linkReverseMapping.containsKey(link)) {
+								linkReverseMapping.get(link).add(fid);
+							} else {
+								HashSet<Integer> fids = new HashSet<>();
+								fids.add(fid);
+								linkReverseMapping.put(link, fids);
+							}
 						}
 					}
 				}
@@ -2466,63 +2477,26 @@ public class Graph
 			//<Constraints of Type 1: Load on link <= max_load
 			out.write("\n\\Type 1: Load on link <= max_load\n");
 			System.out.println(new Date() + ": Starting part 1");
-			for(int i=0; i<noNodes; i++) {
-				for(int j=0; j<adjacencyList[i].size(); j++) { // for each link
-					int v = adjacencyList[i].get(j).linkTo;
-					String constraint = "c1_" + i + "_" + v + ": ";
-					boolean shouldWriteConstraint = false;
-					if (i<numServers) { // SVR-SW link
-						int f = i;
-						for (int t=0; t<numServers; t++) {
-							if (serverLevelMatrix[f][t]>0) {
-								int fid = allFlowIDs[f][t].flowID;
-								int linkid = linkidMapping.get(new LinkSrcDst(i,v));
-								if (fVarNames[fid][linkid] != null) {
-									if (!shouldWriteConstraint) {
-										constraint += fVarNames[fid][linkid];
-										shouldWriteConstraint = true;
-									} else {
-										constraint += " + " + fVarNames[fid][linkid];
-									}
-								}
-							}
-						}
-					} else if (v<numServers) { // SW-SVR link
-						int t=v;
-						for (int f=0; f<numServers; f++) {
-							if (serverLevelMatrix[f][t]>0) {
-								int fid = allFlowIDs[f][t].flowID;
-								int linkid = linkidMapping.get(new LinkSrcDst(i,v));
-								if (fVarNames[fid][linkid] != null) {
-									if (!shouldWriteConstraint) {
-										constraint += fVarNames[fid][linkid];
-										shouldWriteConstraint = true;
-									} else {
-										constraint += " + " + fVarNames[fid][linkid];
-									}
-								}
-							}
-						}
-					} else { // SW-SW link
-						for (int fid=0; fid<flowcount; fid++) {
-							int linkid = linkidMapping.get(new LinkSrcDst(i,v));
-							if(fVarNames[fid][linkid] != null) {
-								if (!shouldWriteConstraint) {
-									constraint += fVarNames[fid][linkid];
-									shouldWriteConstraint = true;
-								} else {
-									constraint += " + " + fVarNames[fid][linkid];
-								}
-							}
-						}
-					}
-					if(shouldWriteConstraint) {
-						out.write(constraint + " <= " + adjacencyList[i].get(j).linkcapacity + "\n");
+			for (Map.Entry<LinkSrcDst, HashSet<Integer>> entry : linkReverseMapping.entrySet()) {
+				LinkSrcDst link = entry.getKey();
+				int linkid = linkidMapping.get(link);
+				HashSet<Integer> fids = entry.getValue();
+				String constraint = "c1_" + link.src + "_" + link.dst + ": ";
+				boolean shouldWriteConstraint = false;
+				for (int fid : fids) {
+					if (!shouldWriteConstraint) {
+						constraint += fVarNames[fid][linkid];
+						shouldWriteConstraint = true;
+					} else {
+						constraint += " + " + fVarNames[fid][linkid];
 					}
 				}
+				if(shouldWriteConstraint) {
+					out.write(constraint + " <= " + linkcapacity + "\n");
+				}
 
-				if(i > 0 && i % 100 == 0) {
-					System.out.println(new Date() + ": " + i + " of " + noNodes + " done");
+				if (linkid > 0 && linkid % 100 == 0) {
+					System.out.println(new Date() + ": " + linkid + " of " + linkcount + " done");
 				}
 			}
 
@@ -2577,8 +2551,8 @@ public class Graph
 					}
 				}
 
-				if (f > 0 && f % 100 == 0) {
-					System.out.println(new Date() + ": " + f + " of " + noNodes + " done");
+				if (fid > 0 && fid % 100 == 0) {
+					System.out.println(new Date() + ": " + fid + " of " + flowcount + " done");
 				}
 			}
 
@@ -2595,6 +2569,7 @@ public class Graph
 			}
 
 			out.write("End\n");
+			System.out.println(new Date() + ": Done writing LP");
 			out.close();
 		}
 		catch (Exception e)
