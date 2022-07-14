@@ -2434,16 +2434,6 @@ public class Graph
 				}
 			}
 
-			System.out.println("Printing linkMapping");
-			for (int i=0; i<3; i++) {
-				System.out.println("fid=" + i);
-				HashSet<LinkSrcDst> links = linkMapping.get(i);
-				for (LinkSrcDst link : links) {
-					System.out.print(link.src + "-" + link.dst + " ");
-				}
-				System.out.println();
-			}
-
 			// Create variables
 			String[][] fVarNames = new String[numFlows][linkcount];
 			for (int fid = 0; fid < numFlows; fid++) {
@@ -2456,9 +2446,6 @@ public class Graph
 					fVarNames[fid][linkid] = linkName;
 				}
 			}
-
-			System.out.println(linkMapping.get(0).contains(new LinkSrcDst(3072,3095)));
-			System.out.println(fVarNames[0][linkidMapping.get(new LinkSrcDst(3072, 3095))] != null);
 
 			//< Objective
 			out.write("Maximize \n");
@@ -2487,7 +2474,7 @@ public class Graph
 			for(int i=0; i<noNodes; i++) {
 				for(int j=0; j<adjacencyList[i].size(); j++) { // for each link
 					int v = adjacencyList[i].get(j).linkTo;
-					String constraint = "c1_" + i + "_" + v + ": 0";
+					String constraint = "c1_" + i + "_" + v + ": ";
 					boolean shouldWriteConstraint = false;
 					if (i<numServers) { // SVR-SW link
 						int f = i;
@@ -2496,8 +2483,12 @@ public class Graph
 								int fid = allFlowIDs[f][t].flowID;
 								int linkid = linkidMapping.get(new LinkSrcDst(i,v));
 								if (fVarNames[fid][linkid] != null) {
-									constraint += " + " + fVarNames[fid][linkid];
-									shouldWriteConstraint = true;
+									if (!shouldWriteConstraint) {
+										constraint += fVarNames[fid][linkid];
+										shouldWriteConstraint = true;
+									} else {
+										constraint += " + " + fVarNames[fid][linkid];
+									}
 								}
 							}
 						}
@@ -2508,8 +2499,12 @@ public class Graph
 								int fid = allFlowIDs[f][t].flowID;
 								int linkid = linkidMapping.get(new LinkSrcDst(i,v));
 								if (fVarNames[fid][linkid] != null) {
-									constraint += " + " + fVarNames[fid][linkid];
-									shouldWriteConstraint = true;
+									if (!shouldWriteConstraint) {
+										constraint += fVarNames[fid][linkid];
+										shouldWriteConstraint = true;
+									} else {
+										constraint += " + " + fVarNames[fid][linkid];
+									}
 								}
 							}
 						}
@@ -2520,8 +2515,12 @@ public class Graph
 									int fid = allFlowIDs[f][t].flowID;
 									int linkid = linkidMapping.get(new LinkSrcDst(i,v));
 									if(fVarNames[fid][linkid] != null) {
-										constraint += " + " + fVarNames[fid][linkid];
-										shouldWriteConstraint = true;
+										if (!shouldWriteConstraint) {
+											constraint += fVarNames[fid][linkid];
+											shouldWriteConstraint = true;
+										} else {
+											constraint += " + " + fVarNames[fid][linkid];
+										}
 									}
 								}
 							}
@@ -2556,22 +2555,30 @@ public class Graph
 							} else { // non-src and non-dest
 								if (u<numServers) { // SVR node
 								} else { // SW node
-									String constraint = "c2_" + fid + "_" + u + "_3: 0";
+									String constraint = "c2_" + fid + "_" + u + "_3: ";
 									boolean shouldWriteConstraint = false;
 									for (int j=0; j<adjacencyList[u].size(); j++) {
 										int v = adjacencyList[u].get(j).linkTo;
 										int linkid = linkidMapping.get(new LinkSrcDst(u,v));
 										if (fVarNames[fid][linkid] != null) {
-											constraint += " + " + fVarNames[fid][linkid];
-											shouldWriteConstraint = true;
+											if (!shouldWriteConstraint) {
+												constraint += fVarNames[fid][linkid];
+												shouldWriteConstraint = true;
+											} else {
+												constraint += " + " + fVarNames[fid][linkid];
+											}
 										}
 									}
 									for (int j=0; j<adjacencyList[u].size(); j++) {
 										int v = adjacencyList[u].get(j).linkTo;
 										int linkid = linkidMapping.get(new LinkSrcDst(v,u));
 										if (fVarNames[fid][linkid] != null) {
-											constraint += " - " + fVarNames[fid][linkid];
-											shouldWriteConstraint = true;
+											if (!shouldWriteConstraint) {
+												constraint += fVarNames[fid][linkid];
+												shouldWriteConstraint = true;
+											} else {
+												constraint += " - " + fVarNames[fid][linkid];
+											}
 										}
 									}
 									if (shouldWriteConstraint) {
