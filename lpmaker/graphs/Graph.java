@@ -822,6 +822,58 @@ public class Graph
 		}
 	}
 
+	public void fasterModifiedFloydWarshall(int numServers) {
+		shortestPathLen = new int[noNodes][noNodes];
+
+		for(int i = 0; i < noNodes; i++) {
+			for(int j = 0; j < noNodes; j++) {
+				if(i == j) {
+					shortestPathLen[i][j] = 0;
+				} else if(findNeighbor(i,j) != null) {
+					shortestPathLen[i][j] = 1;//adjacencyMatrix[i][j];
+				} else {
+					shortestPathLen[i][j] = Graph.INFINITY;
+				}
+			}
+		}
+
+		//floyd warshall for SW to SW
+		for(int k = numServers; k < noNodes; k++) {
+			for(int i = numServers; i < noNodes; i++) {
+				for(int j = numServers; j < noNodes; j++) {
+					if(shortestPathLen[i][j] > shortestPathLen[i][k] + shortestPathLen[k][j]) {
+						shortestPathLen[i][j] = shortestPathLen[i][k] + shortestPathLen[k][j];
+					}
+				}
+			}
+		}
+
+		// for SVR to SVR
+		for (int i=0; i<numServers; i++) {
+			for (int j=0; j<numServers; j++) {
+				int isw = adjacencyList[i].get(0).linkTo;
+				int jsw = adjacencyList[j].get(0).linkTo;
+				shortestPathLen[i][j] = shortestPathLen[isw][jsw] + 2;
+			}
+		}
+
+		// for SW to SVR
+		for (int i=numServers; i<noNodes; i++) {
+			for (int j=0; j<numServers; j++) {
+				int jsw = adjacencyList[j].get(0).linkTo;
+				shortestPathLen[i][j] = shortestPathLen[i][jsw] + 1;
+			}
+		}
+
+		// for SVR to SW
+		for (int i=0; i<numServers; i++) {
+			for (int j=numServers; j<noNodes; j++) {
+				int isw = adjacencyList[i].get(0).linkTo;
+				shortestPathLen[i][j] = shortestPathLen[isw][j] + 1;
+			}
+		}
+	}
+
 	private static boolean isNeighbor(Graph mynet, int n1, int n2) {
 		for (int i = 0; i < mynet.adjacencyList[n1].size(); i++) {
 			if (mynet.adjacencyList[n1].get(i).linkTo == n2) {
@@ -2299,7 +2351,7 @@ public class Graph
 
 
 	public void fasterPrintServerGraphforMCFFairCondensed(String filename, double[][] serverLevelMatrix, int numSwitches, int numServers) {
-		modifiedFloydWarshall();
+		fasterModifiedFloydWarshall(numServers);
 
 		try
 		{
