@@ -2406,6 +2406,7 @@ public class Graph
 			System.out.println("numFlows=" + flowcount);
 
 			// Create linkidMapping
+			System.out.println("Creating linkidMapping...");
 			int linkcount = 0;
 			HashMap<LinkSrcDst, Integer> linkidMapping = new HashMap<>();
 			for (int u=0; u<noNodes; u++) {
@@ -2417,25 +2418,26 @@ public class Graph
 			}
 
 			// Create linkMapping
-			HashMap<Integer, HashSet<LinkSrcDst>> linkMapping = new HashMap<>();
-			HashMap<LinkSrcDst, HashSet<Integer>> linkReverseMapping = new HashMap<>();
+			System.out.println("Creating linkMapping and linkReverseMapping...");
+			HashMap<Integer, HashSet<Integer>> linkMapping = new HashMap<>(); // fid -> set(linkid)
+			HashMap<Integer, HashSet<Integer>> linkReverseMapping = new HashMap<>(); // linkid -> set(fid)
 			for (int fid=0; fid<flowcount; fid++) {
 				int f = fidMapping.get(fid).src;
 				int t = fidMapping.get(fid).dst;
-				HashSet<LinkSrcDst> links = new HashSet<>();
+				HashSet<Integer> links = new HashSet<>();
 				for (int u = 0; u < noNodes; u++) {
 					for (int j = 0; j < adjacencyList[u].size(); j++) {
 						int v = adjacencyList[u].get(j).linkTo;
 						if (!fasterIsFlowZero(f, t, u, v, numServers)) {
-							LinkSrcDst link = new LinkSrcDst(u, v);
-							links.add(link);
+							int linkid = linkidMapping.get(new LinkSrcDst(u, v));
+							links.add(linkid);
 
-							if (linkReverseMapping.containsKey(link)) {
-								linkReverseMapping.get(link).add(fid);
+							if (linkReverseMapping.containsKey(linkid)) {
+								linkReverseMapping.get(linkid).add(fid);
 							} else {
 								HashSet<Integer> fids = new HashSet<>();
 								fids.add(fid);
-								linkReverseMapping.put(link, fids);
+								linkReverseMapping.put(linkid, fids);
 							}
 						}
 					}
@@ -2444,14 +2446,12 @@ public class Graph
 			}
 
 			// Create variables
+			System.out.println("Creating variables...");
 			String[][] fVarNames = new String[flowcount][linkcount];
 			for (int fid = 0; fid < flowcount; fid++) {
-				HashSet<LinkSrcDst> links = linkMapping.get(fid);
-				for (LinkSrcDst link : links) {
-					int linkSrc = link.src;
-					int linkDst = link.dst;
-					int linkid = linkidMapping.get(new LinkSrcDst(linkSrc, linkDst));
-					String linkName = "f_" + fid + "_" + linkSrc + "_" + linkDst;
+				HashSet<Integer> links = linkMapping.get(fid);
+				for (int linkid : links) {
+					String linkName = "f_" + fid + "_" + linkid;
 					fVarNames[fid][linkid] = linkName;
 				}
 			}
@@ -2477,11 +2477,10 @@ public class Graph
 			//<Constraints of Type 1: Load on link <= max_load
 			out.write("\n\\Type 1: Load on link <= max_load\n");
 			System.out.println(new Date() + ": Starting part 1");
-			for (Map.Entry<LinkSrcDst, HashSet<Integer>> entry : linkReverseMapping.entrySet()) {
-				LinkSrcDst link = entry.getKey();
-				int linkid = linkidMapping.get(link);
+			for (Map.Entry<Integer, HashSet<Integer>> entry : linkReverseMapping.entrySet()) {
+				int linkid = entry.getKey();
 				HashSet<Integer> fids = entry.getValue();
-				String constraint = "c1_" + link.src + "_" + link.dst + ": ";
+				String constraint = "c1_" + linkid + ": ";
 				boolean shouldWriteConstraint = false;
 				for (int fid : fids) {
 					if (!shouldWriteConstraint) {
