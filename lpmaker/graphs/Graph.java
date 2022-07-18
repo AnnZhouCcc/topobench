@@ -481,6 +481,11 @@ public class Graph
 		throw new RuntimeException("getServersForSwitch should be overloaded in derived classes");
 	}
 
+	public int generateRandomSwitch()
+	{
+		throw new RuntimeException("generateRandomSwitch should be overloaded in derived classes");
+	}
+
 	//should be overloaded
 	public int getNoSwitches()
 	{
@@ -911,6 +916,58 @@ public class Graph
 		}
 	}
 
+	public static void fasterModifiedFloydWarshall(int numServers, int noNodes, Graph mynet) {
+		shortestPathLen = new int[noNodes][noNodes];
+
+		for(int i = 0; i < noNodes; i++) {
+			for(int j = 0; j < noNodes; j++) {
+				if(i == j) {
+					shortestPathLen[i][j] = 0;
+				} else if(isNeighbor(mynet,i,j)) {
+					shortestPathLen[i][j] = 1;//adjacencyMatrix[i][j];
+				} else {
+					shortestPathLen[i][j] = Graph.INFINITY;
+				}
+			}
+		}
+
+		//floyd warshall for SW to SW
+		for(int k = numServers; k < noNodes; k++) {
+			for(int i = numServers; i < noNodes; i++) {
+				for(int j = numServers; j < noNodes; j++) {
+					if(shortestPathLen[i][j] > shortestPathLen[i][k] + shortestPathLen[k][j]) {
+						shortestPathLen[i][j] = shortestPathLen[i][k] + shortestPathLen[k][j];
+					}
+				}
+			}
+		}
+
+		// for SVR to SVR
+		for (int i=0; i<numServers; i++) {
+			for (int j=0; j<numServers; j++) {
+				int isw = mynet.adjacencyList[i].get(0).linkTo;
+				int jsw = mynet.adjacencyList[j].get(0).linkTo;
+				shortestPathLen[i][j] = shortestPathLen[isw][jsw] + 2;
+			}
+		}
+
+		// for SW to SVR
+		for (int i=numServers; i<noNodes; i++) {
+			for (int j=0; j<numServers; j++) {
+				int jsw = mynet.adjacencyList[j].get(0).linkTo;
+				shortestPathLen[i][j] = shortestPathLen[i][jsw] + 1;
+			}
+		}
+
+		// for SVR to SW
+		for (int i=0; i<numServers; i++) {
+			for (int j=numServers; j<noNodes; j++) {
+				int isw = mynet.adjacencyList[i].get(0).linkTo;
+				shortestPathLen[i][j] = shortestPathLen[isw][j] + 1;
+			}
+		}
+	}
+
 	// Print shortestpaths
 	public void printPathLengths(String plFile)
 	{
@@ -955,7 +1012,7 @@ public class Graph
 	// If slack is set to 3, flows can not deviate more than 2 hops from their shortest path distance
 	private boolean isFlowZero(FlowID flowID, int linkFrom, int linkTo)
 	{
-		int SLACK = 3;
+		int SLACK = 6;
 		int srcSw = flowID.srcSwitch;
 		int destSw = flowID.dstSwitch;
 
@@ -967,7 +1024,7 @@ public class Graph
 
 	static public boolean isFlowZero(int srcSw, int destSw, int linkFrom, int linkTo)
 	{
-		int SLACK = 3;
+		int SLACK = 6;
 //		int srcSw = flowID.srcSwitch;
 //		int destSw = flowID.dstSwitch;
 
@@ -978,7 +1035,7 @@ public class Graph
 	}
 
 	static public boolean fasterIsFlowZero(int srcSw, int destSw, int linkFrom, int linkTo, int numServers) {
-		int SLACK = 3;
+		int SLACK = 6;
 		if (linkFrom < numServers) {
 			if (linkFrom == srcSw) return false;
 			return true;

@@ -71,11 +71,18 @@ public class ServerGraphFromFileSrcDstPair extends Graph {
 			// Give up on using weightBeforeEachNode.
 			// For weightEachNode, only the last 80 entries are useful.
 			setUpFixWeight(0);
+			int weightSoFar = 0;
 			for(int t = switchOffset; t < switchOffset+numSwitches; t++){
 				int curr_weight = (numPorts - adjacencyList[t].size()); // total number of ports = number of servers + number of neighboring switches
 				weightEachNode[t] = curr_weight;
+				weightBeforeEachNode[t] = weightSoFar;
+				weightSoFar += curr_weight;
 			}
-			totalWeight = numServers;
+			if (weightSoFar != numServers) {
+				System.out.println("***Error: weightSoFar != numServers, weightSoFar=" + weightSoFar + ", numServers=" + numServers);
+			}
+			weightBeforeEachNode[switchOffset+numSwitches] = weightSoFar;
+			totalWeight = weightSoFar;
 			System.out.println("total number of servers = " + totalWeight);
 
 			// Add SW-SVR links
@@ -119,25 +126,25 @@ public class ServerGraphFromFileSrcDstPair extends Graph {
 		}
 	}
 
-//	public int svrToSwitch(int i) {
-//		if (i>=numServers) {
-//			System.out.println("**Error: whichserver exceeds total number of servers in svrToSwitch: whichserver=" + i + ", numservers=" + numServers);
-//			System.exit(0);
-//		}
-//
-//		int switchOffset = numServers;
-//		int sumServers = 0;
-//		for (int sw = switchOffset; sw < switchOffset+numSwitches; sw++) {
-//			sumServers += weightEachNode[sw];
-//			if (sumServers > i) {
-//				return sw;
-//			}
-//		}
-//		System.out.println("Failed to locate the server on any switch.");
-//		System.out.println("server id = " + i + ", number of switches = " + numSwitches + ", number of ports = " + numPorts);
-//		return -1;
-//	}
-//
+	public int svrToSwitch(int i) {
+		if (i>=numServers) {
+			System.out.println("**Error: whichserver exceeds total number of servers in svrToSwitch: whichserver=" + i + ", numservers=" + numServers);
+			System.exit(0);
+		}
+
+		int switchOffset = numServers;
+		int sumServers = 0;
+		for (int sw = switchOffset; sw < switchOffset+numSwitches; sw++) {
+			sumServers += weightEachNode[sw];
+			if (sumServers > i) {
+				return sw;
+			}
+		}
+		System.out.println("Failed to locate the server on any switch.");
+		System.out.println("server id = " + i + ", number of switches = " + numSwitches + ", number of ports = " + numPorts);
+		return -1;
+	}
+
 //	public int[] getServersForSwitch(int whichSwitch) {
 //		int startServer = 0;
 //		for (int sw=0; sw<noNodes; sw++) {

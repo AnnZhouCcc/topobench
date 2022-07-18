@@ -84,4 +84,9 @@ public class LeafSpine extends Graph {
 		}
 		return serverarr;
 	}
+
+	public int generateRandomSwitch() { // have to be a leaf switch
+		rand.nextInt(); // for some reason, the first random number for any run is 62; thus discarding the first number
+		return rand.nextInt(numLeafSwitches)+numSpineSwitches;
+	}
 }
