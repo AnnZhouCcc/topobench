@@ -600,15 +600,6 @@ public class ProduceLP {
 //						mynet.PrintServerGraphforMCFFairCondensed("my." + runs + ".lp", tm.serverLevelMatrix, switches, nsvrs);
 						System.out.println("fasterPrintServerGraphforMCFFairCondensed");
 						mynet.fasterPrintServerGraphforMCFFairCondensed("my." + runs + ".lp", tm.serverLevelMatrix, switches, nsvrs);
-
-
-
-
-
-
-
-
-
 					}
 				} else {
 					String netpathFile = args[23];

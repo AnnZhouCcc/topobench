@@ -1,7 +1,9 @@
 package lpmaker.graphs;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -13,6 +15,7 @@ public class GraphFromFileSrcDstPair extends Graph {
 		numPorts = totalPorts;
 		populateAdjacencyList(fileName);
 		name="fromfile";
+		writeAdjacencyList();
 	}
 
 	/*
@@ -84,5 +87,25 @@ public class GraphFromFileSrcDstPair extends Graph {
 			serverarr[s] = s+startServer;
 		}
 		return serverarr;
+	}
+
+	public void writeAdjacencyList() {
+		String writefile = "intermediatefiles/adjacencylist.txt";
+		try {
+			BufferedWriter out = new BufferedWriter(new FileWriter(writefile));
+			for (int u = 0; u < noNodes; u++) {
+				int size = adjacencyList[u].size();
+				out.write(size + "\t");
+				for (int j = 0; j < size; j++) {
+					int v = adjacencyList[u].get(j).linkTo;
+					out.write(v + "\t");
+				}
+				out.write("\n");
+			}
+			out.close();
+		} catch (Exception e) {
+			System.err.println("GraphFromFileSrcDstPair writeAdjacencyList Error: " + e.getMessage());
+			e.printStackTrace();
+		}
 	}
 }

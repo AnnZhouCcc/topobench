@@ -47,6 +47,7 @@ public class TrafficMatrix {
         timeframeEnd = _timeframeEnd;
 
         generateTraffic(trafficfile, a, b, numServersPerSwitches, rrgnet, lsnet);
+//        writeServerTrafficMatrix();
     }
 
     // Send from all servers to some random server
@@ -1442,9 +1443,11 @@ public class TrafficMatrix {
             }
         }
 
-        printSwitchLevelMatrix("resultfiles/serverlevelmatrix.txt");
+//        printSwitchLevelMatrix("resultfiles/serverlevelmatrix.txt");
 
         System.out.println("Total traffic = " + totalTraffic);
+
+//        setUpServerTrafficMatrix();
     }
 
     public void generateTrafficClusterX(String cluster) {
@@ -1656,7 +1659,8 @@ public class TrafficMatrix {
 
         System.out.println("Total traffic = " + totalTraffic);
 
-        setUpServerTrafficMatrix();
+//        setUpServerTrafficMatrix();
+        writeServerLevelMatrix();
     }
 
     public void setUpServerTrafficMatrix() {
@@ -1704,7 +1708,7 @@ public class TrafficMatrix {
                 serverTrafficMatrix[srcsw][dstsw] += serverTrafficMatrix[i][j];
             }
         }
-        printServerTrafficMatrix("lpserverfiles/servertrafficmatrix2.txt",numServers,topology.noNodes);
+//        printServerTrafficMatrix("lpserverfiles/servertrafficmatrix2.txt",numServers,topology.noNodes);
     }
 
     public void generateTraffic(String trafficfile, int a, int b, int[] numServersPerSwitches, Graph rrgnet, Graph lsnet) {
@@ -1803,6 +1807,7 @@ public class TrafficMatrix {
             generateTrafficMix(a,b,lsnet);
         }
         else if (trafficmode == 205) {
+            generateTrafficARackToBRack(a,b,lsnet);
             generateServerTrafficARackToBRack(a,b,lsnet);
         }
         else {
@@ -1812,5 +1817,40 @@ public class TrafficMatrix {
 
     public HashSet<Integer> getHotRacks() {
         return hotRacks;
+    }
+
+    public void writeServerTrafficMatrix() {
+        String writefile = "intermediatefiles/servertrafficmatrix.txt";
+        int numNodes = numServers + numSwitches;
+        try {
+            BufferedWriter out = new BufferedWriter(new FileWriter(writefile));
+            for (int i=0; i<numNodes; i++) {
+                for (int j=0; j<numNodes; j++) {
+                    out.write(serverTrafficMatrix[i][j] + "\t");
+                }
+                out.write("\n");
+            }
+            out.close();
+        } catch (Exception e) {
+            System.err.println("TrafficMatrix writeServerTrafficMatrix Error: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public void writeServerLevelMatrix() {
+        String writefile = "intermediatefiles/serverlevelmatrix.txt";
+        try {
+            BufferedWriter out = new BufferedWriter(new FileWriter(writefile));
+            for (int i=0; i<numServers; i++) {
+                for (int j=0; j<numServers; j++) {
+                    out.write(serverLevelMatrix[i][j] + "\t");
+                }
+                out.write("\n");
+            }
+            out.close();
+        } catch (Exception e) {
+            System.err.println("TrafficMatrix writeServerLevelMatrix Error: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

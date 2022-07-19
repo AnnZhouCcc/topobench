@@ -1,41 +1,41 @@
 NRUNS=1
 MYJAVAPATH="../"
+INTERMEDIATEFILEPATH="../intermediatefiles"
 
 # Compile
 cd $MYJAVAPATH
 javac -nowarn lpmaker/ProduceLP.java
+javac -nowarn lpmaker/ProduceThroughput.java
 cd -
 
-#switches=80
-#port=64
-#numsvr=3072
+switches=80
+port=64
+numsvr=3072
 #numsvr=2988
-#numspinesw=16
-
-switches=6
-port=4
-numsvr=8
-numspinesw=2
+numspinesw=16
+numleafsw=`expr $switches - $numspinesw`
 
 topology=rrg
 #topology=dring
 #topology=leafspine
-#graphtype=23
+graphtype=23
 #graphtype=24
-graphtype=25
-#graphfile=graphfiles/rrg_instance1_80_64.edgelist
+#graphtype=25
+graphindex=1
+graphfile=graphfiles/rrg_instance1_80_64.edgelist
 #graphfile=graphfiles/dring_instance1_80_64.edgelist
-graphfile=graphfiles/test_instance1_80_64.edgelist
+#graphfile=graphfiles/test_instance1_80_64.edgelist
 
 method=2
 declare -a rs=("opt")
 # declare -a rs=("ecmp" "su2" "su3" "fhi" "16disjoint" "32disjoint" "16short" "32short" "100random3" "racke" "wracke" "opt")
 #declare -a rs=("ecmp" "su2" "su3" "32disjoint" "32short")
 
-#trafficmode=105
 trafficmode=205
-a=1
-b=1
+#trafficmode=105
+traffic=16to4
+a=16
+b=4
 trafficfile=none
 timeframestart=0
 timeframeend=0
@@ -82,10 +82,18 @@ do
 
   flowVal=`./lpRun.sh ../topology/my.lp $method`
   rm -rf ../flowIDmap* ../linkCaps* flowIDmap* linkCaps*
-  echo "$flowVal" >> flowtmp_"$suffix"
+#  echo "$flowVal" >> flowtmp_"$suffix"
+  cd $INTERMEDIATEFILEPATH
+  rm -rf networkthroughput
+  echo "$flowVal" >> networkthroughput
+  cd -
+
+  cd $MYJAVAPATH
+  java lpmaker/ProduceThroughput $graphindex $numleafsw $numspinesw $numsvr $port _"$topology"_"$routing"_"$traffic"
+  cd -
 done
 
-avgflow=`cat flowtmp_"$suffix" | awk '{if(NF>0 && $1>=0){sum+=$1; cnt++;}} END{print sum/cnt}'`
-echo "$switches $numsvr $port 1 $avgflow" >> ../resultfiles/result_"$suffix".txt
+#avgflow=`cat flowtmp_"$suffix" | awk '{if(NF>0 && $1>=0){sum+=$1; cnt++;}} END{print sum/cnt}'`
+#echo "$switches $numsvr $port 1 $avgflow" >> ../resultfiles/result_"$suffix".txt
 
 done
