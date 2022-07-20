@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 public class GraphFromFileSrcDstPair extends Graph {
 
 	public GraphFromFileSrcDstPair(int size, String fileName, int totalPorts){
-		super(size);
+		super(size); // size: numSwitches
 		numPorts = totalPorts;
 		populateAdjacencyList(fileName);
 		name="fromfile";

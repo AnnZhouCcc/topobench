@@ -10,29 +10,19 @@ cd -
 
 switches=80
 port=64
-numsvr=3072
-#numsvr=2988
+numsvr=3072 #2988
 numspinesw=16
 numleafsw=`expr $switches - $numspinesw`
 
-topology=rrg
-#topology=dring
-#topology=leafspine
-graphtype=23
-#graphtype=24
-#graphtype=25
+topology=rrg #dring leafspine
+graphtype=23 #24
 graphindex=1
-graphfile=graphfiles/rrg_instance1_80_64.edgelist
-#graphfile=graphfiles/dring_instance1_80_64.edgelist
-#graphfile=graphfiles/test_instance1_80_64.edgelist
+graphfile=graphfiles/rrg_instance1_80_64.edgelist #graphfiles/dring_instance1_80_64.edgelist graphfiles/test_instance1_80_64.edgelist
 
 method=2
-declare -a rs=("opt")
-# declare -a rs=("ecmp" "su2" "su3" "fhi" "16disjoint" "32disjoint" "16short" "32short" "100random3" "racke" "wracke" "opt")
-#declare -a rs=("ecmp" "su2" "su3" "32disjoint" "32short")
+declare -a rs=("opt") #rs=("ecmp" "su2" "su3" "fhi" "16disjoint" "32disjoint" "16short" "32short" "100random3" "racke" "wracke" "opt")
 
-trafficmode=205
-#trafficmode=105
+trafficmode=205 #105
 traffic=16to4
 a=16
 b=4
@@ -46,8 +36,7 @@ isOptimal=false
 isEqualShare=false
 shouldAvoidHotRacks=false
 isPathWeighted=false
-pathweightfile=none
-#pathweightfile=../WTHelpers/yatesfiles/pathweightfiles/racke.txt
+pathweightfile=none #../WTHelpers/yatesfiles/pathweightfiles/racke.txt
 
 for routing in "${rs[@]}"
 do
@@ -80,13 +69,16 @@ do
   mv pl.0 topology/pathlengths/
   cd -
 
-  flowVal=`./lpRun.sh ../topology/my.lp $method`
-  rm -rf ../flowIDmap* ../linkCaps* flowIDmap* linkCaps*
-#  echo "$flowVal" >> flowtmp_"$suffix"
-  cd $INTERMEDIATEFILEPATH
-  rm -rf networkthroughput
-  echo "$flowVal" >> networkthroughput
-  cd -
+  if [ "$isEqualShare" = "false" ] && [ "$isPathWeighted" = "false" ]
+  then
+    flowVal=`./lpRun.sh ../topology/my.lp $method`
+    rm -rf ../flowIDmap* ../linkCaps* flowIDmap* linkCaps*
+    #  echo "$flowVal" >> flowtmp_"$suffix"
+    cd $INTERMEDIATEFILEPATH
+    rm -rf networkthroughput
+    echo "$flowVal" >> networkthroughput
+    cd -
+  fi
 
   cd $MYJAVAPATH
   java lpmaker/ProduceThroughput $graphindex $numleafsw $numspinesw $numsvr $port _"$topology"_"$routing"_"$traffic"

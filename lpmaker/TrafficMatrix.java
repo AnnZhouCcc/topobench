@@ -1,6 +1,8 @@
 package lpmaker;
 
 import lpmaker.graphs.Graph;
+import lpmaker.graphs.GraphFromFileSrcDstPair;
+import lpmaker.graphs.LeafSpine;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -33,12 +35,12 @@ public class TrafficMatrix {
     int timeframeStart;
     int timeframeEnd;
 
-    public TrafficMatrix(int _numSwitches, int trafficMode, String trafficfile, Graph mynet, int a, int b, int[] numServersPerSwitches, int _timeframeStart, int _timeframeEnd, Graph rrgnet, Graph lsnet) {
+    public TrafficMatrix(int _numSwitches, int trafficMode, String trafficfile, Graph mynet, int a, int b, int[] numServersPerSwitches, int _timeframeStart, int _timeframeEnd, GraphFromFileSrcDstPair rrgnet, LeafSpine lsnet) {
         numSwitches = _numSwitches;
         numServers = mynet.totalWeight;
         int numNodes = numServers+numSwitches;
-        switchLevelMatrix = new double[numNodes][numNodes];
-        serverLevelMatrix = new double[numNodes][numNodes];
+        switchLevelMatrix = new double[numSwitches][numSwitches];
+        serverLevelMatrix = new double[numServers][numServers];
         serverTrafficMatrix = new double[numNodes][numNodes];
         trafficmode = trafficMode;
         topology = mynet;
@@ -47,7 +49,6 @@ public class TrafficMatrix {
         timeframeEnd = _timeframeEnd;
 
         generateTraffic(trafficfile, a, b, numServersPerSwitches, rrgnet, lsnet);
-//        writeServerTrafficMatrix();
     }
 
     // Send from all servers to some random server
@@ -1618,8 +1619,100 @@ public class TrafficMatrix {
         System.out.println();
     }
 
-    public void generateServerTrafficARackToBRack(int a, int b, Graph lsnet) {
-        System.out.println("Generate server traffic a rack to b rack: a=" + a + ", b=" + b + ".");
+    public void generateSwitchServerTrafficAllServerToAllServer() {
+        System.out.println("Generate switch & server traffic all server to all server.");
+        double unitTraffic = 1;
+        double totalTraffic = 0;
+
+        for (int srcsvr=0; srcsvr<numServers; srcsvr++) {
+            for (int dstsvr=0; dstsvr<numServers; dstsvr++) {
+                int mysrcsw = topology.svrToSwitch(srcsvr);
+                int mydstsw = topology.svrToSwitch(dstsvr);
+                serverLevelMatrix[srcsvr][dstsvr] += unitTraffic;
+                switchLevelMatrix[mysrcsw][mydstsw] += unitTraffic;
+                totalTraffic += unitTraffic;
+            }
+        }
+        System.out.println("Total traffic = " + totalTraffic);
+
+        writeServerLevelMatrix();
+    }
+
+    public void generateSwitchServerTrafficRackPermutation(LeafSpine lsnet) {
+        System.out.println("Generate switch & server traffic rack permutation.");
+        double unitTraffic = 1;
+        double totalTraffic = 0;
+
+        int[] dstsws = new int[lsnet.noNodes]; // the first numSpineSwitches should be unused
+        boolean[] dsthassender = new boolean[lsnet.noNodes];
+        for (int srcsw=lsnet.getNumSpineSwitches(); srcsw<lsnet.noNodes; srcsw++) {
+            while (true) {
+                int dstsw = lsnet.generateRandomSwitch();
+                if (dstsw == srcsw) continue;
+                if (dsthassender[dstsw]) continue;
+                dsthassender[dstsw] = true;
+                dstsws[srcsw] = dstsw;
+                break;
+            }
+        }
+
+        for (int i=lsnet.getNumSpineSwitches(); i<lsnet.noNodes; i++) {
+            int srcsw = i;
+            int dstsw = dstsws[i];
+            int[] srcsvrs = lsnet.getServersForSwitch(srcsw);
+            int[] dstsvrs = lsnet.getServersForSwitch(dstsw);
+            for (int srcsvr : srcsvrs) {
+                if (srcsvr>=topology.totalWeight) continue;
+                for (int dstsvr : dstsvrs) {
+                    if (dstsvr>=topology.totalWeight) continue;
+                    int mysrcsw = topology.svrToSwitch(srcsvr);
+                    int mydstsw = topology.svrToSwitch(dstsvr);
+                    serverLevelMatrix[srcsvr][dstsvr] += unitTraffic;
+                    switchLevelMatrix[mysrcsw][mydstsw] += unitTraffic;
+                    totalTraffic += unitTraffic;
+                }
+            }
+        }
+        System.out.println("Total traffic = " + totalTraffic);
+
+        writeServerLevelMatrix();
+    }
+
+    public void generateSwitchServerTrafficServerPermutation() {
+        System.out.println("Generate switch & server traffic server permutation.");
+        double unitTraffic = 1;
+        double totalTraffic = 0;
+
+        int numServers = topology.totalWeight;
+        int[] dstsvrs = new int[numServers];
+        boolean[] dsthassender = new boolean[numServers];
+        for (int srcsvr=0; srcsvr<numServers; srcsvr++) {
+            while (true) {
+                int dstsvr = topology.rand.nextInt(numServers);
+                if (dstsvr == srcsvr) continue;
+                if (dsthassender[dstsvr]) continue;
+                dsthassender[dstsvr] = true;
+                dstsvrs[srcsvr] = dstsvr;
+                break;
+            }
+        }
+
+        for (int i=0; i<numServers; i++) {
+            int srcsvr = i;
+            int dstsvr = dstsvrs[i];
+            int mysrcsw = topology.svrToSwitch(srcsvr);
+            int mydstsw = topology.svrToSwitch(dstsvr);
+            serverLevelMatrix[srcsvr][dstsvr] += unitTraffic;
+            switchLevelMatrix[mysrcsw][mydstsw] += unitTraffic;
+            totalTraffic += unitTraffic;
+        }
+        System.out.println("Total traffic = " + totalTraffic);
+
+        writeServerLevelMatrix();
+    }
+
+    public void generateSwitchServerTrafficARackToBRack(int a, int b, LeafSpine lsnet) {
+        System.out.println("Generate switch & server traffic a rack to b rack: a=" + a + ", b=" + b + ".");
         double unitTraffic = 1;
         double totalTraffic = 0;
 
@@ -1641,25 +1734,138 @@ public class TrafficMatrix {
         System.out.println(dstswslist);
 
         for (int srcsw : srcswslist) {
+            int[] srcsvrs = lsnet.getServersForSwitch(srcsw);
             for (int dstsw : dstswslist) {
-                int[] srcsvrs = lsnet.getServersForSwitch(srcsw);
                 int[] dstsvrs = lsnet.getServersForSwitch(dstsw);
-//                printArray(srcsvrs);
-//                printArray(dstsvrs);
+
                 for (int srcsvr : srcsvrs) {
                     if (srcsvr >= topology.totalWeight) continue;
                     for (int dstsvr : dstsvrs) {
                         if (dstsvr >= topology.totalWeight) continue;
+
+                        int mysrcsw = topology.svrToSwitch(srcsvr);
+                        int mydstsw = topology.svrToSwitch(dstsvr);
+
                         serverLevelMatrix[srcsvr][dstsvr] += unitTraffic;
+                        switchLevelMatrix[mysrcsw][mydstsw] += unitTraffic;
                         totalTraffic += unitTraffic;
                     }
                 }
             }
         }
-
         System.out.println("Total traffic = " + totalTraffic);
 
-//        setUpServerTrafficMatrix();
+        writeServerLevelMatrix();
+    }
+
+    public void generateSwitchServerTrafficClusterX(String cluster) {
+        System.out.println("Generate switch & server traffic cluster " + cluster + ".");
+        double totalTraffic = 0;
+        double scaledown = 1000;
+        int solve_starttime = timeframeStart;
+        int solve_endtime = timeframeEnd;
+
+        String file_prefix = "../DRing/src/emp/datacentre/trafficfiles/cluster_" + cluster + "/traffic/traffic_64racks";
+        String[] file_suffix = {};
+        if (cluster.equals("a")) {
+            file_suffix = new String[]{"_0_273"};
+        } else if (cluster.equals("b")) {
+            file_suffix = new String[]{"_0_500","_500_1000","_1000_1500","_1500_2000","_2000_2500","_2500_2900"};
+        } else if (cluster.equals("c")) {
+            file_suffix = new String[]{"_0_273"};
+        } else {
+            System.out.println("***Error: unknown cluster, cluster " + cluster);
+        }
+
+        try {
+            BufferedReader br;
+            String strLine = "";
+            for (int i=0; i<file_suffix.length; i++) {
+                String trafficfile = file_prefix + file_suffix[i];
+                br = new BufferedReader(new FileReader(trafficfile));
+                while ((strLine = br.readLine()) != null){
+                    StringTokenizer strTok = new StringTokenizer(strLine);
+                    int timestamp = Integer.parseInt(strTok.nextToken());
+                    double traffic = Double.parseDouble(strTok.nextToken());
+                    traffic /= scaledown;
+                    int srcsvr = Integer.parseInt(strTok.nextToken());
+                    int dstsvr = Integer.parseInt(strTok.nextToken());
+                    if (srcsvr>=topology.totalWeight) continue;
+                    if (dstsvr>=topology.totalWeight) continue;
+                    int srcsw = topology.svrToSwitch(srcsvr);
+                    int dstsw = topology.svrToSwitch(dstsvr);
+
+                    if (timestamp >= solve_endtime) break;
+                    if (timestamp >= solve_starttime && timestamp < solve_endtime) {
+                        serverLevelMatrix[srcsvr][dstsvr] += traffic;
+                        switchLevelMatrix[srcsw][dstsw] += traffic;
+                        totalTraffic += traffic;
+                    }
+                }
+                br.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println("Total traffic = " + totalTraffic);
+
+        writeServerLevelMatrix();
+    }
+
+    public void generateSwitchServerTrafficMix(int n, int t, LeafSpine lsnet) {
+        System.out.println("Generate switch & server traffic mix, n="+n+", t="+t);
+        double unitTraffic = 1;
+        double totalTraffic = 0;
+
+        HashSet<Integer> heavyRacks = new HashSet<>();
+        while (heavyRacks.size() < n) {
+            heavyRacks.add(lsnet.generateRandomSwitch());
+        }
+        System.out.println(heavyRacks);
+        HashSet<Integer> lightRacks = new HashSet<>();
+        for (int s=lsnet.getNumSpineSwitches(); s<lsnet.noNodes; s++) {
+            if (!heavyRacks.contains(s)) lightRacks.add(s);
+        }
+        System.out.println(lightRacks);
+
+        HashSet<Integer> heavyServers = new HashSet<>();
+        for (int hr : heavyRacks) {
+            int[] servers = lsnet.getServersForSwitch(hr);
+            for (int svr : servers) heavyServers.add(svr);
+        }
+        System.out.println("Number of heavy servers = " + heavyServers.size());
+        HashSet<Integer> lightServers = new HashSet<>();
+        for (int lr : lightRacks) {
+            int[] servers = lsnet.getServersForSwitch(lr);
+            for (int svr : servers) lightServers.add(svr);
+        }
+        System.out.println("Number of light servers = " + lightServers.size());
+
+        for (int srcsvr=0; srcsvr<heavyServers.size(); srcsvr++) {
+            for (int dstsvr=0; dstsvr<heavyServers.size(); dstsvr++) {
+                if (srcsvr>=topology.totalWeight) continue;
+                if (dstsvr>=topology.totalWeight) continue;
+                int srcsw = topology.svrToSwitch(srcsvr);
+                int dstsw = topology.svrToSwitch(dstsvr);
+                serverLevelMatrix[srcsvr][dstsvr] += unitTraffic*t;
+                switchLevelMatrix[srcsw][dstsw] += unitTraffic*t;
+                totalTraffic += unitTraffic*t;
+            }
+        }
+
+        for (int srcsvr=0; srcsvr<lightServers.size(); srcsvr++) {
+            for (int dstsvr=0; dstsvr<lightServers.size(); dstsvr++) {
+                if (srcsvr>=topology.totalWeight) continue;
+                if (dstsvr>=topology.totalWeight) continue;
+                int srcsw = topology.svrToSwitch(srcsvr);
+                int dstsw = topology.svrToSwitch(dstsvr);
+                serverLevelMatrix[srcsvr][dstsvr] += unitTraffic;
+                switchLevelMatrix[srcsw][dstsw] += unitTraffic;
+                totalTraffic += unitTraffic;
+            }
+        }
+        System.out.println("Total traffic = " + totalTraffic);
+
         writeServerLevelMatrix();
     }
 
@@ -1711,7 +1917,7 @@ public class TrafficMatrix {
 //        printServerTrafficMatrix("lpserverfiles/servertrafficmatrix2.txt",numServers,topology.noNodes);
     }
 
-    public void generateTraffic(String trafficfile, int a, int b, int[] numServersPerSwitches, Graph rrgnet, Graph lsnet) {
+    public void generateTraffic(String trafficfile, int a, int b, int[] numServersPerSwitches, GraphFromFileSrcDstPair rrgnet, LeafSpine lsnet) {
         // traffic-mode: 0 = randPerm; 1 = all-all; 2 = all-to-one; Any higher n means stride(n)
         int inaccuracymode = 0;
         System.out.println("trafficmode = " + trafficmode);
@@ -1806,9 +2012,23 @@ public class TrafficMatrix {
         else if (trafficmode == 107) {
             generateTrafficMix(a,b,lsnet);
         }
+        else if (trafficmode == 200) {
+            generateSwitchServerTrafficAllServerToAllServer();
+        }
+        else if (trafficmode == 202) {
+            generateSwitchServerTrafficRackPermutation(lsnet);
+        }
+        else if (trafficmode == 204) {
+            generateSwitchServerTrafficServerPermutation();
+        }
         else if (trafficmode == 205) {
-            generateTrafficARackToBRack(a,b,lsnet);
-            generateServerTrafficARackToBRack(a,b,lsnet);
+            generateSwitchServerTrafficARackToBRack(a,b,lsnet);
+        }
+        else if (trafficmode == 206) {
+            generateSwitchServerTrafficClusterX(trafficfile);
+        }
+        else if (trafficmode == 207) {
+            generateSwitchServerTrafficMix(a,b,lsnet);
         }
         else {
             System.out.println("Trafficmode is not recognized.");

@@ -108,7 +108,6 @@ public class ProduceThroughput {
 			while ((line = reader.readLine()) != null) {
 				StringTokenizer tokenizer = new StringTokenizer(line);
 				for (int to=0; to<numServers; to++) {
-//					System.out.println(from + " " + to);
 					serverLevelMatrix[from][to] = Double.parseDouble(tokenizer.nextToken());
 				}
 				from++;

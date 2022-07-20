@@ -1,5 +1,8 @@
 package lpmaker.graphs;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+
 public class LeafSpine extends Graph {
 
 	int numLeafSwitches;
@@ -16,6 +19,7 @@ public class LeafSpine extends Graph {
 		name="leafspine";
 		checkLeafSpineValidity();
 		populateAdjacencyList();
+		writeAdjacencyList();
 	}
 
 	private void checkLeafSpineValidity() {
@@ -88,5 +92,33 @@ public class LeafSpine extends Graph {
 	public int generateRandomSwitch() { // have to be a leaf switch
 		rand.nextInt(); // for some reason, the first random number for any run is 62; thus discarding the first number
 		return rand.nextInt(numLeafSwitches)+numSpineSwitches;
+	}
+
+	public void writeAdjacencyList() {
+		String writefile = "intermediatefiles/adjacencylist.txt";
+		try {
+			BufferedWriter out = new BufferedWriter(new FileWriter(writefile));
+			for (int u = 0; u < noNodes; u++) {
+				int size = adjacencyList[u].size();
+				out.write(size + "\t");
+				for (int j = 0; j < size; j++) {
+					int v = adjacencyList[u].get(j).linkTo;
+					out.write(v + "\t");
+				}
+				out.write("\n");
+			}
+			out.close();
+		} catch (Exception e) {
+			System.err.println("LeafSpine writeAdjacencyList Error: " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
+
+	public int getNumLeafSwitches() {
+		return numLeafSwitches;
+	}
+
+	public int getNumSpineSwitches() {
+		return numSpineSwitches;
 	}
 }

@@ -450,8 +450,8 @@ public class ProduceLP {
 			int timeframeEnd = Integer.parseInt(args[31]);
 
 			System.out.println("number of switches: " + switches);
-			Graph mynet = new GraphFromFileSrcDstPair(switches, graphFile, switchports);
-			Graph lsnet = new LeafSpine(switches, switchports, numSpineSwitches,  3072); // Hard-coded for DRing, which only has 2988 servers
+			GraphFromFileSrcDstPair mynet = new GraphFromFileSrcDstPair(switches, graphFile, switchports);
+			LeafSpine lsnet = new LeafSpine(switches, switchports, numSpineSwitches,  3072); // Hard-coded for DRing, which only has 2988 servers
 
 			TrafficMatrix tm = new TrafficMatrix(switches, trafficMode, trafficFile, mynet, a, b, mynet.weightEachNode, timeframeStart, timeframeEnd, mynet, lsnet);
 			boolean shouldAvoidHotRacks = Boolean.parseBoolean(args[27]);
@@ -462,9 +462,12 @@ public class ProduceLP {
 			if (createLP == 1) {
 				boolean useOptimalRouting = Boolean.parseBoolean(args[22]);
 				if (useOptimalRouting) {
-					if (trafficMode == 1 || trafficMode == 5) {
-						System.out.println("PrintSimpleGraph");
-						mynet.PrintSimpleGraph("my." + runs + ".lp", tm.switchLevelMatrix);
+					if (trafficMode < 100) {
+						System.out.println("***Warning: trafficMode < 100, trafficMode=" + trafficMode);
+						if (trafficMode == 1 || trafficMode == 5) {
+							System.out.println("PrintSimpleGraph");
+							mynet.PrintSimpleGraph("my." + runs + ".lp", tm.switchLevelMatrix);
+						}
 					} else {
 						System.out.println("PrintGraphforMCFFairCondensed");
 						mynet.PrintGraphforMCFFairCondensed("my." + runs + ".lp",100, tm.switchLevelMatrix);
@@ -484,16 +487,23 @@ public class ProduceLP {
 
 					NetPath netpath = new NetPath(netpathFile, mynet.adjacencyList, mynet.noNodes, hotRacks, augmentMethod, pathweightFile);
 
-					if (trafficMode == 1 || trafficMode == 5) {
-						System.out.println("PrintSimpleGraph");
-						mynet.PrintSimpleGraph("my." + runs + ".lp", tm.switchLevelMatrix);
+					if (trafficMode < 100) {
+						System.out.println("***Warning: trafficMode < 100, trafficMode=" + trafficMode);
 					} else {
-//						System.out.println("PrintGraphforMCFFairCondensedForKnownRouting");
 						boolean useEqualShare = Boolean.parseBoolean(args[24]);
 						System.out.println("Should use equal share? " + useEqualShare);
+						if (useEqualShare) {
+							System.out.println("EvaluateEqualPath");
+							mynet.EvaluateEqualPath(tm.switchLevelMatrix, netpath.pathPool);
+						} else if (isPathWeighted) {
+							System.out.println("EvaluateWeightedPath");
+							mynet.EvaluateWeightedPath(tm.switchLevelMatrix, netpath.pathPool, pathweightFile);
+						} else {
+//						System.out.println("PrintGraphforMCFFairCondensedForKnownRouting");
 //						mynet.PrintGraphforMCFFairCondensedForKnownRouting("my." + runs + ".lp",100, tm.switchLevelMatrix, netpath.rackPool, netpath.pathPool, netpath.linksUsage, netpath.linkPool, useEqualShare, isPathWeighted, netpath.pathWeights);
-						System.out.println("PrintGraphforMCFFairCondensedForKnownRouting2");
-						mynet.PrintGraphforMCFFairCondensedForKnownRouting2("my." + runs + ".lp",100, tm.switchLevelMatrix, netpath.pathPool);
+							System.out.println("PrintGraphforMCFFairCondensedForKnownRouting2");
+							mynet.PrintGraphforMCFFairCondensedForKnownRouting2("my." + runs + ".lp", 100, tm.switchLevelMatrix, netpath.pathPool);
+						}
 					}
 				}
 			} else {
@@ -515,8 +525,8 @@ public class ProduceLP {
 			int timeframeEnd = Integer.parseInt(args[31]);
 
 			System.out.println("number of switches: " + switches);
-			Graph mynet = new LeafSpine(switches, switchports, numSpineSwitches, nsvrs);
-			Graph rrgnet = new GraphFromFileSrcDstPair(switches, graphFile, switchports);
+			LeafSpine mynet = new LeafSpine(switches, switchports, numSpineSwitches, nsvrs);
+			GraphFromFileSrcDstPair rrgnet = new GraphFromFileSrcDstPair(switches, graphFile, switchports);
 
 			TrafficMatrix tm = new TrafficMatrix(switches, trafficMode, trafficFile, mynet, a, b, mynet.weightEachNode, timeframeStart, timeframeEnd, rrgnet, mynet);
 			boolean shouldAvoidHotRacks = Boolean.parseBoolean(args[27]);
@@ -527,9 +537,12 @@ public class ProduceLP {
 			if (createLP == 1) {
 				boolean useOptimalRouting = Boolean.parseBoolean(args[22]);
 				if (useOptimalRouting) {
-					if (trafficMode == 1 || trafficMode == 5) {
-						System.out.println("PrintSimpleGraph");
-						mynet.PrintSimpleGraph("my." + runs + ".lp", tm.switchLevelMatrix);
+					if (trafficMode < 100) {
+						System.out.println("***Warning: trafficMode < 100, trafficMode=" + trafficMode);
+						if (trafficMode == 1 || trafficMode == 5) {
+							System.out.println("PrintSimpleGraph");
+							mynet.PrintSimpleGraph("my." + runs + ".lp", tm.switchLevelMatrix);
+						}
 					} else {
 						System.out.println("PrintGraphforMCFFairCondensed");
 						mynet.PrintGraphforMCFFairCondensed("my." + runs + ".lp",100, tm.switchLevelMatrix);
@@ -549,14 +562,23 @@ public class ProduceLP {
 
 					NetPath netpath = new NetPath(netpathFile, mynet.adjacencyList, mynet.noNodes, hotRacks, augmentMethod, pathweightFile);
 
-					if (trafficMode == 1 || trafficMode == 5) {
-						System.out.println("PrintSimpleGraph");
-						mynet.PrintSimpleGraph("my." + runs + ".lp", tm.switchLevelMatrix);
+					if (trafficMode < 100) {
+						System.out.println("***Warning: trafficMode < 100, trafficMode=" + trafficMode);
 					} else {
-						System.out.println("PrintGraphforMCFFairCondensedForKnownRouting");
 						boolean useEqualShare = Boolean.parseBoolean(args[24]);
 						System.out.println("Should use equal share? " + useEqualShare);
-						mynet.PrintGraphforMCFFairCondensedForKnownRouting("my." + runs + ".lp",100, tm.switchLevelMatrix, netpath.rackPool, netpath.pathPool, netpath.linksUsage, netpath.linkPool, useEqualShare, isPathWeighted, netpath.pathWeights);
+						if (useEqualShare) {
+							System.out.println("EvaluateEqualPath");
+							mynet.EvaluateEqualPath(tm.switchLevelMatrix, netpath.pathPool);
+						} else if (isPathWeighted) {
+							System.out.println("EvaluateWeightedPath");
+							mynet.EvaluateWeightedPath(tm.switchLevelMatrix, netpath.pathPool, pathweightFile);
+						} else {
+//						System.out.println("PrintGraphforMCFFairCondensedForKnownRouting");
+//						mynet.PrintGraphforMCFFairCondensedForKnownRouting("my." + runs + ".lp",100, tm.switchLevelMatrix, netpath.rackPool, netpath.pathPool, netpath.linksUsage, netpath.linkPool, useEqualShare, isPathWeighted, netpath.pathWeights);
+							System.out.println("PrintGraphforMCFFairCondensedForKnownRouting2");
+							mynet.PrintGraphforMCFFairCondensedForKnownRouting2("my." + runs + ".lp", 100, tm.switchLevelMatrix, netpath.pathPool);
+						}
 					}
 				}
 			} else {
@@ -565,6 +587,7 @@ public class ProduceLP {
 
 			mynet.printPathLengths("pl." + runs);
 		}
+		/*
 		else if (graphtype == 25){ // ServerGraphFromFileSrcDstPair
 			int numSpineSwitches = Integer.parseInt(args[32]);
 			String graphFile = args[2];
@@ -634,6 +657,7 @@ public class ProduceLP {
 
 			mynet.printPathLengths("pl." + runs);
 		}
+		 */
 		System.out.println("Done Constructing Graph");
 	}
    

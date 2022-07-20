@@ -481,11 +481,6 @@ public class Graph
 		throw new RuntimeException("getServersForSwitch should be overloaded in derived classes");
 	}
 
-	public int generateRandomSwitch()
-	{
-		throw new RuntimeException("generateRandomSwitch should be overloaded in derived classes");
-	}
-
 	//should be overloaded
 	public int getNoSwitches()
 	{
@@ -1085,13 +1080,13 @@ public class Graph
 			int commodityIndex = 0;
 			for (int f = 0; f < noNodes; f ++)
 				for (int t = 0; t < noNodes; t++)
-					if (switchLevelMatrix[f][t] != 0) commodityIndex ++;
+					if (f!=t && switchLevelMatrix[f][t]>0) commodityIndex ++;
 
 
 			int numFlows = 0;
 			for (int f = 0; f < noNodes; f++)
 				for (int t = 0; t < noNodes; t++)
-					if(switchLevelMatrix[f][t]>0)
+					if(f!=t && switchLevelMatrix[f][t]>0)
 						numFlows++;
 
 			String file_index = filename.substring(3); 
@@ -1105,7 +1100,7 @@ public class Graph
 
 			for (int f = 0; f < noNodes; f++)
 				for (int t = 0; t < noNodes; t++)
-					if(switchLevelMatrix[f][t]>0)
+					if(f!=t && switchLevelMatrix[f][t]>0)
 					{
 						allFlowIDs[curfID] = new FlowID(curfID, f, t);
 						output1.write(curfID + " " + f + " " + t + "\n");
@@ -1164,13 +1159,13 @@ public class Graph
 
 
 				//<Constraints of Type 0: fairness i.e. flow >= K
-				out.write("\n\nSUBJECT TO \n\\Type 0: Flow >= K\n");
+				out.write("\n\nSUBJECT TO \n\\Type 0: Flow >= K*TM\n");
 				System.out.println(new Date() + ": Starting part 0");
 				for (int f = 0; f < noNodes; f++)
 				{
 					for (int t = 0; t < noNodes; t++)
 					{
-						if(switchLevelMatrix[f][t]>0)	  //for each flow fid with source f
+						if(f!=t && switchLevelMatrix[f][t]>0)	  //for each flow fid with source f
 						{
 							constraint = "c0_" + fid + ": ";
 							//System.out.println("CHECK FLOW =========== " + fid + " " + f + " " + t);
@@ -1211,7 +1206,7 @@ public class Graph
 	                        String objective = "";
 	                        for (int f = 0; f < noNodes; f++) {
 	                                for (int t = 0; t < noNodes; t++) {
-	                                        if(switchLevelMatrix[f][t]>0)   { //for each flow fid with source f
+	                                        if(f!=t && switchLevelMatrix[f][t]>0)   { //for each flow fid with source f
 	                                                for(int j=0; j<adjacencyList[f].size(); j++) { //for each out link of f = (f,j)
 	                                                        objective += "f_" + fid + "_" + f + "_" + adjacencyList[f].elementAt(j).intValue() + " ";
 	                                                        if(j!=adjacencyList[f].size()-1)
@@ -1274,7 +1269,7 @@ public class Graph
 			fid = 0;
 			for (int f = 0; f < noNodes; f++) {
 				for (int t = 0; t < noNodes; t++) {
-					if (switchLevelMatrix[f][t] > 0)       //for each flow fid
+					if (f!=t && switchLevelMatrix[f][t] > 0)       //for each flow fid
 					{
 						for (int u = 0; u < noNodes; u++)   //for each node u
 						{
@@ -1352,7 +1347,7 @@ public class Graph
 			fid = 0;
 			for (int f = 0; f < noNodes; f++) {
 				for (int t = 0; t < noNodes; t++) {
-					if (switchLevelMatrix[f][t] > 0) // for each flow fid from f to t
+					if (f!=t && switchLevelMatrix[f][t] > 0) // for each flow fid from f to t
 					{
 						for (int u = 0; u < noNodes; u++) // for each node u
 						{
@@ -1365,14 +1360,14 @@ public class Graph
 								}
 							}
 
-							for (int j = 0; j < adjacencyList[u].size(); j++) // for each in link of u = (j,u)
-							{
-								if (!isFlowZero(allFlowIDs[fid], adjacencyList[u].elementAt(j).intValue(), u)) {
-									constraint = "c3_" + fid + "_" + adjacencyList[u].elementAt(j).intValue() + "_" + u + ": ";
-									constraint += "f_" + fid + "_" + adjacencyList[u].elementAt(j).intValue() + "_" + u;
-									out.write(constraint + " >= 0\n");
-								}
-							}
+//							for (int j = 0; j < adjacencyList[u].size(); j++) // for each in link of u = (j,u)
+//							{
+//								if (!isFlowZero(allFlowIDs[fid], adjacencyList[u].elementAt(j).intValue(), u)) {
+//									constraint = "c3_" + fid + "_" + adjacencyList[u].elementAt(j).intValue() + "_" + u + ": ";
+//									constraint += "f_" + fid + "_" + adjacencyList[u].elementAt(j).intValue() + "_" + u;
+//									out.write(constraint + " >= 0\n");
+//								}
+//							}
 						}
 						fid++;
 					}
@@ -1837,13 +1832,13 @@ public class Graph
 			int commodityIndex = 0;
 			for (int f = 0; f < noNodes; f ++)
 				for (int t = 0; t < noNodes; t++)
-					if (switchLevelMatrix[f][t] != 0) commodityIndex ++;
+					if (f!=t && switchLevelMatrix[f][t]>0) commodityIndex ++;
 
 
 			int numFlows = 0;
 			for (int f = 0; f < noNodes; f++)
 				for (int t = 0; t < noNodes; t++)
-					if(switchLevelMatrix[f][t]>0)
+					if(f!=t && switchLevelMatrix[f][t]>0)
 						numFlows++;
 
 			String file_index = filename.substring(3);
@@ -1857,7 +1852,7 @@ public class Graph
 
 			for (int f = 0; f < noNodes; f++)
 				for (int t = 0; t < noNodes; t++)
-					if(switchLevelMatrix[f][t]>0)
+					if(f!=t && switchLevelMatrix[f][t]>0)
 					{
 						allFlowIDs[curfID] = new FlowID(curfID, f, t);
 						output1.write(curfID + " " + f + " " + t + "\n");
@@ -1922,7 +1917,7 @@ public class Graph
 				{
 					for (int t = 0; t < noNodes; t++)
 					{
-						if(switchLevelMatrix[f][t]>0)	  //for each flow fid with source f
+						if(f!=t && switchLevelMatrix[f][t]>0)	  //for each flow fid with source f
 						{
 							constraint = "c0_" + fid + ": ";
 							//System.out.println("CHECK FLOW =========== " + fid + " " + f + " " + t);
@@ -1963,7 +1958,7 @@ public class Graph
 				String objective = "";
 				for (int f = 0; f < noNodes; f++) {
 					for (int t = 0; t < noNodes; t++) {
-						if(switchLevelMatrix[f][t]>0)   { //for each flow fid with source f
+						if(f!=t && switchLevelMatrix[f][t]>0)   { //for each flow fid with source f
 							for(int j=0; j<adjacencyList[f].size(); j++) { //for each out link of f = (f,j)
 								objective += "f_" + fid + "_" + f + "_" + adjacencyList[f].elementAt(j).intValue() + " ";
 								if(j!=adjacencyList[f].size()-1)
@@ -2026,7 +2021,7 @@ public class Graph
 			fid = 0;
 			for (int f = 0; f < noNodes; f++) {
 				for (int t = 0; t < noNodes; t++) {
-					if (switchLevelMatrix[f][t] > 0)       //for each flow fid
+					if (f!=t && switchLevelMatrix[f][t] > 0)       //for each flow fid
 					{
 						for (int u = 0; u < noNodes; u++)   //for each node u
 						{
@@ -2104,7 +2099,7 @@ public class Graph
 			fid = 0;
 			for (int f = 0; f < noNodes; f++) {
 				for (int t = 0; t < noNodes; t++) {
-					if (switchLevelMatrix[f][t] > 0) // for each flow fid from f to t
+					if (f!=t && switchLevelMatrix[f][t] > 0) // for each flow fid from f to t
 					{
 						for (int u = 0; u < noNodes; u++) // for each node u
 						{
@@ -2117,14 +2112,14 @@ public class Graph
 								}
 							}
 
-							for (int j = 0; j < adjacencyList[u].size(); j++) // for each in link of u = (j,u)
-							{
-								if (!isFlowZeroForKnownRouting2(allFlowIDs[fid], adjacencyList[u].elementAt(j).intValue(), u,pathPool)) {
-									constraint = "c3_" + fid + "_" + adjacencyList[u].elementAt(j).intValue() + "_" + u + ": ";
-									constraint += "f_" + fid + "_" + adjacencyList[u].elementAt(j).intValue() + "_" + u;
-									out.write(constraint + " >= 0\n");
-								}
-							}
+//							for (int j = 0; j < adjacencyList[u].size(); j++) // for each in link of u = (j,u)
+//							{
+//								if (!isFlowZeroForKnownRouting2(allFlowIDs[fid], adjacencyList[u].elementAt(j).intValue(), u,pathPool)) {
+//									constraint = "c3_" + fid + "_" + adjacencyList[u].elementAt(j).intValue() + "_" + u + ": ";
+//									constraint += "f_" + fid + "_" + adjacencyList[u].elementAt(j).intValue() + "_" + u;
+//									out.write(constraint + " >= 0\n");
+//								}
+//							}
 						}
 						fid++;
 					}
@@ -2141,7 +2136,7 @@ public class Graph
 			{
 				for (int t = 0; t < noNodes; t++)
 				{
-					if (switchLevelMatrix[f][t] > 0) // for each flow fid from f to t
+					if (f!=t && switchLevelMatrix[f][t] > 0) // for each flow fid from f to t
 					{
 						for (Path thisPath : pathPool[f][t]) {
 							int pid = thisPath.pid;
@@ -2171,7 +2166,7 @@ public class Graph
 			{
 				for (int t = 0; t < noNodes; t++)
 				{
-					if (switchLevelMatrix[f][t] > 0) // for each flow fid from f to t
+					if (f!=t && switchLevelMatrix[f][t] > 0) // for each flow fid from f to t
 					{
 						ArrayList<Integer>[][] pids = new ArrayList[noNodes][noNodes];
 						for (int i=0; i<noNodes; i++) {
@@ -3156,4 +3151,127 @@ public class Graph
             e.printStackTrace();
         }
     }
+
+	public void EvaluateEqualPath(double[][] switchLevelMatrix, ArrayList<Path>[][] pathPool) {
+		double maxFlow = 100;
+
+		double[][] capacity = new double[noNodes][noNodes];
+		double[][] traffic = new double[noNodes][noNodes];
+
+		for (int u=0; u<noNodes; u++) {
+			for (int j=0; j<adjacencyList[u].size(); j++) {
+				int v = adjacencyList[u].get(j).linkTo;
+				capacity[u][v] += adjacencyList[u].get(j).linkcapacity;
+			}
+		}
+
+		for (int f=0; f<noNodes; f++) {
+			for (int t=0; t<noNodes; t++) {
+				traffic[f][t] = maxFlow;
+				if (f!=t && switchLevelMatrix[f][t]>0) {
+					double trafficThisFlow = switchLevelMatrix[f][t];
+					ArrayList<Path> paths = pathPool[f][t];
+					int numPathsThisFlow = paths.size();
+					double trafficPerPathThisFlow = trafficThisFlow/numPathsThisFlow;
+					for (Path p : paths) {
+						for (NPLink link : p.path) {
+							traffic[link.from][link.to] += trafficPerPathThisFlow;
+						}
+					}
+				}
+			}
+		}
+
+		double networkthroughput = maxFlow;
+		for (int i=0; i<noNodes; i++) {
+			for (int j=0; j<noNodes; j++) {
+				if (traffic[i][j] < maxFlow) {
+					networkthroughput = Math.min(networkthroughput, capacity[i][j] / traffic[i][j]);
+				}
+			}
+		}
+
+		try {
+			BufferedWriter out = new BufferedWriter(new FileWriter("intermediatefiles/networkthroughput"));
+			out.write(networkthroughput + "\n");
+			out.close();
+		} catch (Exception e) {
+			System.err.println("Graph EvaluateEqualPath Error: " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
+
+	public void EvaluateWeightedPath(double[][] switchLevelMatrix, ArrayList<Path>[][] pathPool, String pathweightfile) {
+		double maxFlow = 100;
+
+		double[][] capacity = new double[noNodes][noNodes];
+		HashMap<Integer,Double>[][] weights = new HashMap[noNodes][noNodes];
+		double[][] traffic = new double[noNodes][noNodes];
+
+		for (int u=0; u<noNodes; u++) {
+			for (int j=0; j<adjacencyList[u].size(); j++) {
+				int v = adjacencyList[u].get(j).linkTo;
+				capacity[u][v] += adjacencyList[u].get(j).linkcapacity;
+			}
+		}
+
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(pathweightfile));
+			String strLine = "";
+			while ((strLine = br.readLine()) != null){
+				StringTokenizer strTok = new StringTokenizer(strLine);
+				int flowSrc = Integer.parseInt(strTok.nextToken());
+				int flowDst = Integer.parseInt(strTok.nextToken());
+				int fid = Integer.parseInt(strTok.nextToken());
+				int firstHopSrc = Integer.parseInt(strTok.nextToken());
+				int firstHopDst = Integer.parseInt(strTok.nextToken());
+				int pid = Integer.parseInt(strTok.nextToken());
+				double weight = Double.parseDouble(strTok.nextToken());
+
+				weights[flowSrc][flowDst].put(pid, weight);
+			}
+			br.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		for (int f=0; f<noNodes; f++) {
+			for (int t=0; t<noNodes; t++) {
+				traffic[f][t] = maxFlow;
+				if (f!=t && switchLevelMatrix[f][t]>0) {
+					double trafficThisFlow = switchLevelMatrix[f][t];
+					ArrayList<Path> paths = pathPool[f][t];
+					HashMap<Integer,Double> pathweight = weights[f][t];
+					for (int pid=0; pid<paths.size(); pid++) {
+						if (pathweight.containsKey(pid)) {
+							double weight = pathweight.get(pid);
+							double trafficThisPath = trafficThisFlow*weight;
+							Path path = paths.get(pid);
+							for (NPLink link : path.path) {
+								traffic[link.from][link.to] += trafficThisPath;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		double networkthroughput = maxFlow;
+		for (int i=0; i<noNodes; i++) {
+			for (int j=0; j<noNodes; j++) {
+				if (traffic[i][j] < maxFlow) {
+					networkthroughput = Math.min(networkthroughput, capacity[i][j] / traffic[i][j]);
+				}
+			}
+		}
+
+		try {
+			BufferedWriter out = new BufferedWriter(new FileWriter("intermediatefiles/networkthroughput"));
+			out.write(networkthroughput + "\n");
+			out.close();
+		} catch (Exception e) {
+			System.err.println("Graph EvaluateEqualPath Error: " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
 }
