@@ -450,8 +450,8 @@ public class ProduceLP {
 			int timeframeEnd = Integer.parseInt(args[31]);
 
 			System.out.println("number of switches: " + switches);
-			GraphFromFileSrcDstPair mynet = new GraphFromFileSrcDstPair(switches, graphFile, switchports);
-			LeafSpine lsnet = new LeafSpine(switches, switchports, numSpineSwitches,  3072); // Hard-coded for DRing, which only has 2988 servers
+			GraphFromFileSrcDstPair mynet = new GraphFromFileSrcDstPair(switches, graphFile, switchports, true);
+			LeafSpine lsnet = new LeafSpine(switches, switchports, numSpineSwitches,  3072, false); // Hard-coded for DRing, which only has 2988 servers
 
 			TrafficMatrix tm = new TrafficMatrix(switches, trafficMode, trafficFile, mynet, a, b, mynet.weightEachNode, timeframeStart, timeframeEnd, mynet, lsnet);
 			boolean shouldAvoidHotRacks = Boolean.parseBoolean(args[27]);
@@ -525,8 +525,8 @@ public class ProduceLP {
 			int timeframeEnd = Integer.parseInt(args[31]);
 
 			System.out.println("number of switches: " + switches);
-			LeafSpine mynet = new LeafSpine(switches, switchports, numSpineSwitches, nsvrs);
-			GraphFromFileSrcDstPair rrgnet = new GraphFromFileSrcDstPair(switches, graphFile, switchports);
+			LeafSpine mynet = new LeafSpine(switches, switchports, numSpineSwitches, nsvrs, true);
+			GraphFromFileSrcDstPair rrgnet = new GraphFromFileSrcDstPair(switches, graphFile, switchports, false);
 
 			TrafficMatrix tm = new TrafficMatrix(switches, trafficMode, trafficFile, mynet, a, b, mynet.weightEachNode, timeframeStart, timeframeEnd, rrgnet, mynet);
 			boolean shouldAvoidHotRacks = Boolean.parseBoolean(args[27]);

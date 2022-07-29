@@ -62,12 +62,11 @@ public class ProduceThroughput {
 		double maxFlow = 100;
 
 		// Parse arguments
-		int graphindex = Integer.parseInt(args[0]);
-		int numLeafSwitches = Integer.parseInt(args[1]);
-		int numSpineSwitches = Integer.parseInt(args[2]);
-		int numServers = Integer.parseInt(args[3]);
-		int numPorts = Integer.parseInt(args[4]);
-		String tag = args[5];
+		int numLeafSwitches = Integer.parseInt(args[0]);
+		int numSpineSwitches = Integer.parseInt(args[1]);
+		int numServers = Integer.parseInt(args[2]);
+		int numPorts = Integer.parseInt(args[3]);
+		String tag = args[4];
 
 		int numSwitches = numLeafSwitches + numSpineSwitches;
 		int numNodes = numServers + numSwitches;

@@ -9,7 +9,7 @@ public class LeafSpine extends Graph {
 	int numSpineSwitches;
 	int numServers;
 
-	public LeafSpine(int _numSwitches, int _numPorts, int _numSpineSwitches, int _numServers){
+	public LeafSpine(int _numSwitches, int _numPorts, int _numSpineSwitches, int _numServers, boolean shouldWriteAdjacencyList){
 		super(_numSwitches);
 		numPorts = _numPorts;
 		noNodes = _numSwitches;
@@ -19,7 +19,7 @@ public class LeafSpine extends Graph {
 		name="leafspine";
 		checkLeafSpineValidity();
 		populateAdjacencyList();
-		writeAdjacencyList();
+		if (shouldWriteAdjacencyList) writeAdjacencyList();
 	}
 
 	private void checkLeafSpineValidity() {
@@ -40,18 +40,18 @@ public class LeafSpine extends Graph {
 	}
 
 	private void populateAdjacencyList(){
-		for (int spinesw=0; spinesw<numSpineSwitches; spinesw++) {
-			for (int leafsw=numSpineSwitches; leafsw<noNodes; leafsw++) {
+		for (int leafsw=0; leafsw<numLeafSwitches; leafsw++) {
+			for (int spinesw=numLeafSwitches; spinesw<noNodes; spinesw++) {
 				if (!isNeighbor(spinesw,leafsw)) addBidirNeighbor(spinesw,leafsw);
 			}
 		}
 
 		setUpFixWeight(0);
-		for (int spinesw=0; spinesw<numSpineSwitches; spinesw++) {
-			weightEachNode[spinesw] = 0;
-		}
-		for (int leafsw=numSpineSwitches; leafsw<noNodes; leafsw++) {
+		for (int leafsw=0; leafsw<numLeafSwitches; leafsw++) {
 			weightEachNode[leafsw] = numPorts - numSpineSwitches;
+		}
+		for (int spinesw=numLeafSwitches; spinesw<noNodes; spinesw++) {
+			weightEachNode[spinesw] = 0;
 		}
 
 		totalWeight = numServers;
@@ -91,7 +91,7 @@ public class LeafSpine extends Graph {
 
 	public int generateRandomSwitch() { // have to be a leaf switch
 		rand.nextInt(); // for some reason, the first random number for any run is 62; thus discarding the first number
-		return rand.nextInt(numLeafSwitches)+numSpineSwitches;
+		return rand.nextInt(numLeafSwitches);
 	}
 
 	public void writeAdjacencyList() {

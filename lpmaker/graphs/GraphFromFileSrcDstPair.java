@@ -10,12 +10,12 @@ import java.util.regex.Pattern;
 
 public class GraphFromFileSrcDstPair extends Graph {
 
-	public GraphFromFileSrcDstPair(int size, String fileName, int totalPorts){
+	public GraphFromFileSrcDstPair(int size, String fileName, int totalPorts, boolean shouldWriteAdjacencyList){
 		super(size); // size: numSwitches
 		numPorts = totalPorts;
 		populateAdjacencyList(fileName);
 		name="fromfile";
-		writeAdjacencyList();
+		if (shouldWriteAdjacencyList) writeAdjacencyList();
 	}
 
 	/*

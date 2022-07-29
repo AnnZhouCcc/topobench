@@ -3167,7 +3167,6 @@ public class Graph
 
 		for (int f=0; f<noNodes; f++) {
 			for (int t=0; t<noNodes; t++) {
-				traffic[f][t] = maxFlow;
 				if (f!=t && switchLevelMatrix[f][t]>0) {
 					double trafficThisFlow = switchLevelMatrix[f][t];
 					ArrayList<Path> paths = pathPool[f][t];
@@ -3183,11 +3182,10 @@ public class Graph
 		}
 
 		double networkthroughput = maxFlow;
-		for (int i=0; i<noNodes; i++) {
-			for (int j=0; j<noNodes; j++) {
-				if (traffic[i][j] < maxFlow) {
-					networkthroughput = Math.min(networkthroughput, capacity[i][j] / traffic[i][j]);
-				}
+		for (int u=0; u<noNodes; u++) {
+			for (int j=0; j<adjacencyList[u].size(); j++) {
+				int v = adjacencyList[u].get(j).linkTo;
+				networkthroughput = Math.min(networkthroughput, capacity[u][v] / traffic[u][v]);
 			}
 		}
 
@@ -3222,10 +3220,9 @@ public class Graph
 				StringTokenizer strTok = new StringTokenizer(strLine);
 				int flowSrc = Integer.parseInt(strTok.nextToken());
 				int flowDst = Integer.parseInt(strTok.nextToken());
-				int fid = Integer.parseInt(strTok.nextToken());
+				int pid = Integer.parseInt(strTok.nextToken());
 				int firstHopSrc = Integer.parseInt(strTok.nextToken());
 				int firstHopDst = Integer.parseInt(strTok.nextToken());
-				int pid = Integer.parseInt(strTok.nextToken());
 				double weight = Double.parseDouble(strTok.nextToken());
 
 				weights[flowSrc][flowDst].put(pid, weight);

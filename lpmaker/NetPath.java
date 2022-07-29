@@ -57,13 +57,13 @@ public class NetPath {
         populateLinkPool();
         initializePathPool();
         populatePathPool();
-        if (augmentMethod >= 0) augmentPathPool(augmentMethod);
-        initializeRackPool();
-        populateRackPool();
-        initializeLinksUsage();
-        populateLinksUsage();
-        initializePathWeights();
-        if (pathweightFileName != null) populatePathWeights();
+//        if (augmentMethod >= 0) augmentPathPool(augmentMethod);
+//        initializeRackPool();
+//        populateRackPool();
+//        initializeLinksUsage();
+//        populateLinksUsage();
+//        initializePathWeights();
+//        if (pathweightFileName != null) populatePathWeights();
     }
 
     public void populateLinkPool() {
