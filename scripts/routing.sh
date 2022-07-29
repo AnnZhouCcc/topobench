@@ -16,7 +16,6 @@ numleafsw=`expr $switches - $numspinesw`
 
 topology=rrg #dring leafspine
 graphtype=23 #24
-graphindex=1
 graphfile=graphfiles/rrg_instance1_80_64.edgelist #graphfiles/dring_instance1_80_64.edgelist graphfiles/test_instance1_80_64.edgelist
 
 method=2
@@ -81,7 +80,7 @@ do
   fi
 
   cd $MYJAVAPATH
-  java lpmaker/ProduceThroughput $graphindex $numleafsw $numspinesw $numsvr $port _"$topology"_"$routing"_"$traffic"
+  java lpmaker/ProduceThroughput $numleafsw $numspinesw $numsvr $port _"$topology"_"$routing"_"$traffic"
   cd -
 done
 

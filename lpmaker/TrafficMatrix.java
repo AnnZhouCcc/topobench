@@ -1154,11 +1154,7 @@ public class TrafficMatrix {
             for (int ii = numSwitches - 1; ii >= 0; ii--) {
                 out.write(ii + "\t");
                 for (int jj = 0; jj < numSwitches; jj++) {
-                    if (ii == jj) {
-                        out.write(0 + "\t");
-                    } else {
-                        out.write(switchLevelMatrix[ii][jj] + "\t");
-                    }
+                    out.write(switchLevelMatrix[ii][jj] + "\t");
                 }
                 out.write("\n");
             }
@@ -1213,7 +1209,6 @@ public class TrafficMatrix {
         }
 
 //        printSwitchLevelMatrix("resultfiles/a2a_tm.txt");
-//        System.exit(0);
 
         System.out.println("Total traffic = " + totalTraffic);
     }
@@ -1635,6 +1630,7 @@ public class TrafficMatrix {
         }
         System.out.println("Total traffic = " + totalTraffic);
 
+//        printSwitchLevelMatrix("resultfiles/switchleveltraffic_a2a.txt");
         writeServerLevelMatrix();
     }
 
