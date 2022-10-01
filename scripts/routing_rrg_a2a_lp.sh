@@ -19,7 +19,9 @@ graphtype=23
 graphfile=graphfiles/rrg_instance1_80_64.edgelist
 
 method=2
-declare -a rs=("opt" "ecmp" "su2" "su3" "32disjoint" "32short")
+#declare -a rs=("opt" "ecmp" "su2" "su3" "32disjoint" "32short")
+#declare -a rs=("racke0" "racke1" "racke2")
+declare -a rs=("ecmp")
 
 trafficmode=200
 traffic=a2a
@@ -42,9 +44,9 @@ do
 
 suffix="$topology"_"$routing"_"$trafficmode"_"$isEqualShare"_"$shouldAvoidHotRacks"_"$isPathWeighted"_"$tag"
 netpathfile=netpathfiles/netpath_"$routing"_"$topology".txt
-if [ "$routing" = "racke" ] || [ "$routing" = "wracke" ]
+if [ "$routing" = "racke0" ] || [ "$routing" = "racke1" ] || [ "$routing" = "racke2" ]
 then
-  netpathfile=../WTHelpers/yatesfiles/netpathfiles/racke.txt
+  netpathfile=../WTHelpers/yatesfiles/netpath_"$routing"_"$topology".txt
 fi
 if [ "$routing" = "opt" ]
 then

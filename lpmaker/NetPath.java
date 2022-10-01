@@ -25,7 +25,7 @@ public class NetPath {
     int numSwitches;
     int augmentMethod;
 
-    ArrayList<Path>[][] pathPool;
+    public ArrayList<Path>[][] pathPool;
     HashMap<Integer, Double>[][] pathWeights;
     NPLink[][] linkPool;
     ArrayList<Rack> rackPool;

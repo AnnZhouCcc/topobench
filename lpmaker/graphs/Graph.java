@@ -991,7 +991,7 @@ public class Graph
 		}
 	}
 
-	private class FlowID
+	public class FlowID
 	{
 		public int flowID;
 		public int srcSwitch;
@@ -3213,6 +3213,12 @@ public class Graph
 			}
 		}
 
+		for (int f=0; f<noNodes; f++) {
+			for (int t=0; t<noNodes; t++) {
+				weights[f][t] = new HashMap<>();
+			}
+		}
+
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(pathweightfile));
 			String strLine = "";
@@ -3234,7 +3240,6 @@ public class Graph
 
 		for (int f=0; f<noNodes; f++) {
 			for (int t=0; t<noNodes; t++) {
-				traffic[f][t] = maxFlow;
 				if (f!=t && switchLevelMatrix[f][t]>0) {
 					double trafficThisFlow = switchLevelMatrix[f][t];
 					ArrayList<Path> paths = pathPool[f][t];
@@ -3247,6 +3252,12 @@ public class Graph
 							for (NPLink link : path.path) {
 								traffic[link.from][link.to] += trafficThisPath;
 							}
+						} else {
+							// pathweight == 0
+							Path path = paths.get(pid);
+							for (NPLink link : path.path) {
+								traffic[link.from][link.to] += 0;
+							}
 						}
 					}
 				}
@@ -3254,11 +3265,10 @@ public class Graph
 		}
 
 		double networkthroughput = maxFlow;
-		for (int i=0; i<noNodes; i++) {
-			for (int j=0; j<noNodes; j++) {
-				if (traffic[i][j] < maxFlow) {
-					networkthroughput = Math.min(networkthroughput, capacity[i][j] / traffic[i][j]);
-				}
+		for (int u=0; u<noNodes; u++) {
+			for (int j=0; j<adjacencyList[u].size(); j++) {
+				int v = adjacencyList[u].get(j).linkTo;
+				networkthroughput = Math.min(networkthroughput, capacity[u][v] / traffic[u][v]);
 			}
 		}
 

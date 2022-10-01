@@ -21,7 +21,7 @@ class TrafficPair {
 }
 
 public class TrafficMatrix {
-    double[][] switchLevelMatrix;
+    public double[][] switchLevelMatrix;
     public double[][] serverLevelMatrix;
     public double[][] serverTrafficMatrix;
     double trafficPerFlow = 1;
@@ -1808,6 +1808,60 @@ public class TrafficMatrix {
         writeServerLevelMatrix();
     }
 
+    public void generateSwitchServerTrafficClusterXInterval(String cluster) {
+        System.out.println("Generate switch & server traffic cluster " + cluster + ".");
+        double totalTraffic = 0;
+        double scaledown = 1000;
+        int solve_starttime = timeframeStart;
+        int solve_endtime = timeframeEnd;
+
+        String file_prefix = "../DRing/src/emp/datacentre/trafficfiles/cluster_" + cluster + "/traffic/traffic_64racks";
+        String[] file_suffix = {};
+        if (cluster.equals("a")) {
+            file_suffix = new String[]{"_0_273"};
+        } else if (cluster.equals("b")) {
+            file_suffix = new String[]{"_0_500","_500_1000","_1000_1500","_1500_2000","_2000_2500","_2500_2900"};
+        } else if (cluster.equals("c")) {
+            file_suffix = new String[]{"_0_273"};
+        } else {
+            System.out.println("***Error: unknown cluster, cluster " + cluster);
+        }
+
+        try {
+            BufferedReader br;
+            String strLine = "";
+            for (int i=0; i<file_suffix.length; i++) {
+                String trafficfile = file_prefix + file_suffix[i];
+                br = new BufferedReader(new FileReader(trafficfile));
+                while ((strLine = br.readLine()) != null){
+                    StringTokenizer strTok = new StringTokenizer(strLine);
+                    int timestamp = Integer.parseInt(strTok.nextToken());
+                    double traffic = Double.parseDouble(strTok.nextToken());
+                    traffic /= scaledown;
+                    int srcsvr = Integer.parseInt(strTok.nextToken());
+                    int dstsvr = Integer.parseInt(strTok.nextToken());
+                    if (srcsvr>=topology.totalWeight) continue;
+                    if (dstsvr>=topology.totalWeight) continue;
+                    int srcsw = topology.svrToSwitch(srcsvr);
+                    int dstsw = topology.svrToSwitch(dstsvr);
+
+                    if (timestamp >= solve_endtime) break;
+                    if (timestamp >= solve_starttime && timestamp < solve_endtime) {
+                        serverLevelMatrix[srcsvr][dstsvr] += traffic;
+                        switchLevelMatrix[srcsw][dstsw] += traffic;
+                        totalTraffic += traffic;
+                    }
+                }
+                br.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println("Total traffic = " + totalTraffic);
+
+        writeServerLevelMatrix();
+    }
+
     public void generateSwitchServerTrafficMix(int n, int t, LeafSpine lsnet) {
         System.out.println("Generate switch & server traffic mix, n="+n+", t="+t);
         double unitTraffic = 1;
@@ -2025,6 +2079,9 @@ public class TrafficMatrix {
         }
         else if (trafficmode == 207) {
             generateSwitchServerTrafficMix(a,b,lsnet);
+        }
+        else if (trafficmode == 208) {
+            generateSwitchServerTrafficClusterXInterval(trafficfile);
         }
         else {
             System.out.println("Trafficmode is not recognized.");
