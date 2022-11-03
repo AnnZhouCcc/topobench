@@ -1631,7 +1631,7 @@ public class TrafficMatrix {
         System.out.println("Total traffic = " + totalTraffic);
 
 //        printSwitchLevelMatrix("resultfiles/switchleveltraffic_a2a.txt");
-        writeServerLevelMatrix();
+//        writeServerLevelMatrix();
     }
 
     public void generateSwitchServerTrafficRackPermutation(LeafSpine lsnet) {
