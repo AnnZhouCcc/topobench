@@ -143,6 +143,10 @@ public class NetPath {
                                 path.addLink(link);
                             } else {
                                 System.out.println("Pattern is not matched.");
+                                System.out.println(strLine);
+                                System.out.println(strTok);
+                                System.out.println(token);
+                                System.out.println("srcsw="+srcSw+", dstsw="+dstSw);
                                 System.out.println("The input format needs to be: [source switch]->[destination switch]");
                             }
 
