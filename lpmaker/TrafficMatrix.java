@@ -1634,6 +1634,76 @@ public class TrafficMatrix {
 //        writeServerLevelMatrix();
     }
 
+    public void generateSwitchServerTrafficARackToBRackFromFile(int a, int b, String trafficfile, LeafSpine lsnet) {
+        int configfilenumber = Integer.parseInt(trafficfile);
+        String s2strafficfile = "trafficfiles/s2s_"+a+"_"+b+"_0_"+configfilenumber;
+        System.out.println("Generate switch & server traffic a rack to b rack from file: a=" + a + ", b=" + b + ", file="+s2strafficfile);
+        double unitTraffic = 1;
+        double totalTraffic = 0;
+
+        ArrayList<Integer> srcswslist = new ArrayList<>();
+        ArrayList<Integer> dstswslist = new ArrayList<>();
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(s2strafficfile));
+            String strLine = "";
+            int linenumber = 0;
+            while ((strLine = br.readLine()) != null) {
+                StringTokenizer strTok = new StringTokenizer(strLine);
+                String token = strTok.nextToken();
+                String[] subtokens = token.split(" ");
+                switch (linenumber) {
+                    case 0:
+                        for (String st : subtokens) {
+                            srcswslist.add(Integer.parseInt(st));
+                        }
+                        break;
+                    case 1:
+                        for (String st : subtokens) {
+                            dstswslist.add(Integer.parseInt(st));
+                        }
+                        break;
+                    default:
+                        System.err.println("File "+s2strafficfile+" has more than two lines.");
+                        break;
+                }
+                linenumber++;
+            }
+            br.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (srcswslist.size() != a) System.err.println("File " + s2strafficfile + " has " + srcswslist.size() + " sending racks; a=" + a);
+        if (dstswslist.size() != b) System.err.println("File " + s2strafficfile + " has " + dstswslist.size() + " receiving racks; b=" + b);
+
+        System.out.println(srcswslist);
+        System.out.println(dstswslist);
+
+        for (int srcsw : srcswslist) {
+            int[] srcsvrs = lsnet.getServersForSwitch(srcsw);
+            for (int dstsw : dstswslist) {
+                int[] dstsvrs = lsnet.getServersForSwitch(dstsw);
+
+                for (int srcsvr : srcsvrs) {
+                    if (srcsvr >= topology.totalWeight) continue;
+                    for (int dstsvr : dstsvrs) {
+                        if (dstsvr >= topology.totalWeight) continue;
+
+                        int mysrcsw = topology.svrToSwitch(srcsvr);
+                        int mydstsw = topology.svrToSwitch(dstsvr);
+
+                        serverLevelMatrix[srcsvr][dstsvr] += unitTraffic;
+                        switchLevelMatrix[mysrcsw][mydstsw] += unitTraffic;
+                        totalTraffic += unitTraffic;
+                    }
+                }
+            }
+        }
+        System.out.println("Total traffic = " + totalTraffic);
+
+//        writeServerLevelMatrix();
+    }
+
     public void generateSwitchServerTrafficRackPermutation(LeafSpine lsnet) {
         System.out.println("Generate switch & server traffic rack permutation.");
         double unitTraffic = 1;
@@ -2009,6 +2079,9 @@ public class TrafficMatrix {
         }
         else if (trafficmode == 200) {
             generateSwitchServerTrafficAllServerToAllServer();
+        }
+        else if (trafficmode == 201) {
+            generateSwitchServerTrafficARackToBRackFromFile(a,b,trafficfile,lsnet);
         }
         else if (trafficmode == 202) {
             generateSwitchServerTrafficRackPermutation(lsnet);
