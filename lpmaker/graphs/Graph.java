@@ -1841,14 +1841,14 @@ public class Graph
 					if(f!=t && switchLevelMatrix[f][t]>0)
 						numFlows++;
 
-			String file_index = filename.substring(3);
-			file_index = file_index.substring(0, file_index.length() - 4);
+			String[] tokens = filename.split("\\/|\\.");
+			String file_index = tokens[1];
 
 			System.out.println(file_index + " ***************************** ");
 
 			FlowID[] allFlowIDs = new FlowID[numFlows];
 			int curfID=0;
-			Writer output1 = new BufferedWriter(new FileWriter("flowIDmap" + file_index));
+			Writer output1 = new BufferedWriter(new FileWriter("flowIDmap_" + file_index));
 
 			for (int f = 0; f < noNodes; f++)
 				for (int t = 0; t < noNodes; t++)

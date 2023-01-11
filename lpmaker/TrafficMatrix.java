@@ -1636,7 +1636,7 @@ public class TrafficMatrix {
 
     public void generateSwitchServerTrafficARackToBRackFromFile(int a, int b, String trafficfile, LeafSpine lsnet) {
         int configfilenumber = Integer.parseInt(trafficfile);
-        String s2strafficfile = "trafficfiles/s2s_"+a+"_"+b+"_0_"+configfilenumber;
+        String s2strafficfile = "/Users/annzhou/research/uiuc/WeightTuning/trafficfiles/s2s_"+a+"_"+b+"_0_"+configfilenumber;
         System.out.println("Generate switch & server traffic a rack to b rack from file: a=" + a + ", b=" + b + ", file="+s2strafficfile);
         double unitTraffic = 1;
         double totalTraffic = 0;
