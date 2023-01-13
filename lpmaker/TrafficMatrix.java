@@ -1702,7 +1702,7 @@ public class TrafficMatrix {
         System.out.println("Total traffic = " + totalTraffic);
 
 //        writeServerLevelMatrix();
-        writeSwitchLevelMatrix();
+//        writeSwitchLevelMatrix();
     }
 
     public void generateSwitchServerTrafficRackPermutation(LeafSpine lsnet) {
