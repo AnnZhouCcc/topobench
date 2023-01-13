@@ -1702,6 +1702,7 @@ public class TrafficMatrix {
         System.out.println("Total traffic = " + totalTraffic);
 
 //        writeServerLevelMatrix();
+        writeSwitchLevelMatrix();
     }
 
     public void generateSwitchServerTrafficRackPermutation(LeafSpine lsnet) {
@@ -2138,6 +2139,28 @@ public class TrafficMatrix {
             out.close();
         } catch (Exception e) {
             System.err.println("TrafficMatrix writeServerLevelMatrix Error: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public void writeSwitchLevelMatrix() {
+        String writefile = "../debugresultfiles/switchlevelmatrix.txt";
+        try {
+            BufferedWriter out = new BufferedWriter(new FileWriter(writefile));
+            for (int i=numSwitches-1; i>=0; i--) {
+                out.write(i+"\t");
+                for (int j=0; j<numSwitches; j++) {
+                    out.write(switchLevelMatrix[i][j] + "\t");
+                }
+                out.write("\n");
+            }
+            out.write("\t");
+            for (int j=0; j<numSwitches; j++) {
+                out.write(j+"\t");
+            }
+            out.close();
+        } catch (Exception e) {
+            System.err.println("TrafficMatrix writeSwitchLevelMatrix Error: " + e.getMessage());
             e.printStackTrace();
         }
     }
