@@ -82,7 +82,8 @@ public class TrafficMatrix {
                 numFlows++;
             }
 
-        System.out.println("Number of flows = " + numFlows);
+            System.out.println("Number of flows = " + numFlows);
+        }
     }
 
     public void TrafficGenStride(int n) {
@@ -1757,10 +1758,8 @@ public class TrafficMatrix {
                 String strLine = "";
                 while ((strLine = br.readLine()) != null) {
                     StringTokenizer strTok = new StringTokenizer(strLine);
-                    String token = strTok.nextToken();
-                    String[] subtokens = token.split(" ");
-                    int thisswitch = Integer.parseInt(subtokens[0]);
-                    int thisserver = Integer.parseInt(subtokens[1]);
+                    int thisswitch = Integer.parseInt(strTok.nextToken());
+                    int thisserver = Integer.parseInt(strTok.nextToken());
                     serverToSwitchMapping.put(thisserver, thisswitch);
                 }
                 br.close();
@@ -1787,6 +1786,144 @@ public class TrafficMatrix {
                             switchLevelMatrix[mysrcsw][mydstsw] += unitTraffic;
                             totalTraffic += unitTraffic;
                         }
+                    }
+                }
+            }
+        }
+
+        System.out.println("Total traffic = " + totalTraffic);
+
+//        writeServerLevelMatrix();
+//        writeSwitchLevelMatrix();
+    }
+
+    public void generateSwitchServerTrafficARackToBRackFromFileServer(int a, int b, String trafficfile) {
+        int configfilenumber = Integer.parseInt(trafficfile);
+        String s2strafficfile = "/home/annzhou/WeightTuning/trafficfiles/v2v_"+a+"_"+b+"_0_"+configfilenumber;
+        System.out.println("Generate switch & server traffic a rack to b rack from file: a=" + a + ", b=" + b + ", file="+s2strafficfile);
+        double unitTraffic = 1;
+        double totalTraffic = 0;
+
+        ArrayList<Integer> srcswslist = new ArrayList<>();
+        ArrayList<Integer> dstswslist = new ArrayList<>();
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(s2strafficfile));
+            String strLine = "";
+            while ((strLine = br.readLine()) != null) {
+                StringTokenizer strTok = new StringTokenizer(strLine);
+                String token = strTok.nextToken();
+                int racknumber = Integer.parseInt(token);
+                if (srcswslist.size() < a) {
+                    srcswslist.add(racknumber);
+                } else {
+                    dstswslist.add(racknumber);
+                }
+            }
+            br.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (srcswslist.size() != a) System.err.println("File " + s2strafficfile + " has " + srcswslist.size() + " sending racks; a=" + a);
+        if (dstswslist.size() != b) System.err.println("File " + s2strafficfile + " has " + dstswslist.size() + " receiving racks; b=" + b);
+
+        System.out.println(srcswslist);
+        System.out.println(dstswslist);
+
+        for (int srcsvr : srcswslist) {
+            for (int dstsvr : dstswslist) {
+                if (srcsvr>=topology.totalWeight || dstsvr>=topology.totalWeight) continue;
+
+                int mysrcsw = topology.svrToSwitch(srcsvr);
+                int mydstsw = topology.svrToSwitch(dstsvr);
+
+                serverLevelMatrix[srcsvr][dstsvr] += unitTraffic;
+                switchLevelMatrix[mysrcsw][mydstsw] += unitTraffic;
+                totalTraffic += unitTraffic;
+            }
+        }
+
+        System.out.println("Total traffic = " + totalTraffic);
+
+//        writeServerLevelMatrix();
+//        writeSwitchLevelMatrix();
+    }
+
+    public void generateSwitchServerTrafficARackToBRackFromFileRandom(int a, int b, String trafficfile) {
+        int configfilenumber = Integer.parseInt(trafficfile);
+        String s2strafficfile = "/home/annzhou/WeightTuning/trafficfiles/s2s_"+a+"_"+b+"_0_"+configfilenumber;
+        System.out.println("Generate switch & server traffic a rack to b rack from file: a=" + a + ", b=" + b + ", file="+s2strafficfile);
+        double unitTraffic = 1;
+        double totalTraffic = 0;
+        int active_servers_per_rack = 36;
+
+        ArrayList<Integer> srcswslist = new ArrayList<>();
+        ArrayList<Integer> dstswslist = new ArrayList<>();
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(s2strafficfile));
+            String strLine = "";
+            while ((strLine = br.readLine()) != null) {
+                StringTokenizer strTok = new StringTokenizer(strLine);
+                String token = strTok.nextToken();
+                int racknumber = Integer.parseInt(token);
+                if (srcswslist.size() < a) {
+                    srcswslist.add(racknumber);
+                } else {
+                    dstswslist.add(racknumber);
+                }
+            }
+            br.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (srcswslist.size() != a) System.err.println("File " + s2strafficfile + " has " + srcswslist.size() + " sending racks; a=" + a);
+        if (dstswslist.size() != b) System.err.println("File " + s2strafficfile + " has " + dstswslist.size() + " receiving racks; b=" + b);
+
+        System.out.println(srcswslist);
+        System.out.println(dstswslist);
+
+        String mappingfilename="";
+        if (topology.totalWeight == 2988) {
+            mappingfilename="/home/annzhou/DRing/src/emp/datacentre/topoflowsfiles/sw-svr-mapping_dring.txt";
+        } else if (topology.totalWeight == 3072) {
+            mappingfilename="/home/annzhou/DRing/src/emp/datacentre/topoflowsfiles/sw-svr-mapping_rrg.txt";
+        } else {
+            System.out.println("***Error this topology is not recognized.");
+        }
+        HashMap<Integer, Integer> serverToSwitchMapping = new HashMap<>();
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(mappingfilename));
+            String strLine = "";
+            while ((strLine = br.readLine()) != null) {
+                StringTokenizer strTok = new StringTokenizer(strLine);
+                int thisswitch = Integer.parseInt(strTok.nextToken());
+                int thisserver = Integer.parseInt(strTok.nextToken());
+                serverToSwitchMapping.put(thisserver, thisswitch);
+            }
+            br.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        for (int srcsw : srcswslist) {
+            for (int dstsw : dstswslist) {
+                ArrayList<Integer> srcservers = new ArrayList<>();
+                ArrayList<Integer> dstservers = new ArrayList<>();
+                for (int s=0; s<topology.totalWeight; s++) {
+                    int r = serverToSwitchMapping.get(s);
+                    if (r == srcsw && srcservers.size()<active_servers_per_rack) srcservers.add(s);
+                    if (r == dstsw && dstservers.size()<active_servers_per_rack) dstservers.add(s);
+                }
+
+                for (int srcsvr : srcservers) {
+                    for (int dstsvr : dstservers) {
+                        int mysrcsw = topology.svrToSwitch(srcsvr);
+                        int mydstsw = topology.svrToSwitch(dstsvr);
+
+                        serverLevelMatrix[srcsvr][dstsvr] += unitTraffic;
+                        switchLevelMatrix[mysrcsw][mydstsw] += unitTraffic;
+                        totalTraffic += unitTraffic;
                     }
                 }
             }
@@ -2194,6 +2331,12 @@ public class TrafficMatrix {
         }
         else if (trafficmode == 208) {
             generateSwitchServerTrafficARackToBRackFromFileFlat(a,b,trafficfile);
+        }
+        else if (trafficmode == 209) {
+            generateSwitchServerTrafficARackToBRackFromFileServer(a,b,trafficfile);
+        }
+        else if (trafficmode == 210) {
+            generateSwitchServerTrafficARackToBRackFromFileRandom(a,b,trafficfile);
         }
         else {
             System.out.println("Trafficmode is not recognized.");
