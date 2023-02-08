@@ -1628,7 +1628,8 @@ public class TrafficMatrix {
         System.out.println("Total traffic = " + totalTraffic);
 
 //        printSwitchLevelMatrix("resultfiles/switchleveltraffic_a2a.txt");
-//        writeServerLevelMatrix();
+        writeServerLevelMatrix();
+        //writeSwitchLevelMatrix();
     }
 
     public void generateSwitchServerTrafficARackToBRackFromFile(int a, int b, String trafficfile, LeafSpine lsnet) {
@@ -1931,8 +1932,8 @@ public class TrafficMatrix {
 
         System.out.println("Total traffic = " + totalTraffic);
 
-//        writeServerLevelMatrix();
-//        writeSwitchLevelMatrix();
+        writeServerLevelMatrix();
+        //writeSwitchLevelMatrix();
     }
 
     public void generateSwitchServerTrafficRackPermutation(LeafSpine lsnet) {
@@ -2105,7 +2106,9 @@ public class TrafficMatrix {
         }
         System.out.println("Total traffic = " + totalTraffic);
 
-//        writeServerLevelMatrix();
+        writeServerLevelMatrix();
+        //writeSwitchLevelMatrix();
+        //printSwitchLevelMatrix("resultfiles/clustera_tm.txt");
     }
 
     public void generateSwitchServerTrafficMix(int n, int t, LeafSpine lsnet) {
