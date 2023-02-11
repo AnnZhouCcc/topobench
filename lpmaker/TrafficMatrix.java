@@ -1628,7 +1628,7 @@ public class TrafficMatrix {
         System.out.println("Total traffic = " + totalTraffic);
 
 //        printSwitchLevelMatrix("resultfiles/switchleveltraffic_a2a.txt");
-        writeServerLevelMatrix();
+        //writeServerLevelMatrix();
         //writeSwitchLevelMatrix();
     }
 
@@ -1884,6 +1884,7 @@ public class TrafficMatrix {
         System.out.println(srcswslist);
         System.out.println(dstswslist);
 
+/*
         String mappingfilename="";
         if (topology.totalWeight == 2988) {
             mappingfilename="/home/annzhou/DRing/src/emp/datacentre/topoflowsfiles/sw-svr-mapping_dring.txt";
@@ -1906,11 +1907,13 @@ public class TrafficMatrix {
         } catch (Exception e) {
             e.printStackTrace();
         }
+*/
 
         for (int srcsw : srcswslist) {
             for (int dstsw : dstswslist) {
                 ArrayList<Integer> srcservers = new ArrayList<>();
                 ArrayList<Integer> dstservers = new ArrayList<>();
+/*
                 for (int s=0; s<topology.totalWeight; s++) {
                     int r = serverToSwitchMapping.get(s);
                     if (r == srcsw && srcservers.size()<active_servers_per_rack) srcservers.add(s);
@@ -1921,9 +1924,18 @@ public class TrafficMatrix {
                     for (int dstsvr : dstservers) {
                         int mysrcsw = topology.svrToSwitch(srcsvr);
                         int mydstsw = topology.svrToSwitch(dstsvr);
+                        if (srcsw != mysrcsw) System.out.println("src");
+                        if (dstsw != mydstsw) System.out.println("dst");
 
                         serverLevelMatrix[srcsvr][dstsvr] += unitTraffic;
                         switchLevelMatrix[mysrcsw][mydstsw] += unitTraffic;
+                        totalTraffic += unitTraffic;
+                    }
+                }
+*/
+                for (int si=0; si<active_servers_per_rack; si++) {
+                    for (int di=0; di<active_servers_per_rack; di++) {
+                        switchLevelMatrix[srcsw][dstsw] += unitTraffic;
                         totalTraffic += unitTraffic;
                     }
                 }
@@ -1932,7 +1944,7 @@ public class TrafficMatrix {
 
         System.out.println("Total traffic = " + totalTraffic);
 
-        writeServerLevelMatrix();
+        //writeServerLevelMatrix();
         //writeSwitchLevelMatrix();
     }
 
