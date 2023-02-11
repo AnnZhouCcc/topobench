@@ -1948,6 +1948,52 @@ public class TrafficMatrix {
         //writeSwitchLevelMatrix();
     }
 
+    public void generateSwitchServerTrafficPermutationFromFile(String trafficfile) {
+        int configfilenumber = Integer.parseInt(trafficfile);
+        String mytrafficfile = "/home/annzhou/DRing/src/emp/datacentre/trafficfiles/permutation_"+configfilenumber;
+        System.out.println("Generate switch & server traffic permutation from file, file="+mytrafficfile);
+        double unitTraffic = 1;
+        double totalTraffic = 0;
+        int active_servers_per_rack = 36;
+
+        ArrayList<Integer> srcswslist = new ArrayList<>();
+        ArrayList<Integer> dstswslist = new ArrayList<>();
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(mytrafficfile));
+            String strLine = "";
+            while ((strLine = br.readLine()) != null) {
+                StringTokenizer strTok = new StringTokenizer(strLine);
+                String token = strTok.nextToken();
+                String[] tokens = token.split(" ");
+                srcswslist.add(Integer.parseInt(tokens[0]));
+                dstswslist.add(Integer.parseInt(tokens[1]));
+            }
+            br.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (srcswslist.size() != dstswslist.size()) System.err.println("Size difference: srcswlist has size " + srcswslist.size() + " while dstswlist has " + dstswslist.size());
+
+        System.out.println(srcswslist);
+        System.out.println(dstswslist);
+
+        for (int i=0; i<srcswslist.size(); i++) {
+            int srcsw = srcswslist.get(i);
+            int dstsw = dstswslist.get(i);
+            for (int si=0; si<active_servers_per_rack; si++) {
+                for (int di=0; di<active_servers_per_rack; di++) {
+                    switchLevelMatrix[srcsw][dstsw] += unitTraffic;
+                    totalTraffic += unitTraffic;
+                }
+            }
+        }
+        System.out.println("Total traffic = " + totalTraffic);
+
+        //writeServerLevelMatrix();
+        //writeSwitchLevelMatrix();
+    }
+
     public void generateSwitchServerTrafficRackPermutation(LeafSpine lsnet) {
         System.out.println("Generate switch & server traffic rack permutation.");
         double unitTraffic = 1;
@@ -2352,6 +2398,9 @@ public class TrafficMatrix {
         }
         else if (trafficmode == 210) {
             generateSwitchServerTrafficARackToBRackFromFileRandom(a,b,trafficfile);
+        }
+        else if (trafficmode == 211) {
+            generateSwitchServerTrafficPermutationFromFile(trafficfile);
         }
         else {
             System.out.println("Trafficmode is not recognized.");
