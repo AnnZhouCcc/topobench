@@ -2214,6 +2214,388 @@ public class Graph
 	}
 
 
+	public void PrintGraphforMCFFairCondensedForKnownRouting3(String filename, String tag, double[][] switchLevelMatrix, ArrayList<Path>[][] pathPool) {
+
+		modifiedFloydWarshall();
+//		int r=noNodes; //# of ToR switches
+//		int svrs=totalWeight;
+
+//		int nflowlet = 1;
+		try {
+			FileWriter fstream = new FileWriter(filename);
+			BufferedWriter out = new BufferedWriter(fstream);
+
+			// Nodes
+//			int numEdges = 0;
+//			for(int i=0; i<noNodes; i++)
+//			{
+//				numEdges += adjacencyList[i].size();
+//			}
+
+			// Edges
+//			int edgeID = 0;
+//			int edgeCapacity = 1;
+//			for(int i=0; i<noNodes; i++)
+//			{
+//				for(int j=0; j<adjacencyList[i].size(); j++)
+//				{
+//					int to = adjacencyList[i].elementAt(j).intValue();
+//					edgeID++;
+//				}
+//			}
+
+			// Commodities
+//			int commodityIndex = 0;
+//			for (int f = 0; f < noNodes; f ++)
+//				for (int t = 0; t < noNodes; t++)
+//					if (f!=t && switchLevelMatrix[f][t]>0) commodityIndex ++;
+
+
+			int numFlows = 0;
+			for (int f = 0; f < noNodes; f++) {
+				for (int t = 0; t < noNodes; t++) {
+					if (f != t && switchLevelMatrix[f][t] > 0) {
+						numFlows++;
+					}
+				}
+			}
+
+//			String[] tokens = filename.split("\\/|\\.");
+//			String file_index = tokens[1];
+//
+//			System.out.println(file_index + " ***************************** ");
+
+			FlowID[] allFlowIDs = new FlowID[numFlows];
+			int curfID=0;
+			Writer output1 = new BufferedWriter(new FileWriter("flowIDmap" + tag));
+
+			for (int f = 0; f < noNodes; f++) {
+				for (int t = 0; t < noNodes; t++) {
+					if (f != t && switchLevelMatrix[f][t] > 0) {
+						allFlowIDs[curfID] = new FlowID(curfID, f, t);
+						output1.write(curfID + " " + f + " " + t + "\n");
+						curfID++;
+					}
+				}
+			}
+			output1.close();
+
+			boolean fair = true;
+//			int fid=0;
+			String constraint = "";
+			if (fair) {
+				// we need to set probability% of flows to large flows.
+				// Rand(100) < probability does not give desired distribution for small network sizes
+				// Hence, we shuffle the flows and choose the first round(prob% * totalFlows) number of flows
+//				ArrayList<Integer> list = new ArrayList<Integer>();
+//				for (int i = 0; i < curfID; i++) {
+//					list.add(Integer.valueOf(i));
+//				}
+//				Collections.shuffle(list);
+//				float prob = (float) probability / 100;
+//				int chooseCount = Math.round(prob * curfID);
+
+				//< Objective
+				out.write("Maximize \n");
+				out.write("obj: ");
+				String objective = "K";
+
+				out.write(objective);
+
+				//<Constraints of Type 0: fairness i.e. flow >= K
+				out.write("\n\nSUBJECT TO \n\\Type 0: Flow >= K\n");
+				System.out.println(new Date() + ": Starting part 0");
+				for (int fid=0; fid< allFlowIDs.length; fid++) { //for each flow fid with source f
+					int f = allFlowIDs[fid].srcSwitch;
+					int t = allFlowIDs[fid].dstSwitch;
+
+//				for (int f = 0; f < noNodes; f++) {
+//					for (int t = 0; t < noNodes; t++) {
+//						if(f!=t && switchLevelMatrix[f][t]>0) {
+					constraint = "c0_" + fid + ": ";
+					//System.out.println("CHECK FLOW =========== " + fid + " " + f + " " + t);
+
+					boolean writeCons = false;
+					for(int j=0; j<adjacencyList[f].size(); j++) {   //for each out link of f = (f,j)
+						if (!isFlowZeroForKnownRouting2(allFlowIDs[fid], f, adjacencyList[f].get(j).linkTo,pathPool)) {
+							constraint += "-f_" + fid + "_" + f + "_" + adjacencyList[f].get(j).linkTo + " ";
+							writeCons = true;
+						}
+						//if(j!=adjacencyList[f].size()-1) constraint += "- ";
+					}
+					if (writeCons) {
+//								Random rand = new Random();
+//								if (list.indexOf(fid) < chooseCount && probability < 100) {
+//									constraint += " + " + 10*switchLevelMatrix[f][t] + " K <= 0\n";
+//								} else {
+						constraint += " + " + switchLevelMatrix[f][t] + " K <= 0\n";
+//								}
+						out.write(constraint);
+					}
+//							fid++;
+//						}
+//					}
+				}
+				//>
+			}
+//
+//			//>
+//			else { // no fairness constraints -- max total throughput
+//				//< Objective
+//				out.write("Maximize \n");
+//				out.write("obj: ");
+//				fid = 0;
+//				String objective = "";
+//				for (int f = 0; f < noNodes; f++) {
+//					for (int t = 0; t < noNodes; t++) {
+//						if(f!=t && switchLevelMatrix[f][t]>0)   { //for each flow fid with source f
+//							for(int j=0; j<adjacencyList[f].size(); j++) { //for each out link of f = (f,j)
+//								objective += "f_" + fid + "_" + f + "_" + adjacencyList[f].elementAt(j).intValue() + " ";
+//								if(j!=adjacencyList[f].size()-1)
+//									objective += "+ ";
+//							}
+//							if(fid != commodityIndex-1)
+//								objective += "+ ";
+//							else
+//								objective += "\n";
+//							fid++;
+//						}
+//					}
+//				}
+//				out.write(objective);
+//				out.write("\n\nSUBJECT TO \n\\Type 0: Flow >= K\n");
+//				//>
+//			}
+
+			//<Constraints of Type 1: Load on link <= max_load
+			out.write("\n\\Type 1: Load on link <= max_load\n");
+			System.out.println(new Date() + ": Starting part 1");
+			constraint = "";
+//			int strCapacity = 25*commodityIndex;
+			for(int i=0; i<noNodes; i++) {
+				for(int j=0; j<adjacencyList[i].size(); j++) {
+//					StringBuilder curConstraint = new StringBuilder(strCapacity);
+					boolean writeCons = false;
+					for(int fd_=0; fd_<numFlows; fd_++)
+					{
+						//for each flow fd_
+						if (!isFlowZeroForKnownRouting2(allFlowIDs[fd_], i, adjacencyList[i].elementAt(j).intValue(),pathPool)) {
+							//constraint += "f_" + fd_ + "_" + i + "_" + adjacencyList[i].elementAt(j).intValue() + " + ";
+							constraint += "f_" + fd_ + "_" + i + "_" + adjacencyList[i].elementAt(j).intValue() + " + ";
+							writeCons = true;
+						}
+					}
+//					constraint = curConstraint.toString();
+					if(constraint.endsWith("+ ")) constraint = constraint.substring(0, constraint.lastIndexOf("+")-1);
+					//System.out.println("string size: "+constraint.length());
+					if(writeCons) {
+						out.write("c1_" + i + "_" + adjacencyList[i].elementAt(j).intValue() + ": " + constraint + " <= " +  adjacencyList[i].elementAt(j).linkcapacity + "\n");
+						//constraint = "";
+					}
+				}
+				if(i > 0 && i % 20 == 0) System.out.println(new Date() + ": "+i+" of "+noNodes+" done");
+			}
+			//>
+
+			//<Constraints of Type 2: Flow conservation at non-source, non-destination
+//			int LARGE_VALUE = 1;		// TOPO_COMPARISON
+			System.out.println(new Date() + ": Starting part 2");
+			out.write("\n\\Type 2: Flow conservation at non-source, non-destination\n");
+
+			for (int fid=0; fid< allFlowIDs.length; fid++) { //for each flow fid with source f
+				int f = allFlowIDs[fid].srcSwitch;
+				int t = allFlowIDs[fid].dstSwitch;
+//			fid = 0;
+//			for (int f = 0; f < noNodes; f++) {
+//				for (int t = 0; t < noNodes; t++) {
+//					if (f!=t && switchLevelMatrix[f][t] > 0) {      Ω
+				for (int u = 0; u < noNodes; u++) {   //for each node u
+					constraint = "";
+					boolean writeCons = false;
+					if (u == f) {   //src
+						/*
+						constraint = "c2_" + fid + "_" + u + "_1: ";
+
+						for (int j = 0; j < adjacencyList[u].size(); j++)   //for each out link of u = (u,j)
+						{
+							if (!isFlowZero(allFlowIDs[fid], u, adjacencyList[u].elementAt(j).intValue())) {
+								constraint += "f_" + fid + "_" + u + "_" + adjacencyList[u].elementAt(j).intValue() + " + ";
+								writeCons = 1;
+							}
+						}
+						if (constraint.endsWith("+ "))
+							constraint = constraint.substring(0, constraint.lastIndexOf("+") - 1);
+						if (writeCons == 1)
+							out.write(constraint + " <= " + switchLevelMatrix[f][t] * LARGE_VALUE + "\n");
+						writeCons = 0;
+
+						 */
+						constraint = "c2_" + fid + "_" + u + "_2: ";
+						for (int j = 0; j < adjacencyList[u].size(); j++) {  //for each in link of u = (j,u)
+							if (!isFlowZeroForKnownRouting2(allFlowIDs[fid], adjacencyList[u].elementAt(j).intValue(), u,pathPool)) {
+								constraint += "f_" + fid + "_" + adjacencyList[u].elementAt(j).intValue() + "_" + u + " + ";
+								writeCons = true;
+							}
+						}
+						if (constraint.endsWith("+ ")) constraint = constraint.substring(0, constraint.lastIndexOf("+") - 1);
+						if (writeCons) out.write(constraint + " = 0\n");
+					} else if (u == t) {
+					} else {  // non-src and non-dest
+						constraint = "c2_" + fid + "_" + u + "_3: ";
+						for (int j = 0; j < adjacencyList[u].size(); j++) {   //for each out link of u = (u,j)
+							if (!isFlowZeroForKnownRouting2(allFlowIDs[fid], u, adjacencyList[u].elementAt(j).intValue(),pathPool)) {
+								constraint += "f_" + fid + "_" + u + "_" + adjacencyList[u].elementAt(j).intValue() + " + ";
+								writeCons = true;
+							}
+						}
+						if (constraint.endsWith("+ ")) constraint = constraint.substring(0, constraint.lastIndexOf("+") - 1);
+						constraint += " - ";
+
+						for (int j = 0; j < adjacencyList[u].size(); j++) {  //for each in link of u = (j,u)
+							if (!isFlowZeroForKnownRouting2(allFlowIDs[fid], adjacencyList[u].elementAt(j).intValue(), u,pathPool)) {
+								constraint += "f_" + fid + "_" + adjacencyList[u].elementAt(j).intValue() + "_" + u + " - ";
+								writeCons = true;
+							}
+						}
+						if (constraint.endsWith("- ")) constraint = constraint.substring(0, constraint.lastIndexOf("-") - 1);
+						if (writeCons) out.write(constraint + " = 0\n");
+					}
+				}
+//						fid++;
+//					}
+//				}
+				if (f > 0 && f % 20 == 0) System.out.println(new Date() + ": " + f + " of " + noNodes + " done");
+			}
+
+			// <Constraints of Type 3: Flow >= 0 for any flow on any link
+			out.write("\n\\Type 3: Flow >= 0 for any flow on any link\n");
+			System.out.println(new Date() + ": Starting part 3");
+			constraint = "";
+
+			for (int fid=0; fid<allFlowIDs.length; fid++) { // for each flow fid from f to t
+				int f = allFlowIDs[fid].srcSwitch;
+				int t = allFlowIDs[fid].dstSwitch;
+//			fid = 0;
+//			for (int f = 0; f < noNodes; f++) {
+//				for (int t = 0; t < noNodes; t++) {
+//					if (f!=t && switchLevelMatrix[f][t] > 0) {
+				for (int u = 0; u < noNodes; u++) { // for each node u
+					for (int j = 0; j < adjacencyList[u].size(); j++) { // for each out link of u = (u,j)
+						if (!isFlowZeroForKnownRouting2(allFlowIDs[fid], u, adjacencyList[u].elementAt(j).intValue(),pathPool)) {
+							constraint = "c3_" + fid + "_" + u + "_" + adjacencyList[u].elementAt(j).intValue() + ": ";
+							constraint += "f_" + fid + "_" + u + "_" + adjacencyList[u].elementAt(j).intValue() + " >= 0\n";
+							out.write(constraint);
+						}
+					}
+
+//							for (int j = 0; j < adjacencyList[u].size(); j++) // for each in link of u = (j,u)
+//							{
+//								if (!isFlowZeroForKnownRouting2(allFlowIDs[fid], adjacencyList[u].elementAt(j).intValue(), u,pathPool)) {
+//									constraint = "c3_" + fid + "_" + adjacencyList[u].elementAt(j).intValue() + "_" + u + ": ";
+//									constraint += "f_" + fid + "_" + adjacencyList[u].elementAt(j).intValue() + "_" + u;
+//									out.write(constraint + " >= 0\n");
+//								}
+//							}
+				}
+//						fid++;
+//					}
+//				}
+			}
+
+
+			//<Constraints of Type 4: Flow conservation per path
+			System.out.println(new Date() + ": Starting part 4");
+			out.write("\n\\Type 4: Flow conservation per path\n");
+
+			constraint = "";
+			for (int fid=0; fid<allFlowIDs.length; fid++) { // for each flow fid from f to t
+				int f = allFlowIDs[fid].srcSwitch;
+				int t = allFlowIDs[fid].dstSwitch;
+//			fid=0;
+//			for (int f = 0; f < noNodes; f++)
+//			{
+//				for (int t = 0; t < noNodes; t++)
+//				{
+//					if (f!=t && switchLevelMatrix[f][t] > 0)
+//					{
+				for (Path thisPath : pathPool[f][t]) {
+					int pid = thisPath.pid;
+					for (int l=1; l<thisPath.path.size(); l++) {
+						NPLink currLink = thisPath.path.get(l);
+						NPLink prevLink = thisPath.path.get(l-1);
+						constraint = "c4_" + fid + "_" + pid + "_" + currLink.from + "_" + currLink.to + ": ";
+						constraint += "f_" + fid + "_" + pid + "_" + currLink.from + "_" + currLink.to + " -f_" + fid + "_" + pid + "_" + prevLink.from + "_" + prevLink.to + " = 0\n";
+						out.write(constraint);
+					}
+				}
+//						fid++;
+//					}
+//				}
+
+				if (f > 0 && f % 20 == 0) System.out.println(new Date() + ": " + f + " of " + noNodes + " done");
+			}
+
+
+			//<Constraints of Type 5
+			System.out.println(new Date() + ": Starting part 5");
+			out.write("\n\\Type 5: Relate f_fid_pid_linkfrom_linkto and f_fid_linkfrom_linkto\n");
+//			fid=0;
+			constraint = "";
+			for (int fid=0; fid< allFlowIDs.length; fid++) { // for each flow fid from f to t
+				int f = allFlowIDs[fid].srcSwitch;
+				int t = allFlowIDs[fid].dstSwitch;
+
+//			for (int f = 0; f < noNodes; f++)
+//			{
+//				for (int t = 0; t < noNodes; t++)
+//				{
+//					if (f!=t && switchLevelMatrix[f][t] > 0)
+//					{
+				ArrayList<Integer>[][] pids = new ArrayList[noNodes][noNodes];
+				for (int i=0; i<noNodes; i++) {
+					for (int j=0; j<noNodes; j++) {
+						pids[i][j] = new ArrayList<>();
+					}
+				}
+
+				for (Path thisPath : pathPool[f][t]) {
+					int pid = thisPath.pid;
+					for (NPLink link : thisPath.path) {
+						pids[link.from][link.to].add(pid);
+					}
+				}
+
+				for (int s=0; s<noNodes; s++) {
+					for (int d=0; d<noNodes; d++) {
+						if (pids[s][d].size() > 0) {
+							constraint = "c5_" + fid + "_" + s + "_" + d + ": f_" + fid + "_" + s + "_" + d;
+							for (int pid : pids[s][d]) {
+								constraint += " -f_" + fid + "_" + pid + "_" + s + "_" + d;
+							}
+							constraint += " = 0\n";
+							out.write(constraint);
+						}
+					}
+				}
+//						fid++;
+//					}
+//				}
+
+				if (f > 0 && f % 20 == 0) System.out.println(new Date() + ": " + f + " of " + noNodes + " done");
+			}
+
+
+			out.write("End\n");
+			out.close();
+		}
+		catch (Exception e)
+		{
+			System.err.println("PrintGraphforMCFFairCondensedForKnownRouting3 Error: " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
+
+
 	public void PrintGraphforMCFFairCondensedForKnownRouting2NonDeterministicLpSolutions(String filename, int probability, double[][] switchLevelMatrix, ArrayList<Path>[][] pathPool, String flowIDmapfilename)
 	{
 
@@ -3585,6 +3967,28 @@ public class Graph
 			}
 		}
 
+		// write out capacity matrix
+		try {
+			BufferedWriter out = new BufferedWriter(new FileWriter("resultfiles/capacity_clustera.txt"));
+			for (int ii = noNodes - 1; ii >= 0; ii--) {
+				out.write(ii + "\t");
+				for (int jj = 0; jj < noNodes; jj++) {
+					out.write(capacity[ii][jj] + "\t");
+				}
+				out.write("\n");
+			}
+
+			out.write("\t");
+			for (int jj = 0; jj < noNodes; jj++) {
+				out.write(jj + "\t");
+			}
+			out.write("\n");
+			out.close();
+		} catch (Exception e) {
+			System.err.println("Graph EvaluateEqualPath Error: " + e.getMessage());
+			e.printStackTrace();
+		}
+
 		for (int f=0; f<noNodes; f++) {
 			for (int t=0; t<noNodes; t++) {
 				if (f!=t && switchLevelMatrix[f][t]>0) {
@@ -3599,6 +4003,50 @@ public class Graph
 					}
 				}
 			}
+		}
+
+		// write out traffic
+		try {
+			BufferedWriter out = new BufferedWriter(new FileWriter("resultfiles/linktraffic_clustera.txt"));
+			for (int ii = noNodes - 1; ii >= 0; ii--) {
+				out.write(ii + "\t");
+				for (int jj = 0; jj < noNodes; jj++) {
+					out.write(traffic[ii][jj] + "\t");
+				}
+				out.write("\n");
+			}
+
+			out.write("\t");
+			for (int jj = 0; jj < noNodes; jj++) {
+				out.write(jj + "\t");
+			}
+			out.write("\n");
+			out.close();
+		} catch (Exception e) {
+			System.err.println("Graph EvaluateEqualPath Error: " + e.getMessage());
+			e.printStackTrace();
+		}
+
+		// write out switchLevelMatrix
+		try {
+			BufferedWriter out = new BufferedWriter(new FileWriter("resultfiles/switchleveltraffic_clustera.txt"));
+			for (int ii = noNodes - 1; ii >= 0; ii--) {
+				out.write(ii + "\t");
+				for (int jj = 0; jj < noNodes; jj++) {
+					out.write(switchLevelMatrix[ii][jj] + "\t");
+				}
+				out.write("\n");
+			}
+
+			out.write("\t");
+			for (int jj = 0; jj < noNodes; jj++) {
+				out.write(jj + "\t");
+			}
+			out.write("\n");
+			out.close();
+		} catch (Exception e) {
+			System.err.println("Graph EvaluateEqualPath Error: " + e.getMessage());
+			e.printStackTrace();
 		}
 
 		double networkthroughput = maxFlow;

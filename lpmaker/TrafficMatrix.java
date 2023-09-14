@@ -1950,7 +1950,7 @@ public class TrafficMatrix {
 
     public void generateSwitchServerTrafficPermutationFromFile(String trafficfile) {
         int configfilenumber = Integer.parseInt(trafficfile);
-        String mytrafficfile = "/home/annzhou/DRing/src/emp/datacentre/trafficfiles/permutation_"+configfilenumber;
+        String mytrafficfile = "../WeightTuning/trafficfiles/permutation_"+configfilenumber+".txt";
         System.out.println("Generate switch & server traffic permutation from file, file="+mytrafficfile);
         double unitTraffic = 1;
         double totalTraffic = 0;
@@ -1964,6 +1964,9 @@ public class TrafficMatrix {
             while ((strLine = br.readLine()) != null) {
                 StringTokenizer strTok = new StringTokenizer(strLine);
                 String token = strTok.nextToken();
+                System.out.println(token);
+                String token2 = strTok.nextToken();
+                System.out.println(token2);
                 String[] tokens = token.split(" ");
                 srcswslist.add(Integer.parseInt(tokens[0]));
                 dstswslist.add(Integer.parseInt(tokens[1]));

@@ -9,7 +9,7 @@ infile=$1
 whichmethod=$2
 
 # Run LP. Replace below with whatever tool you want to use to run the LP.
-../../gurobi912/linux64/bin/gurobi_cl Method=$whichmethod Crossover=0 $infile > templog
+/Library/gurobi912/mac64/bin/gurobi_cl Method=$whichmethod Crossover=0 $infile > templog
 #objective=`cat templog | grep "Optimal objective " | awk '{print $3}' | awk -F "e" '{print $1*10^$2}'`
 objective=`cat templog | grep "Optimal objective " | awk '{print $3}'`
 
@@ -20,4 +20,4 @@ else
 	echo "$objective"
 fi
 
-rm -rf templog gurobi.log
+#rm -rf templog gurobi.log

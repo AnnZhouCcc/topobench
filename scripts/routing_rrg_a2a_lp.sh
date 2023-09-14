@@ -14,14 +14,18 @@ numsvr=3072
 numspinesw=16
 numleafsw=`expr $switches - $numspinesw`
 
-topology=rrg
+#topology=rrg
+#graphtype=23
+#graphfile=graphfiles/rrg_instance1_80_64.edgelist
+
+topology=flat-leafspine
 graphtype=23
-graphfile=graphfiles/rrg_instance1_80_64.edgelist
+graphfile=graphfiles/leafspine_instance1_80_64.edgelist
 
 method=2
 #declare -a rs=("opt" "ecmp" "su2" "su3" "32disjoint" "32short")
 #declare -a rs=("racke0" "racke1" "racke2")
-declare -a rs=("ecmp")
+declare -a rs=("opt")
 
 trafficmode=200
 traffic=a2a
@@ -33,7 +37,7 @@ timeframeend=0
 
 tag=
 
-isOptimal=false
+isOptimal=true
 isEqualShare=false
 shouldAvoidHotRacks=false
 isPathWeighted=false
@@ -73,10 +77,10 @@ do
   if [ "$isEqualShare" = "false" ] && [ "$isPathWeighted" = "false" ]
   then
     flowVal=`./lpRun.sh ../topology/my.lp $method`
-    rm -rf ../flowIDmap* ../linkCaps* flowIDmap* linkCaps*
+#    rm -rf ../flowIDmap* ../linkCaps* flowIDmap* linkCaps*
     #  echo "$flowVal" >> flowtmp_"$suffix"
     cd $INTERMEDIATEFILEPATH
-    rm -rf networkthroughput
+#    rm -rf networkthroughput
     echo "$flowVal" >> networkthroughput
     cd -
   fi

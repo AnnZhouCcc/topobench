@@ -21,11 +21,19 @@ graphfile=graphfiles/rrg_instance1_80_64.edgelist
 method=2
 declare -a rs=("ecmp")
 
-trafficmode=200
-traffic=a2a
+#trafficmode=200
+#traffic=a2a
+#a=0
+#b=0
+#trafficfile=none
+#timeframestart=0
+#timeframeend=0
+
+trafficmode=211
+traffic=0
 a=0
 b=0
-trafficfile=none
+trafficfile=0
 timeframestart=0
 timeframeend=0
 
