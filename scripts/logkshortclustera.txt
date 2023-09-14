@@ -1,0 +1,781 @@
+/home/annzhou/topobench/scripts
+2short
+NEWSFLASH: USING YOUR RANDOM SEED -----------------------------------------------
+graph file: graphfiles/rrg_instance1_80_64.edgelist
+traffic file: a
+number of switches: 80
+total number of servers = 3072
+trafficmode = 206
+inaccuracymode = 0
+Generate switch & server traffic cluster a.
+Total traffic = 6.642540978E9
+Should avoid hot racks? false
+netpath file: /home/annzhou/DRing/src/emp/datacentre/netpathfiles/netpath_2short_rrg.txt
+augment method: -1
+Should use equal share? false
+PrintGraphforMCFFairCondensedForKnownRouting2
+0 ***************************** 
+Fri Feb 10 23:42:49 CST 2023: Starting part 0
+Fri Feb 10 23:42:49 CST 2023: Starting part 1
+Fri Feb 10 23:42:50 CST 2023: 20 of 80 done
+Fri Feb 10 23:42:50 CST 2023: 40 of 80 done
+Fri Feb 10 23:42:51 CST 2023: 60 of 80 done
+Fri Feb 10 23:42:51 CST 2023: Starting part 2
+Fri Feb 10 23:42:51 CST 2023: 20 of 80 done
+Fri Feb 10 23:42:52 CST 2023: 40 of 80 done
+Fri Feb 10 23:42:52 CST 2023: 60 of 80 done
+Fri Feb 10 23:42:53 CST 2023: Starting part 3
+Fri Feb 10 23:42:53 CST 2023: Starting part 4
+Fri Feb 10 23:42:53 CST 2023: 20 of 80 done
+Fri Feb 10 23:42:53 CST 2023: 40 of 80 done
+Fri Feb 10 23:42:53 CST 2023: 60 of 80 done
+Fri Feb 10 23:42:53 CST 2023: Starting part 5
+Fri Feb 10 23:42:54 CST 2023: 20 of 80 done
+Fri Feb 10 23:42:55 CST 2023: 40 of 80 done
+Fri Feb 10 23:42:55 CST 2023: 60 of 80 done
+Done Constructing Graph
+/home/annzhou/topobench/scripts
+4.12993583e-08
+/home/annzhou/topobench/scripts
+/home/annzhou/topobench/scripts
+4short
+NEWSFLASH: USING YOUR RANDOM SEED -----------------------------------------------
+graph file: graphfiles/rrg_instance1_80_64.edgelist
+traffic file: a
+number of switches: 80
+total number of servers = 3072
+trafficmode = 206
+inaccuracymode = 0
+Generate switch & server traffic cluster a.
+Total traffic = 6.642540978E9
+Should avoid hot racks? false
+netpath file: /home/annzhou/DRing/src/emp/datacentre/netpathfiles/netpath_4short_rrg.txt
+augment method: -1
+Should use equal share? false
+PrintGraphforMCFFairCondensedForKnownRouting2
+0 ***************************** 
+Fri Feb 10 23:43:06 CST 2023: Starting part 0
+Fri Feb 10 23:43:06 CST 2023: Starting part 1
+Fri Feb 10 23:43:07 CST 2023: 20 of 80 done
+Fri Feb 10 23:43:08 CST 2023: 40 of 80 done
+Fri Feb 10 23:43:08 CST 2023: 60 of 80 done
+Fri Feb 10 23:43:09 CST 2023: Starting part 2
+Fri Feb 10 23:43:09 CST 2023: 20 of 80 done
+Fri Feb 10 23:43:10 CST 2023: 40 of 80 done
+Fri Feb 10 23:43:11 CST 2023: 60 of 80 done
+Fri Feb 10 23:43:11 CST 2023: Starting part 3
+Fri Feb 10 23:43:13 CST 2023: Starting part 4
+Fri Feb 10 23:43:13 CST 2023: 20 of 80 done
+Fri Feb 10 23:43:13 CST 2023: 40 of 80 done
+Fri Feb 10 23:43:13 CST 2023: 60 of 80 done
+Fri Feb 10 23:43:13 CST 2023: Starting part 5
+Fri Feb 10 23:43:14 CST 2023: 20 of 80 done
+Fri Feb 10 23:43:14 CST 2023: 40 of 80 done
+Fri Feb 10 23:43:15 CST 2023: 60 of 80 done
+Done Constructing Graph
+/home/annzhou/topobench/scripts
+7.67843441e-08
+/home/annzhou/topobench/scripts
+/home/annzhou/topobench/scripts
+6short
+NEWSFLASH: USING YOUR RANDOM SEED -----------------------------------------------
+graph file: graphfiles/rrg_instance1_80_64.edgelist
+traffic file: a
+number of switches: 80
+total number of servers = 3072
+trafficmode = 206
+inaccuracymode = 0
+Generate switch & server traffic cluster a.
+Total traffic = 6.642540978E9
+Should avoid hot racks? false
+netpath file: /home/annzhou/DRing/src/emp/datacentre/netpathfiles/netpath_6short_rrg.txt
+augment method: -1
+Should use equal share? false
+PrintGraphforMCFFairCondensedForKnownRouting2
+0 ***************************** 
+Fri Feb 10 23:43:25 CST 2023: Starting part 0
+Fri Feb 10 23:43:25 CST 2023: Starting part 1
+Fri Feb 10 23:43:27 CST 2023: 20 of 80 done
+Fri Feb 10 23:43:28 CST 2023: 40 of 80 done
+Fri Feb 10 23:43:30 CST 2023: 60 of 80 done
+Fri Feb 10 23:43:31 CST 2023: Starting part 2
+Fri Feb 10 23:43:32 CST 2023: 20 of 80 done
+Fri Feb 10 23:43:32 CST 2023: 40 of 80 done
+Fri Feb 10 23:43:33 CST 2023: 60 of 80 done
+Fri Feb 10 23:43:34 CST 2023: Starting part 3
+Fri Feb 10 23:43:36 CST 2023: Starting part 4
+Fri Feb 10 23:43:36 CST 2023: 20 of 80 done
+Fri Feb 10 23:43:36 CST 2023: 40 of 80 done
+Fri Feb 10 23:43:36 CST 2023: 60 of 80 done
+Fri Feb 10 23:43:36 CST 2023: Starting part 5
+Fri Feb 10 23:43:37 CST 2023: 20 of 80 done
+Fri Feb 10 23:43:38 CST 2023: 40 of 80 done
+Fri Feb 10 23:43:38 CST 2023: 60 of 80 done
+Done Constructing Graph
+/home/annzhou/topobench/scripts
+9.45361127e-08
+/home/annzhou/topobench/scripts
+/home/annzhou/topobench/scripts
+8short
+NEWSFLASH: USING YOUR RANDOM SEED -----------------------------------------------
+graph file: graphfiles/rrg_instance1_80_64.edgelist
+traffic file: a
+number of switches: 80
+total number of servers = 3072
+trafficmode = 206
+inaccuracymode = 0
+Generate switch & server traffic cluster a.
+Total traffic = 6.642540978E9
+Should avoid hot racks? false
+netpath file: /home/annzhou/DRing/src/emp/datacentre/netpathfiles/netpath_8short_rrg.txt
+augment method: -1
+Should use equal share? false
+PrintGraphforMCFFairCondensedForKnownRouting2
+0 ***************************** 
+Fri Feb 10 23:43:50 CST 2023: Starting part 0
+Fri Feb 10 23:43:50 CST 2023: Starting part 1
+Fri Feb 10 23:43:52 CST 2023: 20 of 80 done
+Fri Feb 10 23:43:55 CST 2023: 40 of 80 done
+Fri Feb 10 23:43:56 CST 2023: 60 of 80 done
+Fri Feb 10 23:43:58 CST 2023: Starting part 2
+Fri Feb 10 23:43:59 CST 2023: 20 of 80 done
+Fri Feb 10 23:44:00 CST 2023: 40 of 80 done
+Fri Feb 10 23:44:01 CST 2023: 60 of 80 done
+Fri Feb 10 23:44:01 CST 2023: Starting part 3
+Fri Feb 10 23:44:03 CST 2023: Starting part 4
+Fri Feb 10 23:44:03 CST 2023: 20 of 80 done
+Fri Feb 10 23:44:03 CST 2023: 40 of 80 done
+Fri Feb 10 23:44:03 CST 2023: 60 of 80 done
+Fri Feb 10 23:44:03 CST 2023: Starting part 5
+Fri Feb 10 23:44:04 CST 2023: 20 of 80 done
+Fri Feb 10 23:44:04 CST 2023: 40 of 80 done
+Fri Feb 10 23:44:05 CST 2023: 60 of 80 done
+Done Constructing Graph
+/home/annzhou/topobench/scripts
+9.47746166e-08
+/home/annzhou/topobench/scripts
+/home/annzhou/topobench/scripts
+10short
+NEWSFLASH: USING YOUR RANDOM SEED -----------------------------------------------
+graph file: graphfiles/rrg_instance1_80_64.edgelist
+traffic file: a
+number of switches: 80
+total number of servers = 3072
+trafficmode = 206
+inaccuracymode = 0
+Generate switch & server traffic cluster a.
+Total traffic = 6.642540978E9
+Should avoid hot racks? false
+netpath file: /home/annzhou/DRing/src/emp/datacentre/netpathfiles/netpath_10short_rrg.txt
+augment method: -1
+Should use equal share? false
+PrintGraphforMCFFairCondensedForKnownRouting2
+0 ***************************** 
+Fri Feb 10 23:44:17 CST 2023: Starting part 0
+Fri Feb 10 23:44:17 CST 2023: Starting part 1
+Fri Feb 10 23:44:20 CST 2023: 20 of 80 done
+Fri Feb 10 23:44:23 CST 2023: 40 of 80 done
+Fri Feb 10 23:44:26 CST 2023: 60 of 80 done
+Fri Feb 10 23:44:28 CST 2023: Starting part 2
+Fri Feb 10 23:44:29 CST 2023: 20 of 80 done
+Fri Feb 10 23:44:30 CST 2023: 40 of 80 done
+Fri Feb 10 23:44:32 CST 2023: 60 of 80 done
+Fri Feb 10 23:44:32 CST 2023: Starting part 3
+Fri Feb 10 23:44:34 CST 2023: Starting part 4
+Fri Feb 10 23:44:34 CST 2023: 20 of 80 done
+Fri Feb 10 23:44:34 CST 2023: 40 of 80 done
+Fri Feb 10 23:44:34 CST 2023: 60 of 80 done
+Fri Feb 10 23:44:34 CST 2023: Starting part 5
+Fri Feb 10 23:44:35 CST 2023: 20 of 80 done
+Fri Feb 10 23:44:36 CST 2023: 40 of 80 done
+Fri Feb 10 23:44:36 CST 2023: 60 of 80 done
+Done Constructing Graph
+/home/annzhou/topobench/scripts
+9.51774890e-08
+/home/annzhou/topobench/scripts
+/home/annzhou/topobench/scripts
+12short
+NEWSFLASH: USING YOUR RANDOM SEED -----------------------------------------------
+graph file: graphfiles/rrg_instance1_80_64.edgelist
+traffic file: a
+number of switches: 80
+total number of servers = 3072
+trafficmode = 206
+inaccuracymode = 0
+Generate switch & server traffic cluster a.
+Total traffic = 6.642540978E9
+Should avoid hot racks? false
+netpath file: /home/annzhou/DRing/src/emp/datacentre/netpathfiles/netpath_12short_rrg.txt
+augment method: -1
+Should use equal share? false
+PrintGraphforMCFFairCondensedForKnownRouting2
+0 ***************************** 
+Fri Feb 10 23:44:49 CST 2023: Starting part 0
+Fri Feb 10 23:44:49 CST 2023: Starting part 1
+Fri Feb 10 23:44:54 CST 2023: 20 of 80 done
+Fri Feb 10 23:44:58 CST 2023: 40 of 80 done
+Fri Feb 10 23:45:02 CST 2023: 60 of 80 done
+Fri Feb 10 23:45:06 CST 2023: Starting part 2
+Fri Feb 10 23:45:08 CST 2023: 20 of 80 done
+Fri Feb 10 23:45:09 CST 2023: 40 of 80 done
+Fri Feb 10 23:45:10 CST 2023: 60 of 80 done
+Fri Feb 10 23:45:11 CST 2023: Starting part 3
+Fri Feb 10 23:45:13 CST 2023: Starting part 4
+Fri Feb 10 23:45:13 CST 2023: 20 of 80 done
+Fri Feb 10 23:45:13 CST 2023: 40 of 80 done
+Fri Feb 10 23:45:14 CST 2023: 60 of 80 done
+Fri Feb 10 23:45:14 CST 2023: Starting part 5
+Fri Feb 10 23:45:14 CST 2023: 20 of 80 done
+Fri Feb 10 23:45:14 CST 2023: 40 of 80 done
+Fri Feb 10 23:45:15 CST 2023: 60 of 80 done
+Done Constructing Graph
+/home/annzhou/topobench/scripts
+9.48853928e-08
+/home/annzhou/topobench/scripts
+/home/annzhou/topobench/scripts
+14short
+NEWSFLASH: USING YOUR RANDOM SEED -----------------------------------------------
+graph file: graphfiles/rrg_instance1_80_64.edgelist
+traffic file: a
+number of switches: 80
+total number of servers = 3072
+trafficmode = 206
+inaccuracymode = 0
+Generate switch & server traffic cluster a.
+Total traffic = 6.642540978E9
+Should avoid hot racks? false
+netpath file: /home/annzhou/DRing/src/emp/datacentre/netpathfiles/netpath_14short_rrg.txt
+augment method: -1
+Should use equal share? false
+PrintGraphforMCFFairCondensedForKnownRouting2
+0 ***************************** 
+Fri Feb 10 23:45:28 CST 2023: Starting part 0
+Fri Feb 10 23:45:28 CST 2023: Starting part 1
+Fri Feb 10 23:45:34 CST 2023: 20 of 80 done
+Fri Feb 10 23:45:41 CST 2023: 40 of 80 done
+Fri Feb 10 23:45:45 CST 2023: 60 of 80 done
+Fri Feb 10 23:45:50 CST 2023: Starting part 2
+Fri Feb 10 23:45:51 CST 2023: 20 of 80 done
+Fri Feb 10 23:45:53 CST 2023: 40 of 80 done
+Fri Feb 10 23:45:54 CST 2023: 60 of 80 done
+Fri Feb 10 23:45:55 CST 2023: Starting part 3
+Fri Feb 10 23:45:58 CST 2023: Starting part 4
+Fri Feb 10 23:45:58 CST 2023: 20 of 80 done
+Fri Feb 10 23:45:58 CST 2023: 40 of 80 done
+Fri Feb 10 23:45:58 CST 2023: 60 of 80 done
+Fri Feb 10 23:45:58 CST 2023: Starting part 5
+Fri Feb 10 23:45:59 CST 2023: 20 of 80 done
+Fri Feb 10 23:45:59 CST 2023: 40 of 80 done
+Fri Feb 10 23:46:00 CST 2023: 60 of 80 done
+Done Constructing Graph
+/home/annzhou/topobench/scripts
+9.41085761e-08
+/home/annzhou/topobench/scripts
+/home/annzhou/topobench/scripts
+16short
+NEWSFLASH: USING YOUR RANDOM SEED -----------------------------------------------
+graph file: graphfiles/rrg_instance1_80_64.edgelist
+traffic file: a
+number of switches: 80
+total number of servers = 3072
+trafficmode = 206
+inaccuracymode = 0
+Generate switch & server traffic cluster a.
+Total traffic = 6.642540978E9
+Should avoid hot racks? false
+netpath file: /home/annzhou/DRing/src/emp/datacentre/netpathfiles/netpath_16short_rrg.txt
+augment method: -1
+Should use equal share? false
+PrintGraphforMCFFairCondensedForKnownRouting2
+0 ***************************** 
+Fri Feb 10 23:46:14 CST 2023: Starting part 0
+Fri Feb 10 23:46:14 CST 2023: Starting part 1
+Fri Feb 10 23:46:21 CST 2023: 20 of 80 done
+Fri Feb 10 23:46:27 CST 2023: 40 of 80 done
+Fri Feb 10 23:46:32 CST 2023: 60 of 80 done
+Fri Feb 10 23:46:37 CST 2023: Starting part 2
+Fri Feb 10 23:46:39 CST 2023: 20 of 80 done
+Fri Feb 10 23:46:41 CST 2023: 40 of 80 done
+Fri Feb 10 23:46:42 CST 2023: 60 of 80 done
+Fri Feb 10 23:46:43 CST 2023: Starting part 3
+Fri Feb 10 23:46:46 CST 2023: Starting part 4
+Fri Feb 10 23:46:46 CST 2023: 20 of 80 done
+Fri Feb 10 23:46:46 CST 2023: 40 of 80 done
+Fri Feb 10 23:46:47 CST 2023: 60 of 80 done
+Fri Feb 10 23:46:47 CST 2023: Starting part 5
+Fri Feb 10 23:46:47 CST 2023: 20 of 80 done
+Fri Feb 10 23:46:47 CST 2023: 40 of 80 done
+Fri Feb 10 23:46:48 CST 2023: 60 of 80 done
+Done Constructing Graph
+/home/annzhou/topobench/scripts
+9.48512880e-08
+/home/annzhou/topobench/scripts
+/home/annzhou/topobench/scripts
+18short
+NEWSFLASH: USING YOUR RANDOM SEED -----------------------------------------------
+graph file: graphfiles/rrg_instance1_80_64.edgelist
+traffic file: a
+number of switches: 80
+total number of servers = 3072
+trafficmode = 206
+inaccuracymode = 0
+Generate switch & server traffic cluster a.
+Total traffic = 6.642540978E9
+Should avoid hot racks? false
+netpath file: /home/annzhou/DRing/src/emp/datacentre/netpathfiles/netpath_18short_rrg.txt
+augment method: -1
+Should use equal share? false
+PrintGraphforMCFFairCondensedForKnownRouting2
+0 ***************************** 
+Fri Feb 10 23:47:04 CST 2023: Starting part 0
+Fri Feb 10 23:47:04 CST 2023: Starting part 1
+Fri Feb 10 23:47:15 CST 2023: 20 of 80 done
+Fri Feb 10 23:47:25 CST 2023: 40 of 80 done
+Fri Feb 10 23:47:33 CST 2023: 60 of 80 done
+Fri Feb 10 23:47:43 CST 2023: Starting part 2
+Fri Feb 10 23:47:45 CST 2023: 20 of 80 done
+Fri Feb 10 23:47:47 CST 2023: 40 of 80 done
+Fri Feb 10 23:47:49 CST 2023: 60 of 80 done
+Fri Feb 10 23:47:50 CST 2023: Starting part 3
+Fri Feb 10 23:47:53 CST 2023: Starting part 4
+Fri Feb 10 23:47:53 CST 2023: 20 of 80 done
+Fri Feb 10 23:47:53 CST 2023: 40 of 80 done
+Fri Feb 10 23:47:53 CST 2023: 60 of 80 done
+Fri Feb 10 23:47:53 CST 2023: Starting part 5
+Fri Feb 10 23:47:54 CST 2023: 20 of 80 done
+Fri Feb 10 23:47:54 CST 2023: 40 of 80 done
+Fri Feb 10 23:47:55 CST 2023: 60 of 80 done
+Done Constructing Graph
+/home/annzhou/topobench/scripts
+9.46638626e-08
+/home/annzhou/topobench/scripts
+/home/annzhou/topobench/scripts
+20short
+NEWSFLASH: USING YOUR RANDOM SEED -----------------------------------------------
+graph file: graphfiles/rrg_instance1_80_64.edgelist
+traffic file: a
+number of switches: 80
+total number of servers = 3072
+trafficmode = 206
+inaccuracymode = 0
+Generate switch & server traffic cluster a.
+Total traffic = 6.642540978E9
+Should avoid hot racks? false
+netpath file: /home/annzhou/DRing/src/emp/datacentre/netpathfiles/netpath_20short_rrg.txt
+augment method: -1
+Should use equal share? false
+PrintGraphforMCFFairCondensedForKnownRouting2
+0 ***************************** 
+Fri Feb 10 23:48:11 CST 2023: Starting part 0
+Fri Feb 10 23:48:12 CST 2023: Starting part 1
+Fri Feb 10 23:48:20 CST 2023: 20 of 80 done
+Fri Feb 10 23:48:27 CST 2023: 40 of 80 done
+Fri Feb 10 23:48:36 CST 2023: 60 of 80 done
+Fri Feb 10 23:48:44 CST 2023: Starting part 2
+Fri Feb 10 23:48:46 CST 2023: 20 of 80 done
+Fri Feb 10 23:48:48 CST 2023: 40 of 80 done
+Fri Feb 10 23:48:50 CST 2023: 60 of 80 done
+Fri Feb 10 23:48:51 CST 2023: Starting part 3
+Fri Feb 10 23:48:55 CST 2023: Starting part 4
+Fri Feb 10 23:48:55 CST 2023: 20 of 80 done
+Fri Feb 10 23:48:55 CST 2023: 40 of 80 done
+Fri Feb 10 23:48:55 CST 2023: 60 of 80 done
+Fri Feb 10 23:48:55 CST 2023: Starting part 5
+Fri Feb 10 23:48:56 CST 2023: 20 of 80 done
+Fri Feb 10 23:48:56 CST 2023: 40 of 80 done
+Fri Feb 10 23:48:56 CST 2023: 60 of 80 done
+Done Constructing Graph
+/home/annzhou/topobench/scripts
+9.45211212e-08
+/home/annzhou/topobench/scripts
+/home/annzhou/topobench/scripts
+22short
+NEWSFLASH: USING YOUR RANDOM SEED -----------------------------------------------
+graph file: graphfiles/rrg_instance1_80_64.edgelist
+traffic file: a
+number of switches: 80
+total number of servers = 3072
+trafficmode = 206
+inaccuracymode = 0
+Generate switch & server traffic cluster a.
+Total traffic = 6.642540978E9
+Should avoid hot racks? false
+netpath file: /home/annzhou/DRing/src/emp/datacentre/netpathfiles/netpath_22short_rrg.txt
+augment method: -1
+Should use equal share? false
+PrintGraphforMCFFairCondensedForKnownRouting2
+0 ***************************** 
+Fri Feb 10 23:49:14 CST 2023: Starting part 0
+Fri Feb 10 23:49:14 CST 2023: Starting part 1
+Fri Feb 10 23:49:25 CST 2023: 20 of 80 done
+Fri Feb 10 23:49:36 CST 2023: 40 of 80 done
+Fri Feb 10 23:49:47 CST 2023: 60 of 80 done
+Fri Feb 10 23:49:55 CST 2023: Starting part 2
+Fri Feb 10 23:49:58 CST 2023: 20 of 80 done
+Fri Feb 10 23:50:00 CST 2023: 40 of 80 done
+Fri Feb 10 23:50:02 CST 2023: 60 of 80 done
+Fri Feb 10 23:50:03 CST 2023: Starting part 3
+Fri Feb 10 23:50:07 CST 2023: Starting part 4
+Fri Feb 10 23:50:07 CST 2023: 20 of 80 done
+Fri Feb 10 23:50:07 CST 2023: 40 of 80 done
+Fri Feb 10 23:50:07 CST 2023: 60 of 80 done
+Fri Feb 10 23:50:07 CST 2023: Starting part 5
+Fri Feb 10 23:50:08 CST 2023: 20 of 80 done
+Fri Feb 10 23:50:08 CST 2023: 40 of 80 done
+Fri Feb 10 23:50:09 CST 2023: 60 of 80 done
+Done Constructing Graph
+/home/annzhou/topobench/scripts
+9.54782432e-08
+/home/annzhou/topobench/scripts
+/home/annzhou/topobench/scripts
+24short
+NEWSFLASH: USING YOUR RANDOM SEED -----------------------------------------------
+graph file: graphfiles/rrg_instance1_80_64.edgelist
+traffic file: a
+number of switches: 80
+total number of servers = 3072
+trafficmode = 206
+inaccuracymode = 0
+Generate switch & server traffic cluster a.
+Total traffic = 6.642540978E9
+Should avoid hot racks? false
+netpath file: /home/annzhou/DRing/src/emp/datacentre/netpathfiles/netpath_24short_rrg.txt
+augment method: -1
+Should use equal share? false
+PrintGraphforMCFFairCondensedForKnownRouting2
+0 ***************************** 
+Fri Feb 10 23:50:27 CST 2023: Starting part 0
+Fri Feb 10 23:50:27 CST 2023: Starting part 1
+Fri Feb 10 23:50:37 CST 2023: 20 of 80 done
+Fri Feb 10 23:50:49 CST 2023: 40 of 80 done
+Fri Feb 10 23:51:00 CST 2023: 60 of 80 done
+Fri Feb 10 23:51:12 CST 2023: Starting part 2
+Fri Feb 10 23:51:15 CST 2023: 20 of 80 done
+Fri Feb 10 23:51:17 CST 2023: 40 of 80 done
+Fri Feb 10 23:51:20 CST 2023: 60 of 80 done
+Fri Feb 10 23:51:21 CST 2023: Starting part 3
+Fri Feb 10 23:51:26 CST 2023: Starting part 4
+Fri Feb 10 23:51:26 CST 2023: 20 of 80 done
+Fri Feb 10 23:51:26 CST 2023: 40 of 80 done
+Fri Feb 10 23:51:26 CST 2023: 60 of 80 done
+Fri Feb 10 23:51:26 CST 2023: Starting part 5
+Fri Feb 10 23:51:27 CST 2023: 20 of 80 done
+Fri Feb 10 23:51:27 CST 2023: 40 of 80 done
+Fri Feb 10 23:51:28 CST 2023: 60 of 80 done
+Done Constructing Graph
+/home/annzhou/topobench/scripts
+9.54355513e-08
+/home/annzhou/topobench/scripts
+/home/annzhou/topobench/scripts
+26short
+NEWSFLASH: USING YOUR RANDOM SEED -----------------------------------------------
+graph file: graphfiles/rrg_instance1_80_64.edgelist
+traffic file: a
+number of switches: 80
+total number of servers = 3072
+trafficmode = 206
+inaccuracymode = 0
+Generate switch & server traffic cluster a.
+Total traffic = 6.642540978E9
+Should avoid hot racks? false
+netpath file: /home/annzhou/DRing/src/emp/datacentre/netpathfiles/netpath_26short_rrg.txt
+augment method: -1
+Should use equal share? false
+PrintGraphforMCFFairCondensedForKnownRouting2
+0 ***************************** 
+Fri Feb 10 23:51:47 CST 2023: Starting part 0
+Fri Feb 10 23:51:47 CST 2023: Starting part 1
+Fri Feb 10 23:52:01 CST 2023: 20 of 80 done
+Fri Feb 10 23:52:13 CST 2023: 40 of 80 done
+Fri Feb 10 23:52:28 CST 2023: 60 of 80 done
+Fri Feb 10 23:52:39 CST 2023: Starting part 2
+Fri Feb 10 23:52:41 CST 2023: 20 of 80 done
+Fri Feb 10 23:52:44 CST 2023: 40 of 80 done
+Fri Feb 10 23:52:46 CST 2023: 60 of 80 done
+Fri Feb 10 23:52:48 CST 2023: Starting part 3
+Fri Feb 10 23:52:53 CST 2023: Starting part 4
+Fri Feb 10 23:52:53 CST 2023: 20 of 80 done
+Fri Feb 10 23:52:53 CST 2023: 40 of 80 done
+Fri Feb 10 23:52:53 CST 2023: 60 of 80 done
+Fri Feb 10 23:52:53 CST 2023: Starting part 5
+Fri Feb 10 23:52:53 CST 2023: 20 of 80 done
+Fri Feb 10 23:52:54 CST 2023: 40 of 80 done
+Fri Feb 10 23:52:54 CST 2023: 60 of 80 done
+Done Constructing Graph
+/home/annzhou/topobench/scripts
+9.51800504e-08
+/home/annzhou/topobench/scripts
+/home/annzhou/topobench/scripts
+28short
+NEWSFLASH: USING YOUR RANDOM SEED -----------------------------------------------
+graph file: graphfiles/rrg_instance1_80_64.edgelist
+traffic file: a
+number of switches: 80
+total number of servers = 3072
+trafficmode = 206
+inaccuracymode = 0
+Generate switch & server traffic cluster a.
+Total traffic = 6.642540978E9
+Should avoid hot racks? false
+netpath file: /home/annzhou/DRing/src/emp/datacentre/netpathfiles/netpath_28short_rrg.txt
+augment method: -1
+Should use equal share? false
+PrintGraphforMCFFairCondensedForKnownRouting2
+0 ***************************** 
+Fri Feb 10 23:53:14 CST 2023: Starting part 0
+Fri Feb 10 23:53:14 CST 2023: Starting part 1
+Fri Feb 10 23:53:21 CST 2023: 20 of 80 done
+Fri Feb 10 23:53:29 CST 2023: 40 of 80 done
+Fri Feb 10 23:53:36 CST 2023: 60 of 80 done
+Fri Feb 10 23:53:41 CST 2023: Starting part 2
+Fri Feb 10 23:53:43 CST 2023: 20 of 80 done
+Fri Feb 10 23:53:46 CST 2023: 40 of 80 done
+Fri Feb 10 23:53:49 CST 2023: 60 of 80 done
+Fri Feb 10 23:53:51 CST 2023: Starting part 3
+Fri Feb 10 23:53:56 CST 2023: Starting part 4
+Fri Feb 10 23:53:56 CST 2023: 20 of 80 done
+Fri Feb 10 23:53:56 CST 2023: 40 of 80 done
+Fri Feb 10 23:53:56 CST 2023: 60 of 80 done
+Fri Feb 10 23:53:56 CST 2023: Starting part 5
+Fri Feb 10 23:53:57 CST 2023: 20 of 80 done
+Fri Feb 10 23:53:57 CST 2023: 40 of 80 done
+Fri Feb 10 23:53:58 CST 2023: 60 of 80 done
+Done Constructing Graph
+/home/annzhou/topobench/scripts
+9.53913967e-08
+/home/annzhou/topobench/scripts
+/home/annzhou/topobench/scripts
+30short
+NEWSFLASH: USING YOUR RANDOM SEED -----------------------------------------------
+graph file: graphfiles/rrg_instance1_80_64.edgelist
+traffic file: a
+number of switches: 80
+total number of servers = 3072
+trafficmode = 206
+inaccuracymode = 0
+Generate switch & server traffic cluster a.
+Total traffic = 6.642540978E9
+Should avoid hot racks? false
+netpath file: /home/annzhou/DRing/src/emp/datacentre/netpathfiles/netpath_30short_rrg.txt
+augment method: -1
+Should use equal share? false
+PrintGraphforMCFFairCondensedForKnownRouting2
+0 ***************************** 
+Fri Feb 10 23:54:17 CST 2023: Starting part 0
+Fri Feb 10 23:54:17 CST 2023: Starting part 1
+Fri Feb 10 23:54:31 CST 2023: 20 of 80 done
+Fri Feb 10 23:54:45 CST 2023: 40 of 80 done
+Fri Feb 10 23:54:57 CST 2023: 60 of 80 done
+Fri Feb 10 23:55:08 CST 2023: Starting part 2
+Fri Feb 10 23:55:10 CST 2023: 20 of 80 done
+Fri Feb 10 23:55:13 CST 2023: 40 of 80 done
+Fri Feb 10 23:55:16 CST 2023: 60 of 80 done
+Fri Feb 10 23:55:18 CST 2023: Starting part 3
+Fri Feb 10 23:55:24 CST 2023: Starting part 4
+Fri Feb 10 23:55:24 CST 2023: 20 of 80 done
+Fri Feb 10 23:55:24 CST 2023: 40 of 80 done
+Fri Feb 10 23:55:25 CST 2023: 60 of 80 done
+Fri Feb 10 23:55:25 CST 2023: Starting part 5
+Fri Feb 10 23:55:25 CST 2023: 20 of 80 done
+Fri Feb 10 23:55:26 CST 2023: 40 of 80 done
+Fri Feb 10 23:55:26 CST 2023: 60 of 80 done
+Done Constructing Graph
+/home/annzhou/topobench/scripts
+9.53524498e-08
+/home/annzhou/topobench/scripts
+/home/annzhou/topobench/scripts
+32short
+NEWSFLASH: USING YOUR RANDOM SEED -----------------------------------------------
+graph file: graphfiles/rrg_instance1_80_64.edgelist
+traffic file: a
+number of switches: 80
+total number of servers = 3072
+trafficmode = 206
+inaccuracymode = 0
+Generate switch & server traffic cluster a.
+Total traffic = 6.642540978E9
+Should avoid hot racks? false
+netpath file: /home/annzhou/DRing/src/emp/datacentre/netpathfiles/netpath_32short_rrg.txt
+augment method: -1
+Should use equal share? false
+PrintGraphforMCFFairCondensedForKnownRouting2
+0 ***************************** 
+Fri Feb 10 23:55:48 CST 2023: Starting part 0
+Fri Feb 10 23:55:48 CST 2023: Starting part 1
+Fri Feb 10 23:56:09 CST 2023: 20 of 80 done
+Fri Feb 10 23:56:26 CST 2023: 40 of 80 done
+Fri Feb 10 23:56:39 CST 2023: 60 of 80 done
+Fri Feb 10 23:56:52 CST 2023: Starting part 2
+Fri Feb 10 23:56:55 CST 2023: 20 of 80 done
+Fri Feb 10 23:56:58 CST 2023: 40 of 80 done
+Fri Feb 10 23:57:01 CST 2023: 60 of 80 done
+Fri Feb 10 23:57:03 CST 2023: Starting part 3
+Fri Feb 10 23:57:09 CST 2023: Starting part 4
+Fri Feb 10 23:57:09 CST 2023: 20 of 80 done
+Fri Feb 10 23:57:09 CST 2023: 40 of 80 done
+Fri Feb 10 23:57:09 CST 2023: 60 of 80 done
+Fri Feb 10 23:57:09 CST 2023: Starting part 5
+Fri Feb 10 23:57:10 CST 2023: 20 of 80 done
+Fri Feb 10 23:57:10 CST 2023: 40 of 80 done
+Fri Feb 10 23:57:11 CST 2023: 60 of 80 done
+Done Constructing Graph
+/home/annzhou/topobench/scripts
+9.44559979e-08
+/home/annzhou/topobench/scripts
+/home/annzhou/topobench/scripts
+34short
+NEWSFLASH: USING YOUR RANDOM SEED -----------------------------------------------
+graph file: graphfiles/rrg_instance1_80_64.edgelist
+traffic file: a
+number of switches: 80
+total number of servers = 3072
+trafficmode = 206
+inaccuracymode = 0
+Generate switch & server traffic cluster a.
+Total traffic = 6.642540978E9
+Should avoid hot racks? false
+netpath file: /home/annzhou/DRing/src/emp/datacentre/netpathfiles/netpath_34short_rrg.txt
+augment method: -1
+Should use equal share? false
+PrintGraphforMCFFairCondensedForKnownRouting2
+0 ***************************** 
+Fri Feb 10 23:57:33 CST 2023: Starting part 0
+Fri Feb 10 23:57:33 CST 2023: Starting part 1
+Fri Feb 10 23:57:48 CST 2023: 20 of 80 done
+Fri Feb 10 23:58:01 CST 2023: 40 of 80 done
+Fri Feb 10 23:58:16 CST 2023: 60 of 80 done
+Fri Feb 10 23:58:35 CST 2023: Starting part 2
+Fri Feb 10 23:58:38 CST 2023: 20 of 80 done
+Fri Feb 10 23:58:41 CST 2023: 40 of 80 done
+Fri Feb 10 23:58:44 CST 2023: 60 of 80 done
+Fri Feb 10 23:58:47 CST 2023: Starting part 3
+Fri Feb 10 23:58:53 CST 2023: Starting part 4
+Fri Feb 10 23:58:53 CST 2023: 20 of 80 done
+Fri Feb 10 23:58:53 CST 2023: 40 of 80 done
+Fri Feb 10 23:58:53 CST 2023: 60 of 80 done
+Fri Feb 10 23:58:53 CST 2023: Starting part 5
+Fri Feb 10 23:58:53 CST 2023: 20 of 80 done
+Fri Feb 10 23:58:54 CST 2023: 40 of 80 done
+Fri Feb 10 23:58:55 CST 2023: 60 of 80 done
+Done Constructing Graph
+/home/annzhou/topobench/scripts
+9.51412163e-08
+/home/annzhou/topobench/scripts
+/home/annzhou/topobench/scripts
+36short
+NEWSFLASH: USING YOUR RANDOM SEED -----------------------------------------------
+graph file: graphfiles/rrg_instance1_80_64.edgelist
+traffic file: a
+number of switches: 80
+total number of servers = 3072
+trafficmode = 206
+inaccuracymode = 0
+Generate switch & server traffic cluster a.
+Total traffic = 6.642540978E9
+Should avoid hot racks? false
+netpath file: /home/annzhou/DRing/src/emp/datacentre/netpathfiles/netpath_36short_rrg.txt
+augment method: -1
+Should use equal share? false
+PrintGraphforMCFFairCondensedForKnownRouting2
+0 ***************************** 
+Fri Feb 10 23:59:15 CST 2023: Starting part 0
+Fri Feb 10 23:59:15 CST 2023: Starting part 1
+Fri Feb 10 23:59:32 CST 2023: 20 of 80 done
+Fri Feb 10 23:59:46 CST 2023: 40 of 80 done
+Fri Feb 10 23:59:59 CST 2023: 60 of 80 done
+Sat Feb 11 00:00:12 CST 2023: Starting part 2
+Sat Feb 11 00:00:15 CST 2023: 20 of 80 done
+Sat Feb 11 00:00:19 CST 2023: 40 of 80 done
+Sat Feb 11 00:00:22 CST 2023: 60 of 80 done
+Sat Feb 11 00:00:25 CST 2023: Starting part 3
+Sat Feb 11 00:00:31 CST 2023: Starting part 4
+Sat Feb 11 00:00:31 CST 2023: 20 of 80 done
+Sat Feb 11 00:00:32 CST 2023: 40 of 80 done
+Sat Feb 11 00:00:32 CST 2023: 60 of 80 done
+Sat Feb 11 00:00:32 CST 2023: Starting part 5
+Sat Feb 11 00:00:32 CST 2023: 20 of 80 done
+Sat Feb 11 00:00:33 CST 2023: 40 of 80 done
+Sat Feb 11 00:00:34 CST 2023: 60 of 80 done
+Done Constructing Graph
+/home/annzhou/topobench/scripts
+9.54649008e-08
+/home/annzhou/topobench/scripts
+/home/annzhou/topobench/scripts
+38short
+NEWSFLASH: USING YOUR RANDOM SEED -----------------------------------------------
+graph file: graphfiles/rrg_instance1_80_64.edgelist
+traffic file: a
+number of switches: 80
+total number of servers = 3072
+trafficmode = 206
+inaccuracymode = 0
+Generate switch & server traffic cluster a.
+Total traffic = 6.642540978E9
+Should avoid hot racks? false
+netpath file: /home/annzhou/DRing/src/emp/datacentre/netpathfiles/netpath_38short_rrg.txt
+augment method: -1
+Should use equal share? false
+PrintGraphforMCFFairCondensedForKnownRouting2
+0 ***************************** 
+Sat Feb 11 00:00:56 CST 2023: Starting part 0
+Sat Feb 11 00:00:56 CST 2023: Starting part 1
+Sat Feb 11 00:01:04 CST 2023: 20 of 80 done
+Sat Feb 11 00:01:12 CST 2023: 40 of 80 done
+Sat Feb 11 00:01:19 CST 2023: 60 of 80 done
+Sat Feb 11 00:01:26 CST 2023: Starting part 2
+Sat Feb 11 00:01:29 CST 2023: 20 of 80 done
+Sat Feb 11 00:01:33 CST 2023: 40 of 80 done
+Sat Feb 11 00:01:36 CST 2023: 60 of 80 done
+Sat Feb 11 00:01:39 CST 2023: Starting part 3
+Sat Feb 11 00:01:46 CST 2023: Starting part 4
+Sat Feb 11 00:01:46 CST 2023: 20 of 80 done
+Sat Feb 11 00:01:46 CST 2023: 40 of 80 done
+Sat Feb 11 00:01:46 CST 2023: 60 of 80 done
+Sat Feb 11 00:01:46 CST 2023: Starting part 5
+Sat Feb 11 00:01:47 CST 2023: 20 of 80 done
+Sat Feb 11 00:01:47 CST 2023: 40 of 80 done
+Sat Feb 11 00:01:48 CST 2023: 60 of 80 done
+Done Constructing Graph
+/home/annzhou/topobench/scripts
+9.54581412e-08
+/home/annzhou/topobench/scripts
+/home/annzhou/topobench/scripts
+40short
+NEWSFLASH: USING YOUR RANDOM SEED -----------------------------------------------
+graph file: graphfiles/rrg_instance1_80_64.edgelist
+traffic file: a
+number of switches: 80
+total number of servers = 3072
+trafficmode = 206
+inaccuracymode = 0
+Generate switch & server traffic cluster a.
+Total traffic = 6.642540978E9
+Should avoid hot racks? false
+netpath file: /home/annzhou/DRing/src/emp/datacentre/netpathfiles/netpath_40short_rrg.txt
+augment method: -1
+Should use equal share? false
+PrintGraphforMCFFairCondensedForKnownRouting2
+0 ***************************** 
+Sat Feb 11 00:02:12 CST 2023: Starting part 0
+Sat Feb 11 00:02:12 CST 2023: Starting part 1
+Sat Feb 11 00:02:30 CST 2023: 20 of 80 done
+Sat Feb 11 00:02:45 CST 2023: 40 of 80 done
+Sat Feb 11 00:03:02 CST 2023: 60 of 80 done
+Sat Feb 11 00:03:16 CST 2023: Starting part 2
+Sat Feb 11 00:03:20 CST 2023: 20 of 80 done
+Sat Feb 11 00:03:24 CST 2023: 40 of 80 done
+Sat Feb 11 00:03:28 CST 2023: 60 of 80 done
+Sat Feb 11 00:03:31 CST 2023: Starting part 3
+Sat Feb 11 00:03:38 CST 2023: Starting part 4
+Sat Feb 11 00:03:38 CST 2023: 20 of 80 done
+Sat Feb 11 00:03:38 CST 2023: 40 of 80 done
+Sat Feb 11 00:03:39 CST 2023: 60 of 80 done
+Sat Feb 11 00:03:39 CST 2023: Starting part 5
+Sat Feb 11 00:03:39 CST 2023: 20 of 80 done
+Sat Feb 11 00:03:40 CST 2023: 40 of 80 done
+Sat Feb 11 00:03:40 CST 2023: 60 of 80 done
+Done Constructing Graph
+/home/annzhou/topobench/scripts
+9.53792802e-08
+/home/annzhou/topobench/scripts
+/home/annzhou/topobench/scripts

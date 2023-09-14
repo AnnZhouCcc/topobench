@@ -1963,10 +1963,10 @@ public class TrafficMatrix {
             String strLine = "";
             while ((strLine = br.readLine()) != null) {
                 StringTokenizer strTok = new StringTokenizer(strLine);
-                String token = strTok.nextToken();
-                String[] tokens = token.split(" ");
-                srcswslist.add(Integer.parseInt(tokens[0]));
-                dstswslist.add(Integer.parseInt(tokens[1]));
+                String token1 = strTok.nextToken();
+                String token2 = strTok.nextToken();
+                srcswslist.add(Integer.parseInt(token1));
+                dstswslist.add(Integer.parseInt(token2));
             }
             br.close();
         } catch (Exception e) {
@@ -2164,7 +2164,7 @@ public class TrafficMatrix {
         }
         System.out.println("Total traffic = " + totalTraffic);
 
-        writeServerLevelMatrix();
+        //writeServerLevelMatrix();
         //writeSwitchLevelMatrix();
         //printSwitchLevelMatrix("resultfiles/clustera_tm.txt");
     }

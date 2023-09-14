@@ -1,0 +1,58 @@
+/home/annzhou/topobench/scripts
+dring opt clustera
+NEWSFLASH: USING YOUR RANDOM SEED -----------------------------------------------
+graph file: graphfiles/dring_instance1_80_64.edgelist
+traffic file: a
+number of switches: 80
+total number of servers = 2988
+trafficmode = 206
+inaccuracymode = 0
+Generate switch & server traffic cluster a.
+Total traffic = 6.318607985E9
+Should avoid hot racks? false
+PrintGraphforMCFFairCondensed
+ ***************************** 
+Sat Feb 11 13:30:55 CST 2023: Starting part 0
+Sat Feb 11 13:30:56 CST 2023: Starting part 1
+Sat Feb 11 13:30:56 CST 2023: 20 of 80 done
+Sat Feb 11 13:30:57 CST 2023: 40 of 80 done
+Sat Feb 11 13:30:57 CST 2023: 60 of 80 done
+Sat Feb 11 13:30:57 CST 2023: Starting part 2
+Sat Feb 11 13:31:00 CST 2023: 20 of 80 done
+Sat Feb 11 13:31:01 CST 2023: 40 of 80 done
+Sat Feb 11 13:31:03 CST 2023: 60 of 80 done
+Sat Feb 11 13:31:04 CST 2023: Starting part 3
+Done Constructing Graph
+/home/annzhou/topobench/scripts
+9.90222672e-08
+/home/annzhou/topobench/scripts
+/home/annzhou/topobench/scripts
+/home/annzhou/topobench/scripts
+dring opt clustera
+NEWSFLASH: USING YOUR RANDOM SEED -----------------------------------------------
+graph file: graphfiles/dring_instance1_80_64.edgelist
+traffic file: a
+number of switches: 80
+total number of servers = 2988
+trafficmode = 206
+inaccuracymode = 0
+Generate switch & server traffic cluster a.
+Total traffic = 6.318607985E9
+Should avoid hot racks? false
+PrintGraphforMCFFairCondensed
+ ***************************** 
+Sat Feb 11 16:29:24 CST 2023: Starting part 0
+Sat Feb 11 16:29:24 CST 2023: Starting part 1
+Sat Feb 11 16:29:24 CST 2023: 20 of 80 done
+Sat Feb 11 16:29:25 CST 2023: 40 of 80 done
+Sat Feb 11 16:29:25 CST 2023: 60 of 80 done
+Sat Feb 11 16:29:26 CST 2023: Starting part 2
+Sat Feb 11 16:29:27 CST 2023: 20 of 80 done
+Sat Feb 11 16:29:28 CST 2023: 40 of 80 done
+Sat Feb 11 16:29:30 CST 2023: 60 of 80 done
+Sat Feb 11 16:29:31 CST 2023: Starting part 3
+Done Constructing Graph
+/home/annzhou/topobench/scripts
+9.90222672e-08
+/home/annzhou/topobench/scripts
+/home/annzhou/topobench/scripts

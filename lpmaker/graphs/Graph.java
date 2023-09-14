@@ -1007,7 +1007,7 @@ public class Graph
 	// If slack is set to 3, flows can not deviate more than 2 hops from their shortest path distance
 	private boolean isFlowZero(FlowID flowID, int linkFrom, int linkTo)
 	{
-		int SLACK = 6;
+		int SLACK = 10;
 		int srcSw = flowID.srcSwitch;
 		int destSw = flowID.dstSwitch;
 
@@ -1019,7 +1019,7 @@ public class Graph
 
 	static public boolean isFlowZero(int srcSw, int destSw, int linkFrom, int linkTo)
 	{
-		int SLACK = 6;
+		int SLACK = 10;
 //		int srcSw = flowID.srcSwitch;
 //		int destSw = flowID.dstSwitch;
 
@@ -1030,7 +1030,7 @@ public class Graph
 	}
 
 	static public boolean fasterIsFlowZero(int srcSw, int destSw, int linkFrom, int linkTo, int numServers) {
-		int SLACK = 6;
+		int SLACK = 10;
 		if (linkFrom < numServers) {
 			if (linkFrom == srcSw) return false;
 			return true;
