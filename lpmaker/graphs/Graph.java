@@ -3993,9 +3993,10 @@ public void PrintGraphforMCFFairCondensedForKnownRouting3(String filename, Strin
 		}
 
 		try {
-			BufferedWriter out = new BufferedWriter(new FileWriter("intermediatefiles/networkthroughput"));
-			out.write(networkthroughput + "\n");
-			out.close();
+			//BufferedWriter out = new BufferedWriter(new FileWriter("intermediatefiles/networkthroughput"));
+			//out.write(networkthroughput + "\n");
+			//out.close();
+			System.out.println(networkthroughput);
 		} catch (Exception e) {
 			System.err.println("Graph EvaluateEqualPath Error: " + e.getMessage());
 			e.printStackTrace();
