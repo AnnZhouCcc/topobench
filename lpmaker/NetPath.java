@@ -27,9 +27,9 @@ public class NetPath {
 
     public ArrayList<Path>[][] pathPool;
     HashMap<Integer, Double>[][] pathWeights;
-    NPLink[][] linkPool;
+    public NPLink[][] linkPool;
     ArrayList<Rack> rackPool;
-    ArrayList<LinkUsageTuple>[][] linksUsage;
+    public ArrayList<LinkUsageTuple>[][] linksUsage;
 
     boolean shouldAvoidHotRacks;
     HashSet<Integer> hotRacks;
