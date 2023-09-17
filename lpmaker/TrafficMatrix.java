@@ -64,6 +64,22 @@ public class TrafficMatrix {
         generateTraffic(trafficfile, a, b, numServersPerSwitches, rrgnet, lsnet, trafficfileList, decayList);
     }
 
+    public TrafficMatrix(int _numSwitches, int trafficMode, String trafficfile, Graph mynet, int a, int b, int[] numServersPerSwitches, int _timeframeStart, int _timeframeEnd, GraphFromFileSrcDstPair rrgnet, LeafSpine lsnet, ArrayList<Integer> timeframestartList, ArrayList<Integer> timeframeendList, ArrayList<Double> decayList) {
+        numSwitches = _numSwitches;
+        numServers = mynet.totalWeight;
+        int numNodes = numServers+numSwitches;
+        switchLevelMatrix = new double[numSwitches][numSwitches];
+        serverLevelMatrix = new double[numServers][numServers];
+        serverTrafficMatrix = new double[numNodes][numNodes];
+        trafficmode = trafficMode;
+        topology = mynet;
+        hotRacks = new HashSet<>();
+        timeframeStart = _timeframeStart;
+        timeframeEnd = _timeframeEnd;
+
+        generateTraffic(trafficfile, a, b, numServersPerSwitches, rrgnet, lsnet, timeframestartList, timeframeendList, decayList);
+    }
+
     // Send from all servers to some random server
     public void TrafficGenAllToOne()
     {
@@ -2226,6 +2242,114 @@ public class TrafficMatrix {
         //printSwitchLevelMatrix("resultfiles/clustera_tm.txt");
     }
 
+    public void generateSwitchServerTrafficFromFileForClusterSud(String cluster, ArrayList<Integer> timeframestartList, ArrayList<Integer> timeframeendList, ArrayList<Double> decayList) {
+        System.out.println("Generate switch & server traffic from file for cluster Sud");
+//        String file_prefix = "../DRing/src/emp/datacentre/trafficfiles/cluster_" + trafficFile + "/traffic/traffic_64racks";
+//        String file_prefix = "../../DataParsing/outputs/cluster_" + cluster + "/traffic/traffic_64racks";
+
+        ArrayList<Double> scalingList = new ArrayList<>();
+        double totalTraffic = 1e9;
+        for (int m=0; m<decayList.size(); m++) {
+            double currTotalTraffic = 0;
+            String file_prefix = "/home/annzhou/DRing/src/emp/datacentre/trafficfiles/cluster_" + cluster + "/traffic_64racks";
+//        String file_prefix = "../../DataParsing/outputs/cluster_" + cluster + "/traffic/traffic_64racks";
+            String[] file_suffix = {};
+            if (cluster.equals("a")) {
+                file_suffix = new String[]{"_0_273"};
+            } else if (cluster.equals("b")) {
+                file_suffix = new String[]{"_0_500","_500_1000","_1000_1500","_1500_2000","_2000_2500","_2500_2900"};
+            } else if (cluster.equals("c")) {
+                file_suffix = new String[]{"_0_273"};
+            } else {
+                System.out.println("***Error: unknown cluster, cluster " + cluster);
+            }
+
+            int timeframestart = timeframestartList.get(m);
+            int timeframeend = timeframeendList.get(m);
+
+            try {
+                BufferedReader br;
+                String strLine = "";
+                for (int f=0; f<file_suffix.length; f++) {
+                    String trafficfile = file_prefix + file_suffix[f];
+                    br = new BufferedReader(new FileReader(trafficfile));
+                    while ((strLine = br.readLine()) != null){
+                        StringTokenizer strTok = new StringTokenizer(strLine);
+                        int timestamp = Integer.parseInt(strTok.nextToken());
+                        double traffic = Double.parseDouble(strTok.nextToken());
+                        int srcsvr = Integer.parseInt(strTok.nextToken());
+                        int dstsvr = Integer.parseInt(strTok.nextToken());
+                        if (srcsvr>=topology.totalWeight) continue;
+                        if (dstsvr>=topology.totalWeight) continue;
+
+                        if (timestamp >= timeframeend) break;
+                        if (timestamp >= timeframestart && timestamp < timeframeend) {
+                            currTotalTraffic += traffic;
+                        }
+                    }
+                    br.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            scalingList.add(totalTraffic/currTotalTraffic);
+        }
+
+        for (int m=0; m<decayList.size(); m++) {
+            String file_prefix = "/home/annzhou/DRing/src/emp/datacentre/trafficfiles/cluster_" + cluster + "/traffic_64racks";
+//        String file_prefix = "../../DataParsing/outputs/cluster_" + cluster + "/traffic/traffic_64racks";
+            String[] file_suffix = {};
+            if (cluster.equals("a")) {
+                file_suffix = new String[]{"_0_273"};
+            } else if (cluster.equals("b")) {
+                file_suffix = new String[]{"_0_500","_500_1000","_1000_1500","_1500_2000","_2000_2500","_2500_2900"};
+            } else if (cluster.equals("c")) {
+                file_suffix = new String[]{"_0_273"};
+            } else {
+                System.out.println("***Error: unknown cluster, cluster " + cluster);
+            }
+
+            int timeframestart = timeframestartList.get(m);
+            int timeframeend = timeframeendList.get(m);
+            double scaling_factor = scalingList.get(m);
+
+            try {
+                BufferedReader br;
+                String strLine = "";
+                for (int f=0; f<file_suffix.length; f++) {
+                    String trafficfile = file_prefix + file_suffix[f];
+                    br = new BufferedReader(new FileReader(trafficfile));
+                    while ((strLine = br.readLine()) != null){
+                        StringTokenizer strTok = new StringTokenizer(strLine);
+                        int timestamp = Integer.parseInt(strTok.nextToken());
+                        double traffic = Double.parseDouble(strTok.nextToken());
+                        int srcsvr = Integer.parseInt(strTok.nextToken());
+                        int dstsvr = Integer.parseInt(strTok.nextToken());
+                        if (srcsvr>=topology.totalWeight) continue;
+                        if (dstsvr>=topology.totalWeight) continue;
+                        int srcsw = topology.svrToSwitch(srcsvr);
+                        int dstsw = topology.svrToSwitch(dstsvr);
+
+                        if (timestamp >= timeframeend) break;
+                        if (timestamp >= timeframestart && timestamp < timeframeend) {
+                            serverLevelMatrix[srcsvr][dstsvr] += traffic * scaling_factor;
+                            switchLevelMatrix[srcsw][dstsw] += traffic * scaling_factor;
+                        }
+                    }
+                    br.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+//        System.out.println("Total traffic = " + totalTraffic);
+
+        //writeServerLevelMatrix();
+        //writeSwitchLevelMatrix();
+        //printSwitchLevelMatrix("resultfiles/clustera_tm.txt");
+    }
+
     public void generateSwitchServerTrafficMix(int n, int t, LeafSpine lsnet) {
         System.out.println("Generate switch & server traffic mix, n="+n+", t="+t);
         double unitTraffic = 1;
@@ -2464,139 +2588,33 @@ public class TrafficMatrix {
         }
     }
 
+    public void generateTraffic(String trafficfile, int a, int b, int[] numServersPerSwitches, GraphFromFileSrcDstPair rrgnet, LeafSpine lsnet, ArrayList<Integer> timeframestartList, ArrayList<Integer> timeframeendList, ArrayList<Double> decayList) {
+        // traffic-mode: 0 = randPerm; 1 = all-all; 2 = all-to-one; Any higher n means stride(n)
+        int inaccuracymode = 0;
+        System.out.println("trafficmode = " + trafficmode);
+        System.out.println("inaccuracymode = " + inaccuracymode);
+
+        switch(trafficmode) {
+            case 301:
+                generateSwitchServerTrafficFromFileForClusterSud(trafficfile, timeframestartList, timeframeendList, decaylist);
+                break;
+            default:
+                System.out.println("Trafficmode is not recognized.");
+        }
+    }
+
     public void generateTraffic(String trafficfile, int a, int b, int[] numServersPerSwitches, GraphFromFileSrcDstPair rrgnet, LeafSpine lsnet, ArrayList<String> trafficfilelist, ArrayList<Double> decaylist) {
         // traffic-mode: 0 = randPerm; 1 = all-all; 2 = all-to-one; Any higher n means stride(n)
         int inaccuracymode = 0;
         System.out.println("trafficmode = " + trafficmode);
         System.out.println("inaccuracymode = " + inaccuracymode);
 
-        if (trafficmode == 0) {
-            RandomPermutationPairs(numServers);
-        }
-        else if (trafficmode == 1) {
-            TrafficGenAllAll();
-        }
-        else if (trafficmode == 2) {
-            TrafficGenAllToOne();
-        }
-        else if (trafficmode == 3) {
-            TrafficGenStride(trafficmode);
-        }
-        else if (trafficmode == 4) {
-            MaxWeightPairs("maxWeightMatch.txt");System.out.println("*******MAX-WEIGHT-MATCHING************");
-        }
-        else if (trafficmode == 5 || trafficmode == 6) {
-            TrafficGenRackLevelAllToAll();
-        }
-        else if (trafficmode == 7) {
-            TrafficGenFromFileHelper(inaccuracymode, trafficfile);
-        }
-        else if (trafficmode == 8) {
-            TrafficGenARackToBRack(a, b, numServersPerSwitches);
-        }
-        else if (trafficmode == 9) {
-            TrafficGenMixA(a, numServersPerSwitches);
-        }
-        else if (trafficmode == 10) {
-            TrafficGenRacktoRackHardCoding(numServersPerSwitches);
-        }
-        else if (trafficmode == 11) {
-            TrafficGenCsSkewedHardCoding();
-        }
-        else if (trafficmode == 12) {
-            TrafficGenFromFileClusterX(trafficfile);
-        }
-        else if (trafficmode == 13) {
-            TrafficGenFromFileClusterXPacketAdjusted(trafficfile);
-        }
-        else if (trafficmode == 14) {
-            TrafficGenClusterX(trafficfile);
-        }
-        else if (trafficmode == 15) {
-            TrafficGenPermutationRackLevel();
-        }
-        else if (trafficmode == 16) {
-            TrafficGenPermutationServerLevel();
-        }
-        else if (trafficmode == 17) {
-            TrafficGenCss16to4HardCoding();
-        }
-        else if (trafficmode == 18) {
-            TrafficGenAlltoAllHardCoding();
-        }
-        else if (trafficmode == 19) {
-            TrafficGenPermutationHardCoding();
-        }
-        /*
-        else if (trafficmode == 20) {
-            TrafficGenAlltoAllHardCoding2();
-        }
-        else if (trafficmode == 21) {
-            TrafficGenPermutationHardCoding2();
-        }
-         */
-        else if (trafficmode == 100) {
-            generateTrafficAllServerToAllServer();
-        }
-        else if (trafficmode == 101) {
-            generateTrafficRRGUniform(rrgnet);
-        }
-        else if (trafficmode == 102) {
-            generateTrafficRackPermutation(lsnet);
-        }
-        else if (trafficmode == 103) {
-            generateTrafficRRGRackPermutation(rrgnet);
-        }
-        else if (trafficmode == 104) {
-            generateTrafficServerPermutation();
-        }
-        else if (trafficmode == 105) {
-            generateTrafficARackToBRack(a,b,lsnet);
-        }
-        else if (trafficmode == 106) {
-            generateTrafficClusterX(trafficfile);
-        }
-        else if (trafficmode == 107) {
-            generateTrafficMix(a,b,lsnet);
-        }
-        else if (trafficmode == 200) {
-            generateSwitchServerTrafficAllServerToAllServer();
-        }
-        else if (trafficmode == 201) {
-            generateSwitchServerTrafficARackToBRackFromFile(a,b,trafficfile,lsnet);
-        }
-        else if (trafficmode == 202) {
-            generateSwitchServerTrafficRackPermutation(lsnet);
-        }
-        else if (trafficmode == 204) {
-            generateSwitchServerTrafficServerPermutation();
-        }
-        else if (trafficmode == 205) {
-            generateSwitchServerTrafficARackToBRack(a,b,lsnet);
-        }
-        else if (trafficmode == 206) {
-            generateSwitchServerTrafficClusterX(trafficfile);
-        }
-        else if (trafficmode == 207) {
-            generateSwitchServerTrafficMix(a,b,lsnet);
-        }
-        else if (trafficmode == 208) {
-            generateSwitchServerTrafficARackToBRackFromFileFlat(a,b,trafficfile);
-        }
-        else if (trafficmode == 209) {
-            generateSwitchServerTrafficARackToBRackFromFileServer(a,b,trafficfile);
-        }
-        else if (trafficmode == 210) {
-            generateSwitchServerTrafficARackToBRackFromFileRandom(a,b,trafficfile);
-        }
-        else if (trafficmode == 211) {
-            generateSwitchServerTrafficPermutationFromFile(trafficfile);
-        }
-        else if (trafficmode == 300) {
-            generateSwitchServerTrafficFromFileSud(trafficfilelist, decaylist);
-        }
-        else {
-            System.out.println("Trafficmode is not recognized.");
+        switch(trafficmode) {
+            case 300:
+                generateSwitchServerTrafficFromFileSud(trafficfilelist, decaylist);
+                break;
+            default:
+                System.out.println("Trafficmode is not recognized.");
         }
     }
 
