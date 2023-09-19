@@ -3935,7 +3935,7 @@ public void PrintGraphforMCFFairCondensedForKnownRouting3(String filename, Strin
 
 		for (int f=0; f<noNodes; f++) {
 			for (int t=0; t<noNodes; t++) {
-				weights[f][t] = new HashMap<>();
+				weights[f][t] = new HashMap<>(); // weights for paths from f to t
 			}
 		}
 
@@ -3964,10 +3964,17 @@ public void PrintGraphforMCFFairCondensedForKnownRouting3(String filename, Strin
 					double trafficThisFlow = switchLevelMatrix[f][t];
 					ArrayList<Path> paths = pathPool[f][t];
 					HashMap<Integer,Double> pathweight = weights[f][t];
-					for (int pid=0; pid<paths.size(); pid++) {
+					if (pathweight.size() == 0) {
+						// then equally divide
+						double equalWeight = 1.0/paths.size();
+						for (int p=0; p<paths.size(); p++) {
+							pathweight.put(p,equalWeight);
+						}
+					}
+					for (int pid = 0; pid < paths.size(); pid++) {
 						if (pathweight.containsKey(pid)) {
 							double weight = pathweight.get(pid);
-							double trafficThisPath = trafficThisFlow*weight;
+							double trafficThisPath = trafficThisFlow * weight;
 							Path path = paths.get(pid);
 							for (NPLink link : path.path) {
 								traffic[link.from][link.to] += trafficThisPath;
