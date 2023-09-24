@@ -2313,6 +2313,7 @@ public class TrafficMatrix {
             int timeframestart = timeframestartList.get(m);
             int timeframeend = timeframeendList.get(m);
             double scaling_factor = scalingList.get(m);
+	    double decay_factor = decayList.get(m);
 
             try {
                 BufferedReader br;
@@ -2333,8 +2334,8 @@ public class TrafficMatrix {
 
                         if (timestamp >= timeframeend) break;
                         if (timestamp >= timeframestart && timestamp < timeframeend) {
-                            serverLevelMatrix[srcsvr][dstsvr] += traffic * scaling_factor;
-                            switchLevelMatrix[srcsw][dstsw] += traffic * scaling_factor;
+                            serverLevelMatrix[srcsvr][dstsvr] += traffic * scaling_factor * decay_factor;
+                            switchLevelMatrix[srcsw][dstsw] += traffic * scaling_factor * decay_factor;
                         }
                     }
                     br.close();
@@ -2596,7 +2597,7 @@ public class TrafficMatrix {
 
         switch(trafficmode) {
             case 301:
-                generateSwitchServerTrafficFromFileForClusterSud(trafficfile, timeframestartList, timeframeendList, decaylist);
+                generateSwitchServerTrafficFromFileForClusterSud(trafficfile, timeframestartList, timeframeendList, decayList);
                 break;
             default:
                 System.out.println("Trafficmode is not recognized.");
