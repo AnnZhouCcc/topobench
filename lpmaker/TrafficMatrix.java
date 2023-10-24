@@ -77,7 +77,7 @@ public class TrafficMatrix {
         timeframeStart = _timeframeStart;
         timeframeEnd = _timeframeEnd;
 
-        generateTraffic(trafficfile, a, b, numServersPerSwitches, rrgnet, lsnet, timeframestartList, timeframeendList, decayList);
+        generateTraffic(trafficfile, a, b, numServersPerSwitches, rrgnet, lsnet);
     }
 
     // Send from all servers to some random server
@@ -2026,6 +2026,39 @@ public class TrafficMatrix {
         //writeSwitchLevelMatrix();
     }
 
+    public void generateSwitchServerTrafficC2C(String trafficfile) {
+        System.out.println("Generate switch & server traffic C2C, file="+trafficfile);
+
+        double totalTraffic = 0;
+        double unitTraffic = 1;
+        String mytrafficfile = "/home/annzhou/DRing/src/emp/datacentre/trafficfiles/c2c/"+trafficfile;
+        try {
+            BufferedReader br;
+            String strLine = "";
+            br = new BufferedReader(new FileReader(mytrafficfile));
+            while ((strLine = br.readLine()) != null) {
+                StringTokenizer strTok = new StringTokenizer(strLine);
+                int srcsvr = Integer.parseInt(strTok.nextToken());
+                int dstsvr = Integer.parseInt(strTok.nextToken());
+                if (srcsvr >= topology.totalWeight) continue;
+                if (dstsvr >= topology.totalWeight) continue;
+                int srcsw = topology.svrToSwitch(srcsvr);
+                int dstsw = topology.svrToSwitch(dstsvr);
+                serverLevelMatrix[srcsvr][dstsvr] += unitTraffic;
+                switchLevelMatrix[srcsw][dstsw] += unitTraffic;
+                totalTraffic += unitTraffic;
+            }
+            br.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        System.out.println("Total traffic = " + totalTraffic);
+
+        //writeServerLevelMatrix();
+        //writeSwitchLevelMatrix();
+    }
+
     public void generateSwitchServerTrafficRackPermutation(LeafSpine lsnet) {
         System.out.println("Generate switch & server traffic rack permutation.");
         double unitTraffic = 1;
@@ -2583,6 +2616,9 @@ public class TrafficMatrix {
         }
         else if (trafficmode == 211) {
             generateSwitchServerTrafficPermutationFromFile(trafficfile);
+        }
+        else if (trafficmode == 212) {
+            generateSwitchServerTrafficC2C(trafficfile);
         }
         else {
             System.out.println("Trafficmode is not recognized.");
