@@ -1,0 +1,244 @@
+Academic license - for non-commercial use only - expires 2024-01-08
+Using license file /home/annzhou/gurobi.lic
+Set parameter Method to value 2
+Set parameter Crossover to value 0
+Set parameter LogFile to value gurobi.log
+Set parameter NonConvex to value 2
+
+Gurobi Optimizer version 9.1.2 build v9.1.2rc0 (linux64)
+Copyright (c) 2021, Gurobi Optimization, LLC
+
+Read LP format model from file ../my.0.lp
+Reading time = 0.02 seconds
+obj: 10560 rows, 8193 columns, 32564 nonzeros
+Thread count: 20 physical cores, 40 logical processors, using up to 20 threads
+Optimize a model with 10560 rows, 8193 columns and 32564 nonzeros
+Model fingerprint: 0x874eed0a
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [1e+00, 1e+00]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [1e+00, 1e+00]
+Presolve removed 8196 rows and 104 columns
+Presolve time: 0.01s
+Presolved: 2364 rows, 8089 columns, 24062 nonzeros
+Ordering time: 0.00s
+
+Barrier statistics:
+ AA' NZ     : 1.997e+04
+ Factor NZ  : 5.988e+04 (roughly 5 MBytes of memory)
+ Factor Ops : 7.312e+06 (less than 1 second per iteration)
+ Threads    : 1
+
+                  Objective                Residual
+Iter       Primal          Dual         Primal    Dual     Compl     Time
+   0   1.11636411e+00  7.98184755e-01  1.27e+00 6.52e-01  7.58e-01     0s
+   1   2.37085286e+00  1.21318777e+03  1.26e-14 6.66e-16  1.19e-01     0s
+   2   3.56242707e+00  1.46999795e+02  1.56e-14 4.44e-16  1.41e-02     0s
+   3   1.04392472e+01  2.59136702e+01  7.94e-15 2.22e-16  1.53e-03     0s
+   4   1.24717514e+01  1.29122888e+01  6.15e-14 8.33e-17  4.34e-05     0s
+   5   1.24969926e+01  1.25025496e+01  8.50e-12 7.53e-17  5.48e-07     0s
+   6   1.24999970e+01  1.25000025e+01  1.51e-10 8.33e-17  5.48e-10     0s
+   7   1.25000000e+01  1.25000000e+01  1.78e-10 1.11e-16  5.84e-16     0s
+
+Barrier solved model in 7 iterations and 0.05 seconds
+Optimal objective 1.25000000e+01
+
+Academic license - for non-commercial use only - expires 2024-01-08
+Using license file /home/annzhou/gurobi.lic
+Set parameter Method to value 2
+Set parameter Crossover to value 0
+Set parameter LogFile to value gurobi.log
+Set parameter NonConvex to value 2
+
+Gurobi Optimizer version 9.1.2 build v9.1.2rc0 (linux64)
+Copyright (c) 2021, Gurobi Optimization, LLC
+
+Read LP format model from file ../my.1.lp
+Reading time = 0.02 seconds
+obj: 10560 rows, 8193 columns, 32568 nonzeros
+Thread count: 20 physical cores, 40 logical processors, using up to 20 threads
+Optimize a model with 10560 rows, 8193 columns and 32568 nonzeros
+Model fingerprint: 0xeb752c44
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  Objective range  [1e+00, 1e+00]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [1e+00, 1e+00]
+Presolve removed 8196 rows and 104 columns
+Presolve time: 0.01s
+Presolved: 2364 rows, 8089 columns, 24066 nonzeros
+Ordering time: 0.00s
+
+Barrier statistics:
+ AA' NZ     : 1.997e+04
+ Factor NZ  : 5.961e+04 (roughly 5 MBytes of memory)
+ Factor Ops : 7.283e+06 (less than 1 second per iteration)
+ Threads    : 1
+
+                  Objective                Residual
+Iter       Primal          Dual         Primal    Dual     Compl     Time
+   0   1.11431844e+00  7.96139442e-01  1.27e+00 6.51e-01  7.56e-01     0s
+   1   2.35389818e+00  1.28229947e+03  1.28e-14 6.66e-16  1.26e-01     0s
+   2   3.81024265e+00  1.48926718e+02  1.46e-14 5.00e-16  1.43e-02     0s
+   3   9.54074807e+00  2.72719050e+01  5.61e-15 6.94e-17  1.75e-03     0s
+   4   1.20228158e+01  1.29957388e+01  3.25e-13 2.22e-16  9.60e-05     0s
+   5   1.22439603e+01  1.23198508e+01  6.32e-12 8.33e-17  7.49e-06     0s
+   6   1.22499919e+01  1.22501244e+01  1.21e-12 2.22e-16  1.31e-08     0s
+   7   1.22500000e+01  1.22500000e+01  9.96e-10 1.11e-16  1.31e-14     0s
+
+Barrier solved model in 7 iterations and 0.06 seconds
+Optimal objective 1.22500000e+01
+
+Academic license - for non-commercial use only - expires 2024-01-08
+Using license file /home/annzhou/gurobi.lic
+Set parameter Method to value 2
+Set parameter Crossover to value 0
+Set parameter LogFile to value gurobi.log
+Set parameter NonConvex to value 2
+
+Gurobi Optimizer version 9.1.2 build v9.1.2rc0 (linux64)
+Copyright (c) 2021, Gurobi Optimization, LLC
+
+Warning: Duplicate section found (read 'SUBJECT TO') - Is a variable name equal to an LP file format keyword?
+Read LP format model from file ../my.2.lp
+Reading time = 0.07 seconds
+obj: 21120 rows, 24579 columns, 65132 nonzeros
+Thread count: 20 physical cores, 40 logical processors, using up to 20 threads
+Optimize a model with 21120 rows, 24579 columns and 65132 nonzeros
+Model fingerprint: 0x3b8cc352
+Model has 16384 quadratic constraints
+Coefficient statistics:
+  Matrix range     [1e+00, 1e+00]
+  QMatrix range    [1e+00, 1e+00]
+  QLMatrix range   [1e+00, 1e+00]
+  Objective range  [1e+00, 1e+00]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [1e+00, 1e+00]
+Presolve removed 16384 rows and 0 columns
+
+Continuous model is non-convex -- solving as a MIP.
+
+Found heuristic solution: objective -0.0000000
+Presolve removed 16392 rows and 260 columns
+Presolve time: 0.08s
+Presolved: 69432 rows, 24320 columns, 161360 nonzeros
+Presolved model has 104 SOS constraint(s)
+Presolved model has 16176 bilinear constraint(s)
+Variable types: 24320 continuous, 0 integer (0 binary)
+Root barrier log...
+
+Ordering time: 0.00s
+
+Barrier statistics:
+ AA' NZ     : 3.996e+04
+ Factor NZ  : 1.195e+05 (roughly 10 MBytes of memory)
+ Factor Ops : 1.459e+07 (less than 1 second per iteration)
+ Threads    : 1
+
+                  Objective                Residual
+Iter       Primal          Dual         Primal    Dual     Compl     Time
+   0   1.04702317e+01  2.38740231e+01  7.90e+00 3.06e-02  8.99e-01     1s
+   1   1.57179325e+00  2.46844970e+03  4.82e-14 8.88e-16  6.87e-02     1s
+   2   3.38960329e+00  1.22896851e+02  5.08e-15 2.00e-04  3.32e-03     1s
+   3   1.06863471e+01  2.21717986e+01  5.33e-15 7.60e-06  3.17e-04     1s
+   4   1.22262887e+01  1.55050548e+01  3.96e-13 1.84e-07  9.06e-05     1s
+   5   1.21587293e+01  1.22761526e+01  8.61e-12 1.11e-16  3.22e-06     2s
+   6   1.22498800e+01  1.22506151e+01  5.80e-10 8.33e-17  2.02e-08     2s
+   7   1.22500000e+01  1.22500000e+01  2.29e-09 8.33e-17  2.99e-14     2s
+
+Barrier solved model in 7 iterations and 1.51 seconds
+Optimal objective 1.22500000e+01
+
+
+Root relaxation: objective 1.225000e+01, 15322 iterations, 0.71 seconds
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0   12.25000    0 3751   -0.00000   12.25000      -     -    2s
+     0     0   12.25000    0 3751   -0.00000   12.25000      -     -    2s
+     0     2   12.25000    0 3751   -0.00000   12.25000      -     -   10s
+     1     4   12.25000    1 3039   -0.00000   12.25000      - 13716   21s
+     3     8   12.25000    2 2401   -0.00000   12.25000      - 18343   52s
+     7    14   12.25000    3 2337   -0.00000   12.25000      - 13777  114s
+    15    20   12.25000    4 2192   -0.00000   12.25000      - 11443  749s
+    29    26   12.25000    5 2252   -0.00000   12.25000      - 41093  862s
+    49    28   12.25000    6 2203   -0.00000   12.25000      - 27287  961s
+    69    32   12.25000    7 1708   -0.00000   12.25000      - 23962 1268s
+    89    34     cutoff    8        -0.00000   12.25000      - 22302 1374s
+   109    38   12.25000    8 1708   -0.00000   12.25000      - 19625 1392s
+   141    43   12.25000    9 1728   -0.00000   12.25000      - 16142 1403s
+   172    48     cutoff   10        -0.00000   12.25000      - 13958 1414s
+   205    51   12.25000   10 1868   -0.00000   12.25000      - 12388 1436s
+   238    53     cutoff   11        -0.00000   12.25000      - 11339 1462s
+   278    59   12.25000   11 1818   -0.00000   12.25000      - 10387 1478s
+   314    60     cutoff   12        -0.00000   12.25000      -  9626 1492s
+   363    67   12.25000   12 1687   -0.00000   12.25000      -  8823 1518s
+   416    71   12.25000   13 1840   -0.00000   12.25000      -  8188 1550s
+   466    76     cutoff   14        -0.00000   12.25000      -  7796 1568s
+   517    81   12.25000   14 1822   -0.00000   12.25000      -  7461 1582s
+   576   106     cutoff   15        -0.00000   12.25000      -  7050 1704s
+   637   143   12.25000   15 1833   -0.00000   12.25000      -  6742 1722s
+   714   175     cutoff   16        -0.00000   12.25000      -  6309 1758s
+   806   221   12.25000   16 2834   -0.00000   12.25000      -  5895 1789s
+   900   302   12.25000   17 1676   -0.00000   12.25000      -  5491 1813s
+  1045   501     cutoff   17        -0.00000   12.25000      -  4984 1852s
+  1342  1151   12.25000   19 1727   -0.00000   12.25000      -  4228 1931s
+  2120  3134     cutoff   21        -0.00000   12.25000      -  3048 2142s
+  4300  3136   12.25000   71    0   -0.00000   12.25000      -  1800 2148s
+  4302  3138    6.40956  322    0   -0.00000   12.25000      -  1799 2156s
+  4303  3141   12.25000   12 2998   -0.00000   12.25000      -  1805 2163s
+  4305  3145   12.25000   13 3319   -0.00000   12.25000      -  1810 2197s
+  4309  3149   12.25000   14 2031   -0.00000   12.25000      -  1823 2448s
+  4317  3153   12.25000   15 1670   -0.00000   12.25000      -  1887 3833s
+  4331  3154   12.25000   16 1947   -0.00000   12.25000      -  2281 3879s
+  4351  3149   12.25000   17 2054   -0.00000   12.25000      -  2305 3918s
+  4371  3149   12.25000   18 1272   -0.00000   12.25000      -  2337 3929s
+  4391  3144     cutoff   19        -0.00000   12.25000      -  2340 3939s
+  4411  3140   12.25000   19 1223   -0.00000   12.25000      -  2345 3946s
+  4438  3133     cutoff   20        -0.00000   12.25000      -  2350 3954s
+  4468  3126   12.25000   20 1115   -0.00000   12.25000      -  2352 3966s
+  4497  3114     cutoff   21        -0.00000   12.25000      -  2360 3981s
+  4526  3114   12.25000   21 1284   -0.00000   12.25000      -  2368 4008s
+  4560  3107     cutoff   22        -0.00000   12.25000      -  2373 4023s
+  4600  3098   12.25000   22 2365   -0.00000   12.25000      -  2378 4037s
+  4643  3086     cutoff   23        -0.00000   12.25000      -  2376 4055s
+  4695  3072   12.25000   23 1251   -0.00000   12.25000      -  2376 4071s
+  4748  3065     cutoff   24        -0.00000   12.25000      -  2375 4081s
+  4811  3048   12.25000   24 1292   -0.00000   12.25000      -  2367 4092s
+  4883  3032     cutoff   25        -0.00000   12.25000      -  2360 4102s
+  4965  3009   12.25000   25 2325   -0.00000   12.25000      -  2348 4146s
+  5055  2979     cutoff   26        -0.00000   12.25000      -  2346 4162s
+  5145  2957   12.25000   26 2290   -0.00000   12.25000      -  2336 4182s
+  5229  2924     cutoff   27        -0.00000   12.25000      -  2344 4192s
+  5308  2906   12.25000   27 1246   -0.00000   12.25000      -  2348 4231s
+  5387  2865     cutoff   28        -0.00000   12.25000      -  2378 4266s
+  5458  2839   12.25000   28 1248   -0.00000   12.25000      -  2404 4288s
+  5540  2801     cutoff   29        -0.00000   12.25000      -  2417 4319s
+  5607  2758   12.25000   29 1165   -0.00000   12.25000      -  2435 4360s
+  5698  2723     cutoff   30        -0.00000   12.25000      -  2448 4529s
+  5770  2691   12.25000   31 1229   -0.00000   12.25000      -  2464 4665s
+  5856  2664   12.25000   32 1217   -0.00000   12.25000      -  2465 4758s
+  5951  2638   12.25000   33 2193   -0.00000   12.25000      -  2465 4932s
+  6075  2602   12.25000   34 1252   -0.00000   12.25000      -  2464 5280s
+  6180  2593     cutoff   35        -0.00000   12.25000      -  2524 5349s
+  6322  2567   12.25000   35 1311   -0.00000   12.25000      -  2540 5405s
+* 6374  2393              72       0.0000143   12.25000      -  2535 5405s
+  6458  2371     cutoff   36         0.00001   12.25000      -  2572 5500s
+  6558  2344     cutoff   37         0.00001   12.25000      -  2613 5639s
+  6652  2322   12.25000   38 2443    0.00001   12.25000      -  2651 5689s
+  6770  2343   12.25000   39 1319    0.00001   12.25000      -  2688 5731s
+
+Interrupt request received
+  6928  2380     cutoff   40         0.00001   12.25000      -  2690 5751s
+* 6962  2219              74       0.0000143   12.25000      -  2679 5751s
+* 7086  2037              73       0.0000223   12.25000      -  2667 5751s
+
+Explored 7106 nodes (18990957 simplex iterations) in 5751.56 seconds
+Thread count was 20 (of 40 available processors)
+
+Solution count 4: 2.22829e-05 1.43213e-05 1.42818e-05 -0 
+
+Solve interrupted
+Best objective 2.228293675092e-05, best bound 1.225000000000e+01, gap 54974700.3907%

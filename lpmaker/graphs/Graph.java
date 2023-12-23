@@ -1057,13 +1057,6 @@ public class Graph
 			FileWriter fstream = new FileWriter(filename);
 			BufferedWriter out = new BufferedWriter(fstream);
 
-			// Nodes
-			int numEdges = 0;
-			for(int i=0; i<noNodes; i++)
-			{
-				numEdges += adjacencyList[i].size();
-			}
-
 			// Edges
 			int edgeID = 0;
 			int edgeCapacity = 1;
@@ -2209,6 +2202,195 @@ public class Graph
 		catch (Exception e)
 		{
 			System.err.println("PrintGraphforMCFFairCondensedForKnownRouting2 Error: " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
+
+
+	// AnnC: template copied from PrintGraphforMCFFairCondensed
+	public void PrintLPMultipleTM(String filename, double[][][] switchLevelMatrixSeries) {
+		try {
+			modifiedFloydWarshall();
+			FileWriter fstream = new FileWriter(filename);
+			BufferedWriter out = new BufferedWriter(fstream);
+
+			//< Objective
+			out.write("Maximize \n");
+			out.write("obj: ");
+			out.write("K");
+
+			out.write("\n\nSUBJECT TO \n");
+
+			for (int mid=0; mid<switchLevelMatrixSeries.length; mid++) {
+				System.out.println("====switchLevelMatrix " + mid + "====");
+				double[][] switchLevelMatrix = switchLevelMatrixSeries[mid];
+
+				int numFlows = 0;
+				for (int f = 0; f < noNodes; f ++) {
+					for (int t = 0; t < noNodes; t++) {
+						if (f!=t && switchLevelMatrix[f][t]>0) numFlows++;
+					}		
+				}
+
+				// the filename typically comes in the format of mp.[runs].lp
+				String[] tokens = filename.split("\\/|\\.");
+				String file_index = tokens[1];
+
+				FlowID[] allFlowIDs = new FlowID[numFlows];
+				int curfID=0;
+				Writer flowIdmapWriter = new BufferedWriter(new FileWriter("flowIDmap" + file_index));
+				for (int f = 0; f < noNodes; f++) {
+					for (int t = 0; t < noNodes; t++) {
+						if(f!=t && switchLevelMatrix[f][t]>0) {
+							allFlowIDs[curfID] = new FlowID(curfID, f, t);
+							flowIdmapWriter.write(curfID + " " + f + " " + t + "\n");
+							curfID++;
+						}
+					}	
+				}
+				flowIdmapWriter.close();
+
+				//<Constraints of Type 0: fairness i.e. flow >= K
+				int fid=0;
+				out.write("\\Type 0: Flow >= K*TM\n");
+				System.out.println(new Date() + ": Starting part 0");
+				for (int f = 0; f < noNodes; f++) {
+					for (int t = 0; t < noNodes; t++) {
+						if(f!=t && switchLevelMatrix[f][t]>0) {	  //for each flow fid with source f
+							String constraint = "c_"+mid+"_0_" + fid + ": ";
+							boolean writeCons = false;
+							for(int j=0; j<adjacencyList[f].size(); j++) {  //for each out link of f = (f,j)
+								if (!isFlowZero(allFlowIDs[fid], f, adjacencyList[f].get(j).linkTo)) {
+									constraint += "-f_" + mid + "_" + fid + "_" + f + "_" + adjacencyList[f].get(j).linkTo + " ";
+									writeCons = true;
+								}
+							}
+							if (writeCons) {
+								constraint += " + " + switchLevelMatrix[f][t] + " K <= 0\n";
+								out.write(constraint);
+							}
+							fid++;
+						}
+					}
+				}
+
+				//<Constraints of Type 1: Load on link <= max_load
+				out.write("\n\\Type 1: Load on link <= max_load\n");
+				System.out.println(new Date() + ": Starting part 1");
+				for(int i=0; i<noNodes; i++) {
+					for(int j=0; j<adjacencyList[i].size(); j++) {
+						String constraint = "";
+						boolean writeCons = false;
+						for(int fd_=0; fd_<numFlows; fd_++) {
+							if (!isFlowZero(allFlowIDs[fd_], i, adjacencyList[i].get(j).linkTo)) {
+								constraint += "f_" + mid + "_" + fd_ + "_" + i + "_" + adjacencyList[i].get(j).linkTo+ " + ";
+								writeCons = true;
+							}
+						}
+						if(constraint.endsWith("+ ")) constraint = constraint.substring(0, constraint.lastIndexOf("+")-1);
+						if(writeCons) {
+							out.write("c_"+mid+"_1_" + i + "_" + adjacencyList[i].get(j).linkTo + ": " + constraint + " <= " +  adjacencyList[i].get(j).linkcapacity+ "\n");
+						}
+					}
+					if (i > 0 && i % 20 == 0) System.out.println(new Date() + ": "+i+" of "+noNodes+" done");
+				}
+
+				//<Constraints of Type 2: Flow conservation at non-source, non-destination
+				System.out.println(new Date() + ": Starting part 2");
+				out.write("\n\\Type 2: Flow conservation at non-source, non-destination\n");
+				fid = 0;
+				for (int f = 0; f < noNodes; f++) {
+					for (int t = 0; t < noNodes; t++) {
+						if (f!=t && switchLevelMatrix[f][t] > 0) {       //for each flow fid
+							for (int u = 0; u < noNodes; u++) {   //for each node u
+								String constraint = "";
+								boolean writeCons = false;
+								if (u == f) {   //src
+									constraint = "c_"+mid+"_2_" + fid + "_" + u + "_2: ";
+									for (int j = 0; j < adjacencyList[u].size(); j++) {  //for each in link of u = (j,u)
+										if (!isFlowZero(allFlowIDs[fid], adjacencyList[u].get(j).linkTo, u)) {
+											constraint += "f_" + mid + "_" + fid + "_" + adjacencyList[u].get(j).linkTo + "_" + u + " + ";
+											writeCons = true;
+										}
+									}
+									if (constraint.endsWith("+ ")) constraint = constraint.substring(0, constraint.lastIndexOf("+") - 1);
+									if (writeCons) out.write(constraint + " = 0\n");
+								} else if (u == t) {
+								} else {  // non-src and non-dest
+									constraint = "c_"+mid+"_2_" + fid + "_" + u + "_3: ";
+									for (int j = 0; j < adjacencyList[u].size(); j++) {   //for each out link of u = (u,j)
+										if (!isFlowZero(allFlowIDs[fid], u, adjacencyList[u].get(j).linkTo)) {
+											constraint += "f_" + mid + "_" + fid + "_" + u + "_" + adjacencyList[u].get(j).linkTo + " + ";
+											writeCons = true;
+										}
+									}
+									if (constraint.endsWith("+ ")) constraint = constraint.substring(0, constraint.lastIndexOf("+") - 1);
+									constraint += " - ";
+
+									for (int j = 0; j < adjacencyList[u].size(); j++) {  //for each in link of u = (j,u)
+										if (!isFlowZero(allFlowIDs[fid], adjacencyList[u].get(j).linkTo, u)) {
+											constraint += "f_" + mid + "_" + fid + "_" + adjacencyList[u].get(j).linkTo + "_" + u + " - ";
+											writeCons = true;
+										}
+									}
+									if (constraint.endsWith("- ")) constraint = constraint.substring(0, constraint.lastIndexOf("-") - 1);
+									if (writeCons) out.write(constraint + " = 0\n");
+								}
+							}
+							fid++;
+						}
+					}
+					if (f > 0 && f % 20 == 0) System.out.println(new Date() + ": " + f + " of " + noNodes + " done");
+				}
+
+				// <Constraints of Type 3: Flow >= 0 for any flow on any link
+				out.write("\n\\Type 3: Flow >= 0 for any flow on any link\n");
+				System.out.println(new Date() + ": Starting part 3");
+				fid = 0;
+				for (int f = 0; f < noNodes; f++) {
+					for (int t = 0; t < noNodes; t++) {
+						if (f!=t && switchLevelMatrix[f][t] > 0) { // for each flow fid from f to t
+							for (int u = 0; u < noNodes; u++) { // for each node u
+								for (int j = 0; j < adjacencyList[u].size(); j++) { // for each out link of u = (u,j)
+									if (!isFlowZero(allFlowIDs[fid], u, adjacencyList[u].get(j).linkTo)) {
+										String constraint = "c_" + mid + "_3_" + fid + "_" + u + "_" + adjacencyList[u].get(j).linkTo + ": ";
+										constraint += "f_" + mid + "_" + fid + "_" + u + "_" + adjacencyList[u].get(j).linkTo + " >= 0\n";
+										out.write(constraint);
+									}
+								}
+							}
+							fid++;
+						}
+					}
+				}
+
+				// <Constraints of Type 4:
+				out.write("\n\\Type 4: \n");
+				System.out.println(new Date() + ": Starting part 4");
+				fid = 0;
+				for (int f = 0; f < noNodes; f++) {
+					for (int t = 0; t < noNodes; t++) {
+						if (f!=t && switchLevelMatrix[f][t] > 0) { // for each flow fid from f to t
+							for (int u = 0; u < noNodes; u++) { // for each node u
+								for (int j = 0; j < adjacencyList[u].size(); j++) { // for each out link of u = (u,j)
+									if (!isFlowZero(allFlowIDs[fid], u, adjacencyList[u].get(j).linkTo)) {
+										String constraint = "c_"+mid+"_4_" + fid + "_" + u + "_" + adjacencyList[u].get(j).linkTo + ": ";
+										constraint += "f_" + mid + "_" + fid + "_" + u + "_" + adjacencyList[u].get(j).linkTo + " - [ b_"+fid+"_"+u+"_"+adjacencyList[u].get(j).linkTo + " * r_"+mid+" ] = 0\n";
+										out.write(constraint);
+									}
+								}
+							}
+							fid++;
+						}
+					}
+				}
+			}
+			
+			out.write("End\n");
+			out.close();
+		}
+		catch (Exception e) {
+			System.err.println("PrintLPMultipleTM Error: " + e.getMessage());
 			e.printStackTrace();
 		}
 	}

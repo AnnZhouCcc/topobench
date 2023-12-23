@@ -80,6 +80,55 @@ public class TrafficMatrix {
         generateTraffic(trafficfile, a, b, numServersPerSwitches, rrgnet, lsnet);
     }
 
+    // AnnC: a dedicated constructor only for ProduceLPMultipleTM
+    public TrafficMatrix(int numsw, int c, int randomSeed) {
+        numSwitches = numsw;
+        switchLevelMatrix = new double[numSwitches][numSwitches];
+        // legacy setup
+        numServers = 0;
+        int numNodes = numServers+numSwitches;
+        serverLevelMatrix = new double[numServers][numServers];
+        serverTrafficMatrix = new double[numNodes][numNodes];
+        trafficmode = 0;
+        topology = null;
+        hotRacks = new HashSet<>();
+        timeframeStart = 0;
+        timeframeEnd = 0;
+
+        // produce c2c traffic
+        Random rand = new Random(randomSeed);
+        HashSet<Integer> senderRacks = new HashSet<>();
+        for (int i=0; i<c; i++) {
+            senderRacks.add(rand.nextInt(numSwitches));
+        }
+        HashSet<Integer> receiverRacks = new HashSet<>();
+        for (int i=0; i<c; i++) {
+            if (c <= numSwitches/3) {
+                // No repetition
+                while (true) {
+                    int nextRack = rand.nextInt(numSwitches);
+                    if (!senderRacks.contains(nextRack)) {
+                        receiverRacks.add(nextRack);
+                        break;
+                    }
+                }
+            } else {
+                receiverRacks.add(rand.nextInt(numSwitches));
+            }
+        }
+
+        double unitTraffic = 1;
+        double totalTraffic = 0;
+        for (Integer s : senderRacks) {
+            for (Integer r : receiverRacks) {
+                switchLevelMatrix[s][r] += unitTraffic;
+                totalTraffic += unitTraffic;
+            }
+        }
+
+        System.out.println("Total traffic = " + totalTraffic);
+    }
+
     // Send from all servers to some random server
     public void TrafficGenAllToOne()
     {
